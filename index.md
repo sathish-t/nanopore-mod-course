@@ -5,6 +5,8 @@ title: Home
 
 In this comprehensive two-day course, participants will learn how to use nanopore sequencing to detect DNA base modifications. Designed to be used to accompany the course and also for self-guided students.
 
+<img src="{{ site.earlhamlogo }}" alt="Earlham Institute logo">
+
 For Students
 : <a href="{{ site.baseurl}}/syllabus">
   <i class="fa fa-file-text-o fa-fw"></i> Syllabus</a>
