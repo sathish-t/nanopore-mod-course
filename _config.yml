@@ -9,18 +9,18 @@ kramdown:
 permalink:        pretty
 
 # Setup
-title:            Data Carpentry for Biologists
-description:      'Teaching the tools to get computers to do cool science'
-url:              http://www.datacarpentry.org/semester-biology
-baseurl:          /semester-biology
-email:            datacarpentrysemester@weecology.org
-feedbackurl:      docs.google.com/forms/d/1y35uJukuZ9MPKQWWqw0Y8R4VOiaOtFJezDY_t_kJfTs/
+title:            Detection of DNA base modification using nanopore sequencing
+description:      'In this comprehensive two-day course, participants will learn how to use nanopore sequencing to detect DNA base modifications'
+url:              https://sathish-t.github.io/nanopore-mod-course
+baseurl:          /nanopore-mod-course
+email:            sathish.thiyagarajan@earlham.ac.uk
+feedbackurl:      https://docs.google.com/forms/d/e/1FAIpQLSexsorpRrVaKZ2Am-dSf9QcivNkrF0_S7X0oeHk2rcJKx3kNA/viewform
 author:
-  name:           'Ethan White'
-  url:            https://twitter.com/ethanwhite
+  name:           'Sathish Thiyagarajan'
+  url:            https://twitter.com/unintegrable
 
 github:
-  repo:           https://github.com/datacarpentry/semester-biology
+  repo:           https://github.com/sathish-t/nanopore-mod-course
   #               Be sure the 'Issues' feature is activated in 'Settings'
 
 plugins:
