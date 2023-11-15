@@ -3,9 +3,7 @@ layout: page
 title: Home
 ---
 
-An introduction to working with data for biologists including: data structure, data manipulation, visualization, basic programming, and databases.
-Designed to be used as a flipped university course and also for self-guided
-students.
+In this comprehensive two-day course, participants will learn how to use nanopore sequencing to detect DNA base modifications. Designed to be used to accompany the course and also for self-guided students.
 
 For Students
 : <a href="{{ site.baseurl}}/syllabus">
@@ -35,6 +33,4 @@ For Instructors
 : <a href="{{ site.baseurl}}/docs">
   <i class="fa fa-question-circle fa-fw"></i> Course Development Help</a>
 
-The material is designed to be modify and remixed to create your own 
-courses. Collaborative development and contributions by 
-are welcome. 
+The material is designed to be modify and remixed to create your own courses. Collaborative development and contributions by others are welcome. 
