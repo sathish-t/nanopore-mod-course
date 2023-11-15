@@ -15,6 +15,7 @@ url:              https://sathish-t.github.io/nanopore-mod-course
 baseurl:          /nanopore-mod-course
 email:            sathish.thiyagarajan@earlham.ac.uk
 feedbackurl:      https://docs.google.com/forms/d/e/1FAIpQLSexsorpRrVaKZ2Am-dSf9QcivNkrF0_S7X0oeHk2rcJKx3kNA/viewform
+earlhamlogo:      https://www.earlham.ac.uk/themes/custom/earlham/dist/svg/logo.svg
 author:
   name:           'Sathish Thiyagarajan'
   url:            https://twitter.com/unintegrable
