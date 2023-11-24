@@ -7,7 +7,7 @@ Self-Guided Students
 : <a href="{{ site.baseurl}}/START-for-self-guided-students">
   <i class="fa fa-play-circle fa-fw"></i> Start Here</a>
 
-Semester-long Course Students
+Training Course Students
 : <a href="{{ site.baseurl}}/computer-setup">
   <i class="fa fa-download fa-fw"></i> Setup</a>
 : <a href="{{ site.baseurl}}/syllabus">
