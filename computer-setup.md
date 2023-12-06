@@ -13,10 +13,9 @@ Please also consult the course prerequisites listed [here](https://www.earlham.a
 
 ### If you are a self-study student
 
-We use the following software packages in the course. 
-We have tested the materials using the corresponding versions of the software.
-NOTE: As the course material is under active development, we may not use all the software
-below for the course.
+We use the software packages below. Please install the corresponding versions.
+You are not expected to know how to code in python or R.
+You would only need to be able to run programs written in these languages.
 
 ```bash
 bedtools -version
@@ -40,13 +39,22 @@ samtools --version | head -n 2
 # Using htslib 1.18
 R --version | head -n 1
 # R version 4.1.2 (2021-11-01) -- "Bird Hippie"
+git --version
+# git version 2.25.1
+```
+
+We also need the repository https://github.com/DNAReplicationLab/DNAscentTools/.
+Get it using the command
+
+```bash
+git clone https://github.com/DNAReplicationLab/DNAscentTools.git
 ```
 
 #### Software packages used in python and R
 
-We installed the following software packages on top of the base installs of python and R.
+We need the following software packages on top of the base installs of python and R.
 
-In Python, we installed:
+In Python, we need:
 - h5py
 - modbampy
 - numpy
@@ -55,7 +63,7 @@ In Python, we installed:
 - pandas 
 - pysam
 
-In R, we installed the following software packages.
+In R, we need:
 - ggplot2
 - hexbin
 - devtools
