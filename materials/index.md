@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Lecture Materials
+title: Hands-on Materials
 ---
 
 TBD
