@@ -18,12 +18,10 @@ For Students
   <i class="fa fa-download fa-fw"></i> Datasets</a>
 
 For Instructors
-: <a href="{{ site.baseurl}}/readings">
-  <i class="fa fa-book fa-fw"></i> Readings</a>
 : <a href="{{ site.baseurl}}/lectures">
   <i class="fa fa-comment fa-fw"></i> Lectures</a>
 : <a href="{{ site.baseurl}}/materials">
-  <i class="fa fa-list-alt fa-fw"></i> Lecture Materials</a>
+  <i class="fa fa-list-alt fa-fw"></i> Hands-on Materials</a>
 : <a href="{{ site.baseurl}}/exercises">
   <i class="fa fa-magic fa-fw"></i> Exercises</a>
 : <a href="{{ site.baseurl}}/docs">
