@@ -8,16 +8,16 @@ title: Syllabus
 ### Day 1
 
 - Course overview and introduction to nanopore sequencing
-- Considerations for high molecular weight DNA extraction and library making
+- Considerations for high molecular weight DNA extraction and library preparation
 - Principles and practice of modified base detection
-- Sequence alignment and pycoQC
-- Base modification detection
-- Case study
-- Visualization of spatial profile of modification density per read with genome browser
+- Hands on: sequence alignment and pycoQC
+- Hands on: base modification detection
+- Hands on: genome browser visualization of base modification data
 
 ### Day 2
 
-- Manipulation of base modification data
+- Hands on: manipulation of base modification data
 - Case study
-- Single molecule base modification data visualization
-- Comparison of methods for base modification detection
+- Hands on: comparison of methods for single molecule base modification detection 
+- Hands on: single molecule base modification data visualisation
+- Review modification detection pipeline and Q & A
