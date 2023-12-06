@@ -3,7 +3,7 @@ layout: page
 title: Computer Setup
 ---
 
-## Overall Instructions
+## Instructions
 
 ### If you are a participant in the training course
 
@@ -16,6 +16,7 @@ Please also consult the course prerequisites listed [here](https://www.earlham.a
 We use the software packages below. Please install the corresponding versions.
 You are not expected to know how to code in python or R.
 You would only need to be able to run programs written in these languages.
+Please also consult the course prerequisites listed [here](https://www.earlham.ac.uk/events/detection-dna-base-modification-using-nanopore-sequencing).
 
 ```bash
 bedtools -version
@@ -43,11 +44,14 @@ git --version
 # git version 2.25.1
 ```
 
-We also need the repository https://github.com/DNAReplicationLab/DNAscentTools/.
-Get it using the command
+We also need the [DNAscentTools](https://github.com/DNAReplicationLab/DNAscentTools/) repository.
+Get the latest version using the command below and then checkout to the version denoted by the commit
+string `6bacc1f`.
 
 ```bash
 git clone https://github.com/DNAReplicationLab/DNAscentTools.git
+cd DNAscentTools/
+git checkout 6bacc1f
 ```
 
 #### Software packages used in python and R
