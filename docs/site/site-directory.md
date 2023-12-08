@@ -33,6 +33,9 @@ Marked (`#`) files and directories are [course customization]({{ site.baseurl }}
 ├── _site                      | Jekyll builds HTML for all site pages
 |                              | Course Materials
 ├── about                      #   Motivation and support documents
+├── assignments                |   Assignments documents
+|   ├── language-descr.md      |     lower case file names
+|   └── ...                    |
 ├── code                       |   Code files used in exercises
 ├── data                       |   Data files used in exercises
 ├── docs                       |   Course & site help docs; Templates
@@ -50,6 +53,9 @@ Marked (`#`) files and directories are [course customization]({{ site.baseurl }}
 |   ├── css                    | Style sheet for Hyde site theme
 |   └── favicon.ico            | Browser tab icon file 
 |                              | Course Materials (Cont.)
+├── readings                   |   Reading materials
+|   ├── LANGUAGE-descr.md      |     File name matches assignment
+|   └── ...                    |
 └── solutions                  |   Solutions documents
     ├── Topic-tit...guage-1.txt|     File name matches exercise
     ├── Topic-tit...guage-2.jpg|     Number if multiple; any .ext
