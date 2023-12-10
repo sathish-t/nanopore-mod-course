@@ -77,11 +77,11 @@ cd DNAscentTools/
 git checkout 6bacc1f
 ```
 
-We need the latest version of the [course]({{ site.baseurl }}) repository.
+We need the latest version of the course repository.
 
 ```bash
 # cd to a suitable folder where you store your scripts or make one and cd to it.
-git clone {{ site.baseurl }}
+git clone {{ site.github.repo }}
 ```
 
 #### Software packages used in python and R
@@ -102,3 +102,26 @@ In R, we need:
 - hexbin
 - devtools
 - ggthemes
+
+
+## Descriptions of software packages and links to their documentation and installation instructions
+
+We list the software packages we use with a brief description and useful links below.
+
+## Dorado  
+
+Oxford NanoporeTech's latest, open-source basecaller.
+Takes raw nanopore currents as input and produces DNA sequences and optionally modification calls as output
+using a set of learned model parameters that associates bases with current characteristics.
+Input formats are fast5 or pod5. Output format is .bam by default and other formats if requested.
+- [Installation and documentation](https://github.com/nanoporetech/dorado)
+
+
+## Modkit
+
+Oxford NanoporeTech's powerful tool to convert modification data from a machine-readable format stored in BAM files
+to a human-friendly, tab-separated format after optional, user-requested data processing steps. The tool can perform
+sophisticated analysis like [differential methylation scoring](https://nanoporetech.github.io/modkit/intro_dmr.html).
+
+- [Installation](https://github.com/nanoporetech/modkit)
+- [Documentation](https://nanoporetech.github.io/modkit/) 
