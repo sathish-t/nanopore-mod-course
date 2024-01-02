@@ -47,4 +47,4 @@ if __name__ == "__main__":
 
     output_data = extract_raw_mod_data(input_file, mod_code, position)
 
-    output_data.to_csv(output_file, index=False)
+    output_data.to_csv(output_file, index=False, sep="\t")

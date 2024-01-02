@@ -54,7 +54,7 @@ def window_mod_data(threshold, window_size, input_file, output_file):
     })
 
     # Write the windowed data to the output file
-    windowed_data.to_csv(output_file, index=False)
+    windowed_data.to_csv(output_file, index=False, sep="\t")
 
 if __name__ == "__main__":
     if len(sys.argv) != 5:

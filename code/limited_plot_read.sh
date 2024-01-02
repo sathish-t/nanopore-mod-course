@@ -2,7 +2,8 @@
 
 # Goal: to extract raw and windowed data from one read and to plot it.
 
-# Usage: > bash limited_plot_read.sh <sample.mod.bam> <readID> <mod_code> <position> <threshold> <window_size> <output_dir>
+# Usage: 
+#   bash limited_plot_read.sh <sample.mod.bam> <readID> <mod_code> <position> <threshold> <window_size> <output_dir>
 
 # Script: limited_plot_read.sh
 
@@ -33,7 +34,7 @@
 # Output files:
 #  plot_png: a  plot with the DNA base modification raw data and windowed data.
 #  one_read_bam: a mod.bam file with the read of interest.
-#  one_read_bam.tsv: a tsv file with the modification information from the read of interest.
+#  one_read_bam.data: a tsv file with the modification information from the read of interest.
 
 # Check the number of arguments
 if [ "$#" -ne 7 ]; then
