@@ -65,7 +65,10 @@ window_size="$6"
 
 python extract_raw_mod_data.py $mod_code $position "$one_read_bam".tsv "$one_read_bam"_rawDetect.tsv
 python window_mod_data.py $threshold $window_size "$one_read_bam"_rawDetect.tsv "$one_read_bam"_winDetect.tsv
-cat "$one_read_bam"_rawDetect.tsv" > "$one_read_bam".data && tail -n +2 $one_read_bam"_winDetect.tsv >> "$one_read_bam".data 
+{
+    cat "$one_read_bam"_rawDetect.tsv"
+    tail -n +2 $one_read_bam"_winDetect.tsv 
+} > "$one_read_bam".data 
 
 # plot data
 Rscript ./plot_one_read_w_win.R "$one_read_bam".data "$one_read_bam".png;
