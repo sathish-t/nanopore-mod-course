@@ -2,6 +2,8 @@ import pandas as pd
 import sys
 import os
 
+# Written by Isabel Díez-Santos and Sathish Thiyagarajan
+
 def extract_raw_mod_data(input_file, mod_code, position):
     """
     Extracts required columns from the input TSV file based on specified conditions.

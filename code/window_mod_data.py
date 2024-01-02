@@ -1,6 +1,8 @@
 import sys
 import pandas as pd
 
+# Written by Isabel Díez-Santos and Sathish Thiyagarajan
+
 def window_mod_data(threshold, window_size, input_file, output_file):
     def convert_threshold(value):
         return 1 if value >= threshold else 0

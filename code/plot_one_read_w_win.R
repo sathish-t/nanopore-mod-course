@@ -1,5 +1,7 @@
 #!/usr/bin/env Rscript
 
+# Written by Isabel Díez-Santos and Sathish Thiyagarajan
+
 # Usage: Rscript ./plot_one_read_w_win.R plot_data plot.png
 
 # Script: plot_one_read_w_win.R
