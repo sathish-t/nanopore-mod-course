@@ -40,11 +40,11 @@ if (length(commandArgs(trailingOnly = TRUE)) > 0) {
 }
 
 if (length(args) < 2) {
-  stop("Usage: Rscript ./<script_name>.R plot_data plot.png", call.= FALSE)
+  stop("Usage: Rscript ./<script_name>.R plot_data plot.png", call. = FALSE)
 }
 
 # load data
-read_data <- read.table(args[1], header = TRUE, comment.char = "#", sep = ",")
+read_data <- read.table(args[1], header = TRUE, comment.char = "#", sep = "\t")
 colnames(read_data) <- c("id", "start", "end", "val", "label")
 
 # check that the id column has only one value
@@ -86,7 +86,7 @@ plot1 <-  ggplot() +
       geom_step(data = subset(read_data, label == "winVal"),
         aes(x = start, y = val, colour = label), size = 2, show.legend = TRUE) +
       xlab("Coordinate (kb)") +
-      ylab("Probability of base modification") +
+      ylab("Modification probability") +
       ylim(c(0, 1)) +
       scale_colour_manual(name = NULL,
                               values = c("rawVal" = "#888888",
@@ -100,8 +100,7 @@ plot1 <-  ggplot() +
                                                  shape = shape_vector[indices]))
                               ) +
       theme_bw(base_size = 60) +
-      theme(legend.position = "none", axis.title.x = element_blank(),
-            axis.title.y = element_blank())
+      theme(legend.position = "none")
 
 # save plot
 ggsave(args[2], plot = plot1, dpi = dpi, width = width, height = height)
