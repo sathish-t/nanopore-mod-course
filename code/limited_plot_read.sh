@@ -3,9 +3,9 @@
 # Goal: to extract raw and windowed data from one read and to plot it.
 
 # Usage: 
-#   bash limited_plot_read.sh <sample.mod.bam> <readID> <mod_code> <position> <threshold> <window_size> <output_dir>
+#   bash plot_read.sh <sample.mod.bam> <readID> <mod_code> <position> <threshold> <window_size> <output_dir>
 
-# Script: limited_plot_read.sh
+# Script: plot_read.sh
 
 # Input file: sample.mod.bam
 
@@ -38,7 +38,7 @@
 
 # Check the number of arguments
 if [ "$#" -ne 7 ]; then
-    echo "Usage: bash limited_plot_read.sh <sample.mod.bam> <readID> <mod_code> <position> <threshold> <window_size> <output_dir>"
+    echo "Usage: bash plot_read.sh <sample.mod.bam> <readID> <mod_code> <position> <threshold> <window_size> <output_dir>"
     exit 1
 fi
 
