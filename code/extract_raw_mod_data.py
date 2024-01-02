@@ -12,7 +12,7 @@ def extract_raw_mod_data(input_file, mod_code, position):
     - position (str): Indicates the position information to use ('not_use_ref' or 'use_ref').
 
     Returns:
-    - tsv file: Extracted data containing read_id, start, end, mod_qual, and detect columns.
+    - tsv file: Extracted data containing read_id, start, end, mod_qual, and label columns.
     """
     data = pd.read_csv(input_file, sep='\t')
 
@@ -31,8 +31,8 @@ def extract_raw_mod_data(input_file, mod_code, position):
 
     output_data = filtered_data[['read_id', start_col, 'mod_qual']].copy()
     output_data['end'] = filtered_data[start_col] + 1
-    output_data['Detect'] = 'rawDetect'
-    output_data = output_data[['read_id', start_col, 'end', 'mod_qual', 'Detect']]
+    output_data['label'] = 'rawVal'
+    output_data = output_data[['read_id', start_col, 'end', 'mod_qual', 'label']]
     return output_data
 
 if __name__ == "__main__":

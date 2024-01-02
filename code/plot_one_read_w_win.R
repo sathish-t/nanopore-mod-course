@@ -14,7 +14,7 @@
 #  id is the readID. it must contain only one value since we are plotting only one read.  
 #  start and end are positions on the reference genome.
 #  val is the probability of the modification for raw or windowed data.
-#  label is the the type of data. allowed labels are 'rawDetect' for raw data and 'winDetect' for windowed data.
+#  label is the the type of data. allowed labels are 'rawVal' for raw data and 'winVal' for windowed data.
 
 # Ouput file: plot.png
 
@@ -56,36 +56,36 @@ read_data$start <- read_data$start/1000
 read_data$end <- read_data$end/1000
 
 # set up plot choices
-break_vector <- c('rawDetect', 'winDetect')
-color_order_vector <- c('rawDetect', 'winDetect')
-label_vector <- c("rawDetect" = "Raw data", "winDetect" = "Windowed data")
+break_vector <- c('rawVal', 'winVal')
+color_order_vector <- c('rawVal', 'winVal')
+label_vector <- c("rawVal" = "Raw data", "winVal" = "Windowed data")
 linetype_vector <- c("blank", "solid")
 shape_vector <- c("circle", ".")
 
 # mark which labels are present in input
 indices <- vector()
 
-if('rawDetect' %in% read_data$label){
+if('rawVal' %in% read_data$label){
   indices <- append(indices,1)
 }
 
-if('winDetect' %in% read_data$label){
+if('winVal' %in% read_data$label){
   indices <- append(indices,2)
 }
 
 # plot the curve
 plot1 <-  ggplot() +
-      geom_point(data = subset(read_data, label == "rawDetect"),
+      geom_point(data = subset(read_data, label == "rawVal"),
         aes(x = start, y = val, colour = label), shape='circle', alpha = 0.2, show.legend = TRUE) +
-      geom_segment(data = subset(read_data, label == "winDetect"),
+      geom_segment(data = subset(read_data, label == "winVal"),
         aes(x = start, y = val, xend = end, yend = val, colour = label), size = 2, show.legend = FALSE) +
-      geom_step(data = subset(read_data, label == "winDetect"),
+      geom_step(data = subset(read_data, label == "winVal"),
         aes(x = start, y = val, colour = label), size = 2, show.legend = TRUE) +
       xlab("Coordinate (kb)") +
       ylab("Probability of base modification") +
       ylim(c(0, 1)) +
       scale_colour_manual(name = NULL,
-                              values = c("rawDetect" = "#888888", "winDetect" = colour_win_detect),
+                              values = c("rawVal" = "#888888", "winVal" = colour_win_detect),
 			                  limits = color_order_vector,
                               breaks = break_vector[indices],
                               labels = label_vector[indices],

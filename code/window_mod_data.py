@@ -39,18 +39,18 @@ def window_mod_data(threshold, window_size, input_file, output_file):
         read_id = window['read_id'].iloc[0]
         read_ids.append(read_id)
 
-        detect_values.append('winDetect')
+        detect_values.append('winVal')
 
         average = window['mod_qual'].mean()
         windows.append(average)
 
-    # Create a new DataFrame with the windowed averages, start, end, read_id, and Detect values
+    # Create a new DataFrame with the windowed averages, start, end, read_id, and label values
     windowed_data = pd.DataFrame({
         'read_id': read_ids,
         'start': start_values,
         'end': end_values,
         'mod_qual': windows,
-        'Detect': detect_values
+        'label': detect_values
     })
 
     # Write the windowed data to the output file
