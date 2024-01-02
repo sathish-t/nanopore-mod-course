@@ -26,14 +26,11 @@ options(bitmapType = "cairo")
 
 # set dpi of output plot
 dpi <- 50
-width <- 18 
-height <- 12 
+width <- 18
+height <- 12
 
 # set default colour of the plot of windowed detect data
 colour_win_detect <- "#C61F16"
-
-# flag to check if the colour of the windowed detect data has been set
-is_colour_set <- FALSE
 
 # load command line arguments if available
 if (length(commandArgs(trailingOnly = TRUE)) > 0) {
@@ -52,30 +49,6 @@ colnames(read_data) <- c("id", "start", "end", "val", "label")
 # if it has multiple values, then stop the script
 if(length(unique(read_data$id)) > 1){
   stop("id column has more than one value! Script behaviour is undefined in this case", call.= FALSE)
-}
-
-# read comments from input file
-comments <- readLines(args[1], n = 1000)
-comments <- comments[substr(comments, 0, 1) == "#"]
-
-# remove leading and trailing spaces from comments
-comments <- gsub("^\\s+|\\s+$", "", comments)
-
-# if any entry in comments is "orientation: +", then set the colour of the windowed detect data to blue
-if(any(grepl("orientation: \\+", comments))){
-  colour_win_detect <- "#1F68C4"
-  is_colour_set <- TRUE
-}
-
-# if any entry in comments is "orientation: -", then set the colour of the windowed detect data to red
-# if the colour has already been set, then stop the script
-if(any(grepl("orientation: -", comments))){
-  colour_win_detect <- "#C61F16"
-  if(is_colour_set){
-    stop("orientation: + and orientation: - both present in comments. Script behaviour is undefined in this case",
-         call.= FALSE)
-  }
-  is_colour_set <- TRUE
 }
 
 # convert b to kb.
@@ -108,7 +81,7 @@ plot1 <-  ggplot() +
         aes(x = start, y = val, xend = end, yend = val, colour = label), size = 2, show.legend = FALSE) +
       geom_step(data = subset(read_data, label == "winDetect"),
         aes(x = start, y = val, colour = label), size = 2, show.legend = TRUE) +
-      xlab("Reference coordinate (kb)") +
+      xlab("Coordinate (kb)") +
       ylab("Probability of base modification") +
       ylim(c(0, 1)) +
       scale_colour_manual(name = NULL,
