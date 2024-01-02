@@ -31,7 +31,7 @@ def window_mod_data(threshold, window_size, input_file, output_file):
 
     for i in range(0, len(data), window_size):
         window = data.iloc[i:i + window_size]
-        start = window['ref_position'].iloc[0]
+        start = window['ref_position'].iloc[0] if 'ref_position' in data.columns else window['forward_read_position'].iloc[0]
         end = window['end'].iloc[-1]
         start_values.append(start)
         end_values.append(end)
