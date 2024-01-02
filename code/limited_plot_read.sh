@@ -67,8 +67,8 @@ window_size="$6"
 python extract_raw_mod_data.py $mod_code $position "$one_read_bam".tsv "$one_read_bam"_rawVal.tsv
 python window_mod_data.py $threshold $window_size "$one_read_bam"_rawVal.tsv "$one_read_bam"_winVal.tsv
 {
-    cat "$one_read_bam"_rawVal.tsv"
-    tail -n +2 $one_read_bam"_winVal.tsv 
+    cat "$one_read_bam"_rawVal.tsv
+    tail -n +2 "$one_read_bam"_winVal.tsv 
 } > "$one_read_bam".data 
 
 # plot data
