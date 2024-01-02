@@ -10,9 +10,9 @@ title: Syllabus
 - [Course overview and introduction to nanopore sequencing]({{ site.baseurl }}/lectures/overview-intro-nanopore)
 - [Considerations for high molecular weight DNA extraction and library preparation]({{ site.baseurl }}/lectures/DNA-extract-library-prepare)
 - [Principles and practice of modified base detection]({{ site.baseurl }}/lectures/modified-base-detection)
-- [Hands on: sequence alignment and pycoQC]({{ site.baseurl }}/materials/sequence-align-pycoqc)
-- [Hands on: base modification detection]({{ site.baseurl }}/materials/base-mod-detection)
-- [Hands on: genome browser visualization of base modification data]({{ site.baseurl }}/materials/genome-browser-visualization)
+- [Hands on: Basecalling, sequence alignment, and pycoQC]({{ site.baseurl }}/materials/sequence-align-pycoqc)
+- [Hands on: Base modification detection]({{ site.baseurl }}/materials/base-mod-detection)
+- [Hands on: Genome browser visualization of base modification data]({{ site.baseurl }}/materials/genome-browser-visualization)
 
 ### Day 2
 
