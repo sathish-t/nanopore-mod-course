@@ -17,7 +17,7 @@ def window_mod_data(threshold, window_size, input_file, output_file):
     """
 
     # Read the data from the input file into a pandas DataFrame
-    data = pd.read_csv(input_file, sep=',')
+    data = pd.read_csv(input_file, sep="\t")
 
     # Apply conversion based on the threshold
     data['mod_qual'] = data['mod_qual'].apply(convert_threshold)
