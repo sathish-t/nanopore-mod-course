@@ -12,6 +12,8 @@ and are followed by more specialized steps like genome assembly or modification 
 
 <!-- TODO: pipeline figure -->
 
+<!-- TODO: explain input dataset, need to explain biological features. -->
+
 ## Basecalling: converting nanopore currents into DNA sequences
 
 Nanopore devices ship with basecalling software that converts nanopore currents into DNA
@@ -106,6 +108,10 @@ ATCGA
   For example, the fifth character `)` associated with the last `A` has an ASCII code of 41.
   Quality increases exponentially with the numeric code: the probability of a wrong basecall drops
   ten fold for an increment of 10 in the ASCII code.
+
+#### Sequencing summary files contain summary statistics about each read
+
+<!-- TODO: explain what sequencing summary file is. -->
 
 ### Running the basecalling commands
 
