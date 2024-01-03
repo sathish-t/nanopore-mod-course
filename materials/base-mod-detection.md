@@ -4,7 +4,18 @@ element: notes
 title: Base modification detection
 ---
 
-Download a plugin we will use for DNAscent.
+In this session, we will perform reference-anchored modification calling
+on the dataset we have been using thus far — yeast DNA where some thymidines have been
+substituted by BrdU.
+We will use the software program `DNAscent` on the files already generated
+by us from previous sessions (fast5, bam, sequencing summary file).
+We will then convert the output of DNAscent into the standard mod bam format for storing
+modification information.
+Along the way, we will also learn the mod bam file format.
+
+## Running DNAscent to produce modification calls along each sequenced DNA strand
+
+We first need to download a plugin to help DNAscent read the later versions of fast5 files.
 
 ```bash
 mkdir -p ~/nanomod_course_references # any suitable folder will do here.
@@ -36,6 +47,8 @@ DNAscent detect -b ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorte
  -q 20 -l 1000
 ```
 
+<!-- TODO: Explain that we learn about features like forks in a previous session -->
+<!-- TODO: Explain that forkSense is not strictly speaking needed for a general DNascent experiment -->
 Run DNAscent forkSense
 
 ```bash
@@ -44,6 +57,8 @@ DNAscent forkSense -d ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect\
  -t 16 \
  --markOrigins --markTerminations --markForks
 ```
+
+## Conversion of DNAscent detect into the modBAM format
 
 Make mod bam file
 
@@ -57,6 +72,14 @@ samtools sort -o ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.s
   ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.bam
 samtools index ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.sorted.bam
 ```
+
+## Discussion of the modBAM file format
+
+<!-- TODO -->
+
+## Conversion from modBAM to TSV format using modkit
+
+<!-- TODO -->
 
 Get tabular output from mod bam file
 
