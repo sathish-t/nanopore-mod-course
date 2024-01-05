@@ -10,9 +10,14 @@ reference genome (alignment/genome mapping), and assess their quality (quality c
 Basecalling and quality control are the first steps in any nanopore experiment,
 and are followed by more specialized steps like genome assembly or modification calling.
 
-<!-- TODO: pipeline figure -->
+We will use a dataset of nanopore currents from [this](https://doi.org/10.1038/s41592-019-0394-y) study
+of DNA replication dynamics in budding yeast as input. Genetically-modified cells consumed
+5-bromodeoxyuridine (BrdU) added to the medium and this allowed substitution of thymidines
+in newly synthesized DNA by BrdU. We are going to sequence the DNA and call modifications
+on it over the next few sessions as described by the genomics pipeline image below.
+We will perform the steps highlighted with an asterisk in this session.
 
-<!-- TODO: explain input dataset, need to explain biological features. -->
+![Reference-unanchored pipeline with basecalling and alignment highlighted](ref_unanc_workflow_basecall_align.png)
 
 ## Basecalling: converting nanopore currents into DNA sequences
 
@@ -109,6 +114,11 @@ ATCGA
   Quality increases exponentially with the numeric code: the probability of a wrong basecall drops
   ten fold for an increment of 10 in the ASCII code.
 
+To save space, fastq files may be compressed.
+Such files end in `.fastq.gz` and are not in plain text but most tools that take fastq files as input
+also accept compressed files. To convert these files to plain text, either unzip them with `gunzip` first,
+or use the `zcat` command instead of the usual `cat` command to display their contents.
+
 #### Sequencing summary files contain summary statistics about each read
 
 <!-- TODO: explain what sequencing summary file is. -->
@@ -116,9 +126,14 @@ ATCGA
 ### Running the basecalling commands
 
 We do the basecalling using guppy as shown below. The options specify input file paths,
-output file paths, the model file of choice (.cfg), and details on how many reads
-per fastq file and how many threads of execution. Normally, reads are split into pass
-and fail bins depending on their quality, but we allow all reads through as our
+output file paths, a model file as dictated by the experimental flowcell (r9.4.1) and accuracy desired (hac),
+and details on how many reads per fastq file and how many threads of execution.
+Basecallers are faster on
+machines with GPUs but we operate in a CPU-only mode here to minimize costs.
+To use GPUs, one needs to specify the input parameter `--device cuda:n` where `n` is the device id
+(this is usually a number like zero), and one might need to do away with `--cpu_threads_per_caller`.
+Normally, reads are split into pass
+and fail bins depending on their quality, but we allow all reads through (`--disable_qscore_filtering`) as our
 reads contain modified bases which are expected to interfere with basecalling accuracy.
 
 <!-- TODO: TBD: Downloading carolin's dataset and setting up just the `60/` fast5 folder 
@@ -146,7 +161,7 @@ In a modification-calling experiment, alignment helps correlate DNA modification
 locations and/or genomic features, so that one can answer questions like 
 'which part of the genome is highly modified?', 'are modification densities higher within genes?' etc.
 We will use the aligner `minimap2`,
-which takes experimental sequence data and a linear reference genome as input and
+which takes basecalled sequence data and a linear reference genome as input and
 reports alignments in the BAM format as requested by us.
 We will give an overview of alignment and the file formats used before running the commands.
 
@@ -209,7 +224,7 @@ We will not go through all the columns in detail. The important ones are:
 - the fourth column is the starting position of the mapping on the reference genome (in 1-based coordinates)
 - the fifth column is the quality of mapping
 - the sixth column is the CIGAR string
-- the tenth column is the DNA sequence of the read
+- the tenth column is the DNA sequence of the read (or its reverse complement depending on the flag)
 
 The first 11 columns are mandatory and are followed by optional tags with the TAG:TYPE:VALUE format.
 Using the optional `ML` and `MM` tags, one can store modification data.

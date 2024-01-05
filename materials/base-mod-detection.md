@@ -12,8 +12,13 @@ by us from previous sessions (fast5, bam, sequencing summary file).
 We will then convert the output of DNAscent into the standard mod bam format for storing
 modification information.
 Along the way, we will also learn the mod bam file format.
+We will be performing the steps highlighted with an asterisk in the pipeline figure below.
+
+![Reference-unanchored pipeline with modification-calling highlighted](ref_unanc_workflow_modcall.png)
 
 ## Running DNAscent to produce modification calls along each sequenced DNA strand
+
+### Preparations to call modifications
 
 We first need to download a plugin to help DNAscent read the later versions of fast5 files.
 
@@ -28,7 +33,8 @@ ls $HDF5_PLUGIN_PATH
 rm ont-vbz-hdf-plugin-1.0.1-Linux-x86_64.tar.gz # if you see the output above, then cleanup by removing the tarball.
 ```
 
-Run DNAscent index
+We now need to create an index needed by DNAscent — a plain text with two columns: read id
+and the fast5 file with the corresponding time course of nanopore current.
 
 ```bash
 DNAscent index -f ~/nanomod_course_data/carolin_nmeth_18/60 \
@@ -36,7 +42,21 @@ DNAscent index -f ~/nanomod_course_data/carolin_nmeth_18/60 \
   -s ~/nanomod_course_outputs/carolin_nmeth_18/sequencing_summary.txt
 ```
 
-Run DNAscent detect
+### Call modifications
+
+We run the reference-anchored modification caller `DNAscent detect` here.
+The program takes alignment information from the bam file, a reference genome,
+and the raw nanopore currents as inputs and outputs the probability of modification
+per thymidine per sequenced strand in a `.detect` format,
+which is very similar to the TSV (tab-separated values) format.
+The program uses a machine-learning approach where model parameters learned previously
+represent differences in nanopore current characteristics between thymidine and BrdU.
+
+The additional options below direct the program to use
+16 computational threads and to reject alignments below a mapping quality of 20 and
+a genome-mapped length of 1000 bases. 
+By omitting the `--GPU` input parameter, we are running DNAscent in a slow, CPU-only mode
+as the virtual machines used in the course do not have GPUs to lower costs.
 
 ```bash
 DNAscent detect -b ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.onlyPrim.bam \
@@ -46,6 +66,8 @@ DNAscent detect -b ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorte
  -t 16 \
  -q 20 -l 1000
 ```
+
+## Call replication dynamics with DNAscent forkSense using single-molecule modification densities
 
 <!-- TODO: Explain that we learn about features like forks in a previous session -->
 <!-- TODO: Explain that forkSense is not strictly speaking needed for a general DNascent experiment -->
@@ -73,10 +95,6 @@ samtools sort -o ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.s
 samtools index ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.sorted.bam
 ```
 
-## Discussion of the modBAM file format
-
-<!-- TODO -->
-
 ## Conversion from modBAM to TSV format using modkit
 
 <!-- TODO -->
@@ -87,3 +105,7 @@ Get tabular output from mod bam file
 cd ~/nanomod_course_outputs/carolin_nmeth_18/
 modkit extract dnascent.detect.mod.sorted.bam dnascent.detect.mod.sorted.bam.tsv
 ```
+
+## Discussion of the modBAM file format
+
+We conclude this session with a discussion of the mod BAM file format ({{ site.baseurl }}/materials/mod-bam-format).
