@@ -1,31 +1,43 @@
 ---
 layout: page
 element: notes
-title: MOD BAM format
+title: Mod BAM file format
 ---
 
-In this page, we are going to discuss how single-molecule modification data
-is stored in BAM files using optional tags.
+We discuss here how single-molecule modification data is stored in BAM files using the `MM` and `ML` tags
+at the end of each line.
 We are going to be building upon our knowledge of the BAM file format, so please
-make sure you are familiar with it as explained in [this]({{ site.baseurl }}/materials/sequence-align-pycoqc)
-session.
+make sure you are familiar with it as explained in this [session]({{ site.baseurl }}/materials/sequence-align-pycoqc)
+where we learned about and performed sequence alignment.
 
-<!-- TODO:
- mention need not know this -->
-
-We will illustrate multiple ways to represent modification information
+We will illustrate multiple ways to represent modification information as summarized in the figure below
 using an example molecule with the sequence `TCGCCTAGCG`.
 Let us assume the read has not been aligned to a reference genome for simplicity.
 
-## Scenario 1: Bases are either modified or unmodified with no ambiguity or missing information
+![Picture explaining different mod bam line formats](mod_bam_format_course.png)
+
+## Scenario 1: Hard modification calls with no ambiguity or missing information
 
 In the simplest scenario, we just want to mark which bases are modified and which are not per molecule.
+In other words, we want to store two lists: locations where bases are modified, and locations
+where they are not, which is essentially just one list as we know the sequence of each molecule.
+Although this type of mod BAM file is the simplest, tools that work with mod BAM files usually
+expect a probability of modification to be present as well and may throw an error if probabilities
+are omitted. So, we begin our discussion with this simplified format solely for pedagogical reasons.
 
 Let us consider the example where the second and the third cytosines of the sequence of interest above have been
 modified to 5-methylcytosine (5mC) and the others are unmodified.
+The simplest way of storing this information is the self-explanatory list `C->5mC:2,3`.
+For reasons we will not get into here, what is stored is instead the *diff* of this list i.e. instead
+of storing positions of modified thymidines, we count the number of unmodified thymidines between 
+each successive pair of modified thymidines.
+This is illustrated in the figure below.
+
+![Picture demonstrating skip array](mm_skip_array_illustration.png)
+
 In other words, when moving along cytosines on the sequence,
-we have to skip `1` cytosine to get to the first modified base and then skip `0` cytosines to get
-to the second modified base.
+we have to skip `1` unmodified cytosine to get to the first modified cytosine and then skip `0` unmodified cytosines to get
+to the second modified cytosine.
 So, the modification tag reads `MM:Z:C+m,1,0;`.
 In addition to the information that we need to execute 1 skip and 0 skips (`,1,0`), the tag tells
 us that we are looking at cytosine modifications (`C`), the modification under
@@ -57,6 +69,12 @@ As older modification tools did not recognize numeric codes,
 we have represented BrdU substitution using the ambiguous one letter code T
 instead i.e. `MM:Z:T+T,0;`.
 
+### Bases where calls are missing are considered unmodified
+
+In our example above, we did not talk about the fourth cytosine at all.
+The ground truth is that information about its modification status is missing.
+But in this 'hard call' representation, 'missing' is equivalent to 'unmodified'.
+
 ### (optional) Multiple types of modifications are present
 
 Let us consider the scenario where both 5mC and 5hmC modifications are present in the sample sequence `TCGCCTAGCG`.
@@ -69,8 +87,99 @@ the fourth (execute three skips) has been modified to 5hmC.
 ONT have released a 'duplex' method where both a strand and its complement from the same cell are sequenced.
 So, one can obtain modification status on both a strand and its complement.
 In our sample sequence `TCGCCTAGCG`, let's say the second and third cytosines have been modified to 5mC,
-and the first cytosine on the complementary strand which pairs with the highlighted G `TC_G_CCTAGCG` has
-been modified to 5mC.
+and the first cytosine on the complementary strand `AGCGGATCGC` has been modified to 5mC.
 The tag would then read (replace spaces with tabs) `MM:Z:C+m,1,0; MM:Z:G-m,0;`.
 
-## Scenario 2: Base modifications are specified using probabilities
+![Picture demonstrating duplex](mm_duplex_illustration.png)
+
+## Scenario 2: Soft modification calls with probabilities
+
+We dealt with a thresholded mod BAM file in the previous section. Here, we look at a non-thresholded
+format which is typically output by modification callers.
+We are required to store a probability of modification per base per read to a mod BAM file,
+so we need to store both a base coordinate and a number between 0 and 1 per coordinate.
+For base coordinates, we just use the 'skip' representation from the previous section.
+For probabilities, we convert them from a floating point number in the 0-1 range to an integer
+in the 0-255 range and store them using a second tag that begins with `ML:B:C`.
+
+Let us revisit the sample sequence `TCGCCTAGCG`.
+Let us say the ground truth is that the probabilities of methylation of each cytosine are
+given by the table below.
+```text
+position modification_probability
+1 0.04
+2 0.90
+3 0.90
+```
+As you can see, the modification status of the fourth cytosine is missing.
+
+### Preparing the base coordinate array (or list)
+
+We prepare the base coordinate array like in the previous example.
+Since we have data at all cytosines except the last, the tag reads `MM:Z:C+m,0,0,0;`
+i.e. all skips are zero as we have data at every cytosine except the last.
+If we want to mark the missing cytosine as unmodified, we use the tag as is,
+or we add an optional period `.` after the modification code `MM:Z:C+m.,0,0,0;`.
+If we want to mark the missing cytosine as missing, we use a question mark `?`
+instead, to form `MM:Z:C+m?,0,0,0;`
+
+### Preparing the modification probability array (or list)
+
+We prepare the probability array by converting the floating point numbers to an
+integer between 0 - 255. We first note that 0.04 is between 10/256 and 11/256.
+Similarly, 0.90 is between 230/256 and 231/256.
+Thus, the probability array reads `ML:B:C,10,230,230`.
+
+### Concatenating the two strings
+Concatenating the two tags with a tab (represented as a space below),
+we get one of three possible strings.
+1. `MM:Z:C+m,0,0,0; ML:B:C,10,230,230`
+2. `MM:Z:C+m.,0,0,0; ML:B:C,10,230,230`
+3. `MM:Z:C+m?,0,0,0; ML:B:C,10,230,230`
+
+The first two strings ask us to treat missing cytosines as unmodified, whereas the last
+line asks us to treat the missing cytosine as missing.
+
+## Is the knowledge of the mod BAM format essential?
+
+The answer depends on what you want to do.
+
+### A tool that reads mod BAM files and does what you want may not exist
+
+Several tools use mod BAM files as input (samtools, modkit, IGV, modbamtools)
+and produce images or tab-separated files as output and these output files
+are typically easier to read and understand than the raw mod BAM file.
+For example, a table like the following is much easier to follow than a string like
+`MM:Z:C+m.,0,0,0; ML:B:C,10,230,230`, and `modkit extract` helps you do that.
+
+```text
+position modification_probability
+1 0.04
+2 0.90
+3 0.90
+```
+
+One such tool may be exactly what you are looking for.
+However, as the modification field is still developing, there may not be a tool
+that does exactly what you want.
+Then, you will need to write that tool yourself.
+
+Let's say you want a script to produce a table with read ids and modification
+counts per read.
+Such a tool does not exist to the best of our knowledge, and the following ideas could work:
+1. you need to get a table such as the one shown above using `modkit extract`
+and process the table using, say, a python or an R script.
+2. you can read the mod BAM file directly with python using a library like `pysam`
+3. you can convert the mod BAM file to plain text (.sam) with `samtools` and process
+the text with python/R.
+
+For option 3, you will need to know how to read a BAM file yourself, so the
+knowledge from this session comes in handy.
+
+### Historical mod BAM files were not well-written
+
+Historically, researchers did not use the `?` or `.` notations or one-letter modification
+codes correctly.
+In other words, questions like 'are missing bases unmodified or missing?',
+'what base is modified?' may not be straightforward to answer and you may need to inspect
+the BAM files yourself using the materials learned in this session.
