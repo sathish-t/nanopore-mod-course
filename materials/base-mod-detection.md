@@ -82,7 +82,11 @@ DNAscent forkSense -d ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect\
 
 ## Conversion of DNAscent detect into the modBAM format
 
-Make mod bam file
+We convert modification data from the specific `.detect` format used by DNAscent to
+the more widely used and standardized `.mod.bam` or mod BAM format using the package
+DNAscentTools developed by the Nieduszynski group.
+Mod BAM files are just BAM files with two additional tags per line that store
+modification information. We will discuss their structure later on in this session.
 
 ```bash
 cd ~/nanomod_course_scripts/DNAscentTools
@@ -90,16 +94,34 @@ cd ~/nanomod_course_scripts/DNAscentTools
     python convert_detect_to_modBAM.py \
       --op ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.bam --tag T
 
+# sort and index the BAM files
 samtools sort -o ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.sorted.bam \
   ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.bam
 samtools index ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.sorted.bam
 ```
 
-## Conversion from modBAM to TSV format using modkit
+## Inspect modification data by conversion from modBAM to TSV format using modkit
 
-<!-- TODO -->
+At the end of our modification pipeline, all we want is a simple table with three columns
+of read_id, coordinate, and modification_density.
+An example with some artificial data is shown below.
 
-Get tabular output from mod bam file
+```text
+# marking thymidine modifications
+read_id coordinate modification_density
+f48c6a85-db3c-445f-865b-4bb876bd4a18 1000 0.1
+f48c6a85-db3c-445f-865b-4bb876bd4a18 1004 0.4
+f48c6a85-db3c-445f-865b-4bb876bd4a18 1014 0.9
+...
+5ddb8919-89de-4ffd-b052-423e53cff109 10210 0.2
+5ddb8919-89de-4ffd-b052-423e53cff109 10224 0.3
+5ddb8919-89de-4ffd-b052-423e53cff109 10249 0.88
+```
+
+We can use the `modkit extract` program to convert data in our mod BAM file into a tabular format.
+Please run the code below and inspect the output `tsv` file.
+You should see columns such as `read_id`, `forward_read_position`,
+`ref_position`, `chrom`, `mod_qual` etc.
 
 ```bash
 cd ~/nanomod_course_outputs/carolin_nmeth_18/
@@ -108,4 +130,5 @@ modkit extract dnascent.detect.mod.sorted.bam dnascent.detect.mod.sorted.bam.tsv
 
 ## Discussion of the modBAM file format
 
-We conclude this session with a discussion of the mod BAM file format ({{ site.baseurl }}/materials/mod-bam-format).
+We conclude this session with a [discussion]({{ site.baseurl }}/materials/mod-bam-format)
+ of the mod BAM file format.
