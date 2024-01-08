@@ -69,9 +69,19 @@ DNAscent detect -b ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorte
 
 ## Call replication dynamics with DNAscent forkSense using single-molecule modification densities
 
-<!-- TODO: Explain that we learn about features like forks in a previous session -->
-<!-- TODO: Explain that forkSense is not strictly speaking needed for a general DNascent experiment -->
-Run DNAscent forkSense
+After modifications are called, one can ask general questions common to all modification experiments
+like which are the highly modified reads, what is the mean density per read etc.
+One can also ask specific questions that are experiment-dependent.
+
+In the experiments of the yeast dataset we have been using,
+the specific questions are about DNA replication dynamics.
+A specialized program called `forkSense` that ships with DNAscent detects gradients in BrdU density
+across a read, and associates these with the movement of replication forks.
+After fork calls are made, locations on the genome from which forks emerged are marked as
+origins of replication, and locations where forks terminate are marked as termination sites.
+We will look into these features more in a [session]({{ site.baseurl }}/lectures/case-study) tomorrow.
+Today, we will just learn how to execute the `forkSense` command and save the biological interpretations
+for tomorrow.
 
 ```bash
 DNAscent forkSense -d ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect\
@@ -102,26 +112,20 @@ samtools index ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.sor
 
 ## Inspect modification data by conversion from modBAM to TSV format using modkit
 
-At the end of our modification pipeline, all we want is a simple table with three columns
-of read_id, coordinate, and modification_density.
-An example with some artificial data is shown below.
+Without a discussion, it is not easy to understand what is in a raw mod BAM file.
+So, before the discussion, let us convert the mod BAM file into the easy-to-understand tab-separated value
+format so that we can get a quick look at our modification calls.
+We will be using the `modkit` program developed by ONT that takes mod BAM files as input
+and produces tabulated data or summary statistics as output.
+One of the functions provided is `modkit extract`.
 
-```text
-# marking thymidine modifications
-read_id coordinate modification_density
-f48c6a85-db3c-445f-865b-4bb876bd4a18 1000 0.1
-f48c6a85-db3c-445f-865b-4bb876bd4a18 1004 0.4
-f48c6a85-db3c-445f-865b-4bb876bd4a18 1014 0.9
-...
-5ddb8919-89de-4ffd-b052-423e53cff109 10210 0.2
-5ddb8919-89de-4ffd-b052-423e53cff109 10224 0.3
-5ddb8919-89de-4ffd-b052-423e53cff109 10249 0.88
-```
-
-We can use the `modkit extract` program to convert data in our mod BAM file into a tabular format.
-Please run the code below and inspect the output `tsv` file.
-You should see columns such as `read_id`, `forward_read_position`,
-`ref_position`, `chrom`, `mod_qual` etc.
+Please run the code below and inspect the output tsv file.
+The most important columns are `read_id`, `forward_read_position`, and `mod_qual` as these answer
+the fundamental question of modification calling: what is the likelihood of modification at every
+position on every read?
+Other useful columns are the position along the reference `ref_position`,
+the length of the read `read_length` etc.
+We can look up the full list in the official documentation [here](https://nanoporetech.github.io/modkit/intro_extract.html).
 
 ```bash
 cd ~/nanomod_course_outputs/carolin_nmeth_18/

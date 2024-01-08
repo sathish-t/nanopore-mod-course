@@ -140,17 +140,24 @@ we get one of three possible strings.
 The first two strings ask us to treat missing cytosines as unmodified, whereas the last
 line asks us to treat the missing cytosine as missing.
 
-## Is the knowledge of the mod BAM format essential?
+## Introduction to manipulation of mod BAM file 
 
-The answer depends on what you want to do.
+Several tools use mod BAM files as input (`samtools`, `modkit`, `IGV`, `modbamtools`)
+and produce images or tab-separated files as output.
+We will be using these programs throughout the course.
+These output files are typically easier to read and understand than the
+raw mod BAM file.
 
-### A tool that reads mod BAM files and does what you want may not exist
+As the modification field is still developing, there may not be a tool
+that does exactly what you want. 
+Knowing how a BAM file is structured could help you if you have to write
+the tool yourself.
 
-Several tools use mod BAM files as input (samtools, modkit, IGV, modbamtools)
-and produce images or tab-separated files as output and these output files
-are typically easier to read and understand than the raw mod BAM file.
-For example, a table like the following is much easier to follow than a string like
-`MM:Z:C+m.,0,0,0; ML:B:C,10,230,230`, and `modkit extract` helps you do that.
+### Convert BAM files to TSV
+
+The simplest operation is conversion of BAM files to tab-separated values format.
+A table like the following is much easier to digest than a string like
+`MM:Z:C+m.,0,0,0; ML:B:C,10,230,230`.
 
 ```text
 position modification_probability
@@ -159,24 +166,37 @@ position modification_probability
 3 0.90
 ```
 
-One such tool may be exactly what you are looking for.
-However, as the modification field is still developing, there may not be a tool
-that does exactly what you want.
-Then, you will need to write that tool yourself.
+One can use `modkit extract` to perform the conversion.
+The command syntax is `modkit extract [OPTIONS] <IN_BAM> <OUT_PATH>`.
+We have already encountered this command in the
+[session]({{ site.baseurl }}/materials/base-mod-detection) on modification detection.
 
-Let's say you want a script to produce a table with read ids and modification
-counts per read.
-Such a tool does not exist to the best of our knowledge, and the following ideas could work:
-1. you need to get a table such as the one shown above using `modkit extract`
+### Example discussion on how to write a tool yourself
+
+Let's say you want a tool to produce a table with read ids and modification
+counts per read. An example is shown below
+
+```text
+read_id mod_count read_length
+f48c6a85-db3c-445f-865b-4bb876bd4a18 100 1000
+5ddb8919-89de-4ffd-b052-423e53cff109 2000 100000
+```
+
+Such a tool does not exist to the best of our knowledge, but one can orchestrate
+pre-existing tools using a scripting language to achieve this.
+The following ideas could work:
+1. you need to get a table with read_id, modification_probability columns using `modkit extract`
 and process the table using, say, a python or an R script.
 2. you can read the mod BAM file directly with python using a library like `pysam`
 3. you can convert the mod BAM file to plain text (.sam) with `samtools` and process
 the text with python/R.
 
-For option 3, you will need to know how to read a BAM file yourself, so the
+For options 2 and 3, you will need to know how a BAM file is structured, so the
 knowledge from this session comes in handy.
+For option 1, you need not know much about a BAM file.
+We are not going to make these tools now as it is beyond the scope of the course.
 
-### Historical mod BAM files were not well-written
+### Caution: historical mod BAM files were not well-written
 
 Historically, researchers did not use the `?` or `.` notations or one-letter modification
 codes correctly.
