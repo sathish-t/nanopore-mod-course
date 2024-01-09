@@ -11,11 +11,11 @@ def window_mod_data(threshold, window_size, input_file, output_file):
 
     Args:
     - input_file: TSV file containing comma-separated read_id, start, end, mod_qual, and detect columns.
-    - threshold (str): Threshold for calling modifications.
-    - window_size (str): Size in bases for data windowing.
+    - threshold (float): Threshold for calling modifications.
+    - window_size (int): Size in bases for data windowing.
 
     Returns:
-    - tsv file: Extracted data containing read_id, start, end, mod_qual, and detect columns.
+    - None.
     """
 
     # Read the data from the input file into a pandas DataFrame
