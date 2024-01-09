@@ -251,6 +251,23 @@ We will use several such commands in our workflow and
 we will introduce them as and when we use them.
 The commands generally have the syntax `samtools <command> <input_file>`.
 
+### Bedtools: a collection of programs that operate on BED files and also on BAM files
+
+Bedtools is another suite of programs that perform operations primarily on the BED file format,
+which consists of tab-separated columns.
+We will be converting BAM files to the BED6 format for some calculations.
+The BED6 format consists of six columns without a header: contig, start, end, name, score, and strand.
+Contig, start, end refer to alignment coordinates of every read.
+The read_id goes under the name column.
+Score is a general column with any kind of integer data and strand can be + or - or . for ambiguous.
+For the sample read with id `acde070d-8c4c-4f0d-9d8a-142843c10333` that we have been discussing,
+the equivalent BED6 line looks like (tabs have been replaced with spaces and coordinates
+are 0-based in BED6):
+
+```text
+chr1 10 15 acde070d-8c4c-4f0d-9d8a-142843c10333 50 +
+```
+
 ### Running the alignment commands
 
 We will first obtain the sacCer3 (_S. cerevisiae_) reference genome
@@ -286,13 +303,55 @@ samtools sort -@ 16 -T /tmp \
 samtools index ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam
 ```
 
-### Inspecting alignments using genome browsers and samtools
+## Preliminary inspection of alignments
 
-<!-- TODO: complete this -->
+### Visualizing alignments using genome browsers
+
+We can inspect the alignments we have obtained using genome browsers.
+These steps are a part of quality control for any pipeline as we want
+to know if our experiments worked.
+
+Let us open IGV on the virtual machines using the instructions from the figure below.
+If you are a self-study student, please open IGV on your computer.
+
+![Instructions on how to open IGV](open_igv.png)
+
+Let us load the sacCer3 genome and the BAM file we have following
+the instructions in the figures below.
+
+![Instructions on how to load genome](igv_load_genome_screenshot.png)
+![Instructions on how to load BAM file](igv_load_file_screenshot.png)
+
+You should see two tracks immediately below the reference genome on top.
+Now, you can zoom in to the genome.
+Select any region of size around 10 to 50 kb and have a look at the result.
+
+### Inspecting alignments using samtools and bedtools
+
+We'll do a few more quality control checks before using command line tools like
+`samtools` and `bedtools` before using pycoQC, a package designed to produce
+quality-control reports. 
+
+Count number of reads in the BAM file with `samtools`.
+
+```bash
+samtools view -c ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam
+```
+
+Inspect a few alignment coordinates by converting BAM files to BED with `bedtools`.
+
+```bash
+bedtools bamtobed -i ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam | shuf | head -n 20
+# the shuf command performs a random shuffle on the input lines
+# the head command then outputs the first 20 lines.
+```
 
 ## Quality control
 
-Run pycoQC
+We will use `pycoQC` to produce quality-control reports of our basecalled and
+aligned data. The program runs commands similar in spirit to the `samtools` and
+`bedtools` commands above to produce metrics like number of pass/fail reads,
+number of alignments etc. and plots like histograms of alignment lengths etc.
 
 ```bash
 pycoQC \
@@ -306,8 +365,6 @@ pycoQC \
 You can open the analysis.html file in your browser after the program has finished running.
 You should see a webpage whose layout and figures, but not the actual details, are similar to
 [this](https://a-slide.github.io/pycoQC/pycoQC/results/Guppy-2.3_basecall-1D_alignment-DNA.html).
-
-<!-- TODO: talk about what you see when you run pycoQC -->
 
 ## Filter BAM file to include only primary reads
 
