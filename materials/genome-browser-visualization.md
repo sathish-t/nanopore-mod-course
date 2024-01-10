@@ -11,10 +11,13 @@ that can be utilized to analyze modifications and show some sample ways
 in which they can be executed.
 The experimentalist must decide whether to use these tools, how to run these tools,
 and/or whether new tools are needed depending on their experiment. 
+Some of these tools will work irrespective of whether we use a reference-dependent or reference-independent
+approach to call modifications.
+We are at the 'further analysis' stage on our pipeline figure below.
 
 ![Reference-unanchored pipeline with further analysis highlighted](ref_unanc_workflow_modcall_end.png)
 
-In this session, we will visualize modification data in mod BAM files (see fig. below) using (1) genome
+In this session, we will visualize modification data in mod BAM files (see figure below) using (1) genome
 browsers (left) where we can rapidly scan data visually across different reads and different
 regions on the genome, and (2) custom scripts (right) which allow us to see modification
 density versus coordinate one read at a time.
@@ -31,13 +34,19 @@ and see data across multiple reads. But, beyond recognizing which regions are hi
 modified on a read (green) and which regions are not (grey), one cannot pick out any
 details of modification density such as gradients as there is no interpolation
 between the two colours to show any intermediary densities.
+Genome browsers cannot be used in a reference-unanchored workflow as they need a reference
+genome to produce visualizations.
+A related problem is that genome browsers ignore sections on reads corresponding to inserts
+i.e. sequences on the read which do not map to the genome.
+
 On the right, we have plotted a read using
 a custom script, which shows raw modification data (grey) and windowed modification
 data (red). Here, we can see details per read but we cannot see multiple reads at
-the same time. We will explore the details of these visualizations and how to make
-them in this session.
+the same time. We can visualize reads in a reference-dependent or reference-independent manner.
 
-In the next session on [manipulation of modification data]({{ site.baseurl }}/materials/single-molecule-visualization),
+We will explore the details of these visualizations and how to make
+them in this session.
+In the next session on [manipulation of modification data]({{ site.baseurl }}/materials/manipulate-modified-base),
 we will discuss how to do the equivalent of some of the analyses
 that goes on behind the scenes to make these visualizations (subsetting, thresholding, pileup etc.)
 so that we can incorporate the commands in our own scripts.
