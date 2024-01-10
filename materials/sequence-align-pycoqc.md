@@ -139,6 +139,9 @@ reads contain modified bases which are expected to interfere with basecalling ac
 <!-- TODO: TBD: Downloading carolin's dataset and setting up just the `60/` fast5 folder 
 at `~/nanomod_course_data/carolin_nmeth_18` -->
 
+<!-- TODO: TBD: Download the code to
+at `~/nanomod_course_scripts/nanopore-mod-course/code ` -->
+
 ```bash
 mkdir -p ~/nanomod_course_outputs/carolin_nmeth_18/
 
