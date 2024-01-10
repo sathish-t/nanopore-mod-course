@@ -12,13 +12,16 @@ in which they can be executed.
 The experimentalist must decide whether to use these tools, how to run these tools,
 and/or whether new tools are needed depending on their experiment. 
 
+![Reference-unanchored pipeline with further analysis highlighted](ref_unanc_workflow_modcall_end.png)
+
 In this session, we will visualize modification data in mod BAM files (see fig. below) using (1) genome
 browsers (left) where we can rapidly scan data visually across different reads and different
 regions on the genome, and (2) custom scripts (right) which allow us to see modification
 density versus coordinate one read at a time.
-We will also do some analysis on mod BAM files using `samtools` and `modkit` to show
-how to re-construct the steps performed by genome browsers so that we can incorporate
-it in our own scripts/commands.
+We will discuss another visualization tool
+`modbamtools` which produces visualizations such as 
+[these](https://rrazaghi.github.io/modbamtools/figs/gm12878_GNAS_hap_h3k27ac_h3k4me1.html)
+in a [session]({{ site.baseurl }}/materials/single-molecule-visualization) tomorrow.
 
 ![Compare IGV and rain plot visualization](compare_igv_and_rain.png)
 
@@ -33,6 +36,11 @@ a custom script, which shows raw modification data (grey) and windowed modificat
 data (red). Here, we can see details per read but we cannot see multiple reads at
 the same time. We will explore the details of these visualizations and how to make
 them in this session.
+
+In the next session on [manipulation of modification data]({{ site.baseurl }}/materials/single-molecule-visualization),
+we will discuss how to do the equivalent of some of the analyses
+that goes on behind the scenes to make these visualizations (subsetting, thresholding, pileup etc.)
+so that we can incorporate the commands in our own scripts.
 
 ## Visualizing modification calls with IGV
 
@@ -71,6 +79,8 @@ show the modified and unmodified count versus genomic position
 pile-up analysis).
 
 Try clicking on a read and see if you can get the following dialog boxes.
+They let you examine the modification probability of a single base on a read
+and extract read details such as read id.
 
 ![IGV view with read dialog boxes](igv_get_read_details.png)
 
@@ -80,8 +90,10 @@ bases marked as modified and unmodified.
 ![IGV view with individual modified bases](igv_individual_modified_bases.png)
 
 We can look at the reads for a few more minutes to get familiar with the visualization.
-Pick a read id of a read that looks interesting to you and record it somewhere.
-When we visualize single molecules, you can visualize this molecule.
+Pick one or a few read ids of reads that look interesting to you and whose lengths are
+in the tens of kbs and record the details such as read id and location on the genome
+somewhere.
+When we visualize single molecules, you can visualize these molecules you've picked out.
 
 ## Visualizing modifications across single reads with custom script
 
@@ -103,4 +115,10 @@ output_dir=
 bash plot_read.sh $mod_bam $read_id $mod_code $ref_flag $threshold $window_size $output_dir
 ```
 
+You should see a figure whose elements look like those in the following figure, although
+the data will be different as you are visualizing a read that you picked out.
+
 ![Rain plot visualization](sample_rain_plot.png)
+
+Compare the plot you see with the track of the same read in IGV.
+Can you pick out the same features?
