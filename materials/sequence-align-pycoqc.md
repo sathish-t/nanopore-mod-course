@@ -26,7 +26,8 @@ sequences. Basecallers use pre-recorded model parameters that contain informatio
 characteristic currents produced by different DNA k-mers as they translocate through the nanopore.
 These programs segment the current corresponding to one DNA strand, assign a k-mer per segment,
 and stitch k-mers together into one sequence. We will use two basecallers: `guppy` in this session
-and the more-recent `dorado` in a later session.
+and the more-recent `dorado` in a [later]({{ site.baseurl }}/materials/compare-modification-detection)
+session.
 
 Basecallers can be run on the nanopore device during sequencing and/or can be run later on a computer.
 For most purposes, on-device basecalling is sufficient. If a higher accuracy is desired or
@@ -35,7 +36,8 @@ Accuracy is specified through input parameters and higher accuracy leads to long
 
 Basecallers generally output DNA sequences with the four canonical DNA bases;
 modification calling is a separate step and is bolted on to the output of basecallers.
-We will deal with modification calling in a later session.
+We will deal with modification calling in a [later]({{ site.baseurl }}/materials/base-mod-detection)
+session.
 
 In this section, we will first look at the input and output file formats used by basecallers,
 and then run the basecalling commands on nanopore data from yeast.
@@ -121,6 +123,7 @@ or use the `zcat` command instead of the usual `cat` command to display their co
 
 #### Sequencing summary files contain summary statistics about each read
 
+TBD.
 <!-- TODO: explain what sequencing summary file is. -->
 
 ### Running the basecalling commands
@@ -342,11 +345,14 @@ samtools view -c ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.
 ```
 
 Inspect a few alignment coordinates by converting BAM files to BED with `bedtools`.
+The six columns in the output should be easy to understand.
+The fifth column, also known as the score, contains the alignment quality by default.
 
 ```bash
 bedtools bamtobed -i ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam | shuf | head -n 20
-# the shuf command performs a random shuffle on the input lines
-# the head command then outputs the first 20 lines.
+# The shuf command performs a random shuffle on the input lines.
+# The head command then outputs the first 20 lines of its input.
+# The combined effect is to output 20 lines selected at random from the bedtools output.
 ```
 
 ## Quality control
@@ -371,11 +377,16 @@ You should see a webpage whose layout and figures, but not the actual details, a
 
 ## Filter BAM file to include only primary reads
 
-<!-- TODO: Motivate that we retain only primary reads, only short section needed here --> 
+We now filter the BAM file containing the alignments to only include primary alignments,
+or the best alignment per molecule.
+When we call modifications, we will get one spatial profile of modification per alignment.
+So if we have multiple alignments per molecule, we will get multiple modification tracks
+per molecule.
+It is just simpler to just get rid of non-primary alignments at this stage.
 
 ```bash
-samtools view -Sb -F "$((256 + 2048))" \
+samtools view -Sb --exclude-flags SECONDARY,SUPPLEMENTARY \
   -o ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.onlyPrim.bam \
   ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam;
-samtools index ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam;
+samtools index ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.onlyPrim.bam;
 ```
