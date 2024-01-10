@@ -4,6 +4,14 @@ element: notes
 title: Genome browser visualization of base modification data
 ---
 
+We have called modifications in a reference-anchored manner in the
+[previous]({{ site.baseurl }}/materials/base-mod-detection) session.
+Our goal in the next few sessions is to introduce several tools
+that can be utilized to analyze modifications and show some sample ways
+in which they can be executed.
+The experimentalist must decide whether to use these tools, how to run these tools,
+and/or whether new tools are needed depending on their experiment. 
+
 In this session, we will visualize modification data in mod BAM files (see fig. below) using (1) genome
 browsers (left) where we can rapidly scan data visually across different reads and different
 regions on the genome, and (2) custom scripts (right) which allow us to see modification
@@ -25,14 +33,6 @@ a custom script, which shows raw modification data (grey) and windowed modificat
 data (red). Here, we can see details per read but we cannot see multiple reads at
 the same time. We will explore the details of these visualizations and how to make
 them in this session.
-
-Modification pipelines have very similar steps till the modifications are called, and very different
-steps after the modifications have been called.
-Our goal in these sessions is to introduce several tools
-that can be utilized to analyze modifications after they are called and show some sample ways
-in which they can be executed.
-The experimentalist must decide whether to use these tools, how to run these tools,
-and/or whether new tools are needed depending on their experiment. 
 
 ## Visualizing modification calls with IGV
 
@@ -83,94 +83,24 @@ We can look at the reads for a few more minutes to get familiar with the visuali
 Pick a read id of a read that looks interesting to you and record it somewhere.
 When we visualize single molecules, you can visualize this molecule.
 
-## Reproducing IGV analyses with samtools
+## Visualizing modifications across single reads with custom script
 
-Before we proceed to single-molecule visualization, let us discuss how to do some of the analyses
-above on the command line with `samtools` or `modkit`. This knowledge will come in handy when
-you want to write scripts on your own.
+We will now visualize a read of interest that you picked out with our custom script.
+Please run the command below, setting the input and output values suitably.
 
-### Subsetting mod BAM files with samtools
-
-The first operation we will look at is subsetting the mod BAM file.
-Whenever you zoom in to a region or click on a read in IGV, you are basically
-subsetting a mod BAM file by region or by read id.
-We will also discuss random subsetting which comes in handy when a BAM file
-is very large and we are interested in a calculation whose result depends
-very weakly on the number of reads, so it is sufficient to run the calculation
-on a randomly-selected subset of reads.
-
-Before we perform any subset, we first count the total number of reads we have
-in a mod BAM file.
-
-Count number of reads
-```bash
-input_file= # fill with whatever input file you want to use
-samtools view -c $input_file
-```
-
-Subset by region:
-Note that the subset will pick out entire reads that pass through a given region,
-not just the part of the read corresponding to the region.
-```bash
-contig=chrII
-start=80000
-end=90000
-input_file= # fill with whatever input file you want to use
-output_file= # fill with an output file name
-samtools view -b -o $output_file $input_file $contig:$start-$end # perform subset
-```
-
-Let's do a quick check that our subset worked by counting the number of reads
-and by examining their coordinates.
+<!-- TODO: finish input and output -->
 
 ```bash
-samtools view -c $input_file      # count reads of input file
-samtools view -c $output_file     # count reads of output file
-bedtools bamtobed -i $output_file | shuf | head -n 10 
-    # look at a few output coordinates
-    # you can run the bedtools command without the shuf and the head if
-    # the output__file is only a few lines long.
-```
-
-Subset by read id:
-```bash
-# fill the following values. 
-# use any suitable mod BAM file and some read id of interest you have recorded.
-input_file=
+# change to the github repo of the course and go to the code folder
+cd ~/nanomod_course_scripts/nanopore-mod-course/code 
+mod_bam=
 read_id=
-output_file=
-samtools view -b -e 'qname=="'$read_id'"' -o $output_file $input_file # perform subset
-samtools view -c $output_file # count reads
+mod_code=T
+ref_flag=use_ref
+threshold=0.5
+window_size=300
+output_dir=
+bash plot_read.sh $mod_bam $read_id $mod_code $ref_flag $threshold $window_size $output_dir
 ```
 
-Get a random subset:
-```bash
-# fill the following values suitably. 
-# use any suitable mod BAM file
-input_file=
-output_file=
-fraction=0.05
-samtools view -s $fraction -b -o $output_file $input_file # perform subset
-samtools view -c $output_file # count reads
-```
-
-### Ways to perform pileup with samtools
-
-<!-- TODO: flesh this out more -->
-
-Get coverage
-`samtools coverage dnascent.detect.mod.sorted.bam`
-
-Get modification
-`samtools mpileup -M dnascent.detect.mod.sorted.bam`
-
-### Pileup with modkit
-
-<!-- TODO: flesh this out more -->
-<!-- TODO: do we need --no-filtering? -->
-`modkit pileup --no-filtering --mod-thresholds T:0.03 dnascent.detect.mod.sorted.bam test.08jan24.bed`
-
-
-<!--
-introduce thresholding and windowing but need not get into details here.
--->
+![Rain plot visualization](sample_rain_plot.png)
