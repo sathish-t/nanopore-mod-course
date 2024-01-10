@@ -1,7 +1,9 @@
 #! /usr/bin/awk -f
-# Pass thresholded mod BAM files as input
-# like
-# samtools view -h sample.bam | awk -f count_mods_per_read.awk
+# Written using ChatGPT.
+# Usage: samtools view -h sample.bam | awk -f count_mods_per_read.awk
+# Input: Pass thresholded mod BAM files with only one type of modification as input
+# Output: Plain text, same as input mod BAM but with new XC tag per line
+#         with modification count of that line
 BEGIN{OFS=FS="\t"}
 !/^@/ {
   found=0;
