@@ -9,14 +9,24 @@ title: Computer Setup
 
 You do not need to read any further than this section.
 You will be given login details to virtual machines by the organisers or the trainers.
-All the software and data required for the course is on these, and
+You will just need to download the latest version of the course repository
+and create a few directories (instructions follow after this paragraph).
+All other software and data required for the course is on the virtual machines, and
 the commands to execute each piece of software will work straight away
-on your Linux command line after you log in.
+on your Linux command line or on the GUI after you log in.
 Please also consult the course prerequisites listed [here](https://www.earlham.ac.uk/events/detection-dna-base-modification-using-nanopore-sequencing).
 
+We need the latest version of the course repository.
 
-If you want to install these packages on your computer after the course is over,
-then please read on.
+```bash
+cd ~/nanomod_course_scripts # go to the folder where scripts are stored
+git clone  --depth 1 {{ site.github.repo }} # get latest version of the course repository
+```
+
+We store input data, scripts, references
+and outputs in the directories `~/nanomod_course_data`, `~/nanomod_course_scripts`,
+`~/nanomod_course_references` and `~/nanomod_course_outputs` respectively.
+Please make them if they do not exist using the `mkdir` command.
 
 ### If you are a self-study student
 
@@ -71,7 +81,9 @@ Get the latest version using the command below and then checkout to the version 
 string `6bacc1f`.
 
 ```bash
-# cd to a suitable folder where you store your scripts or make one and cd to it.
+mkdir -p ~/nanomod_course_scripts
+# we store scripts in the above folder.
+cd ~/nanomod_course_scripts
 git clone https://github.com/DNAReplicationLab/DNAscentTools.git
 cd DNAscentTools/
 git checkout 6bacc1f
@@ -80,8 +92,25 @@ git checkout 6bacc1f
 We need the latest version of the course repository.
 
 ```bash
-# cd to a suitable folder where you store your scripts or make one and cd to it.
-git clone {{ site.github.repo }}
+mkdir -p ~/nanomod_course_scripts
+cd ~/nanomod_course_scripts
+# we store scripts in the above folder.
+git clone --depth 1 {{ site.github.repo }}
+```
+
+#### Directory structure
+
+We use the following four directories to store input data, scripts,
+references, and outputs respectively.
+You can use different directories if you wish.
+Please substitute suitably throughout the course material
+if you use different directories.
+
+```bash
+mkdir -p ~/nanomod_course_data
+mkdir -p ~/nanomod_course_scripts
+mkdir -p ~/nanomod_course_references
+mkdir -p ~/nanomod_course_outputs
 ```
 
 #### Software packages used in python and R
