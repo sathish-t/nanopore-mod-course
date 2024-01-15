@@ -84,8 +84,8 @@ You should see something similar to the figure below.
 
 The gray and green tracks on top result from a pile-up analysis and
 show the modified and unmodified count versus genomic position
-(any averaging calculation that operates over all reads at every base is called a
-pile-up analysis).
+(any averaging calculation that operates over all reads at every base
+on a reference genome is called a pile-up analysis).
 
 Try clicking on a read and see if you can get the following dialog boxes.
 They let you examine the modification probability of a single base on a read
