@@ -113,9 +113,9 @@ mkdir -p ~/nanomod_course_references
 mkdir -p ~/nanomod_course_outputs
 ```
 
-#### Software packages used in python and R
+#### Software modules used in python and R
 
-We need the following software packages on top of the base installs of python and R.
+We need the following software modules on top of the base installs of python and R.
 
 In Python, we need:
 - h5py
@@ -136,6 +136,7 @@ In R, we need:
 ## Descriptions of software packages and links to their documentation and installation instructions
 
 We list the software packages we use with a brief description and useful links below.
+Please install the versions we have listed [above](#if-you-are-a-self-study-student).
 
 ## Dorado  
 
@@ -144,6 +145,11 @@ Takes raw nanopore currents as input and produces DNA sequences and optionally m
 using a set of learned model parameters that associates bases with current characteristics.
 Input formats are fast5 or pod5. Output format is .bam by default and other formats if requested.
 - [Installation and documentation](https://github.com/nanoporetech/dorado)
+
+## Guppy
+
+Oxford NanoporeTech's basecaller. Less advanced than dorado. Please follow this
+[link](https://help.nanoporetech.com/en/articles/6628042-how-do-i-install-stand-alone-guppy) to install it.
 
 
 ## Modkit
@@ -154,3 +160,24 @@ sophisticated analysis like [differential methylation scoring](https://nanoporet
 
 - [Installation](https://github.com/nanoporetech/modkit)
 - [Documentation](https://nanoporetech.github.io/modkit/) 
+
+## DNAscent
+
+Reference-anchored modification-calling program. Uses raw nanopore currents, the reference genome, and
+alignment information to output a probability of BrdU substitution at each thymidine in a sequenced strand.
+Uses a set of learned model parameters that help distinguish between currents produced by thymidines and
+BrdUs in different k-mer environments. 
+- [Installation](https://github.com/MBoemo/DNAscent)
+- [Documentation](https://dnascent.readthedocs.io/en/latest/base.html)
+
+## Minimap2
+
+Alignment software that finds the best-fit location of a given sequence on a linear reference genome.
+- [Installation and documentation](https://github.com/lh3/minimap2)
+
+## Programming languages
+
+We will run scripts written in python and R.
+As these are very popular and have many methods of installation, we are not going to discuss them here.
+Please remember to install the required [modules](#software-modules-used-in-python-and-r) on top
+of the base installs of each package.
