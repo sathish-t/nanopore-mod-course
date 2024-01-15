@@ -11,11 +11,67 @@ modQC: how many modified, unmodified, no standard package so we'll have to do th
 three choices - our own program, samtools or modkit.
 -->
 
-<!-- TODO: flesh out an intro -->
-Discuss how to do some of the analyses
-above on the command line with `samtools` or `modkit`. 
+In this session, we will look at commands that manipulate modification 
+data in mod BAM and produce summary statistics or plots.
+Some of these commands are similar to those run behind the scenes
+in a visualization software.
+By running these commands ourselves, we get quantitative output
+in a tabular format instead of an image format, and we can manipulate
+this data further in our own scripts/pipelines.
 
-### Subsetting mod BAM files with samtools
+![List of manipulations with mod BAM](manipulate_mod_bam.png)
+
+## Refresher: Examine mod BAM files with modkit extract
+
+As we have seen in a previous [session]({{ site.baseurl }}/materials/mod-bam-format),
+the raw mod BAM format is pretty hard to parse for a person.
+It is much more convenient to convert mod BAM files into a tabular format using
+the `modkit extract` command.
+
+```bash
+input_bam_file= # fill with a suitable file
+modkit extract $input_bam_file -
+# - means the output goes to the standard output i.e. the screen.
+# if your file is too large, pipe output through shuf and head.
+# e.g. modkit extract $input_bam_file - | shuf | head -n 20
+```
+
+Please pay close attention to the first, second, third, fourth, and eleventh columns
+which contain data corresponding to the read id, position along the read,
+position along the reference, contig on the reference, and modification probability.
+
+## Simple thresholding of mod BAM files with modkit
+
+In reality, a base on a DNA strand can be either modified or unmodified.
+So, the probability of modification associated with every base in a mod BAM file
+is due to uncertainty in the measurement procedure.
+A thresholding step converts these soft modification calls into hard binary calls
+(modified/unmodified) using a numeric threshold on the probability.
+The simplest threshold is 50%.
+We can execute the thresholding step using `modkit`.
+
+```bash
+input_mod_bam= # fill suitably
+output_mod_bam= # fill suitably
+modkit call-mods --no-filtering $input_mod_bam $output_mod_bam
+```
+
+Run `modkit extract` on the input and output mod bam files.
+You will see that the modification probability is now either
+a value very close to zero 1/(2\*256) or a value very close to
+one 1 - 1/(2\*256).
+
+(optional) Please note that if there are multiple modifications,
+`--no-filtering` calls each base as unmodified or modified with a
+particular modification depending on which of these cases is assigned
+the highest probability.
+
+<!-- TODO: work this in 
+modkit call-mods --mod-threshold m:0.92 --filter-percentile 0\
+  PAM63103_0cd67e80_10000.only_10_reads.5mCG.bam test.2.bam
+-->
+
+## Subsetting mod BAM files with samtools
 
 The first operation we will look at is subsetting the mod BAM file.
 Whenever you zoom in to a region or click on a read in IGV, you are basically
@@ -112,3 +168,7 @@ samtools view -e '[XC]/qlen>0.02' -b -o testo.bam sample.bam
 
 <!-- TODO: can introduce modbedtools https://github.com/lidaof/modbedtools 
 https://doi.org/10.1016/j.xgen.2023.100455 -->
+
+<!-- TODO: 
+modkit sample-probs -n 1000 --out-dir ./test --hist --buckets 20 gm12878_ul_sup_megalodon_HP_chr20.bam
+-->
