@@ -307,7 +307,7 @@ tools require that BAM/SAM files are sorted and indexed.
 We can use samtools to do this.
 
 ```bash
-samtools sort -@ 16 -T /tmp \
+samtools sort -@ 8 -T /tmp \
   -o ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam \
   ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sam
 samtools index ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam
