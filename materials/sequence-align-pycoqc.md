@@ -4,6 +4,10 @@ element: notes
 title: Sequence alignment and pycoQC
 ---
 
+The hands-on sessions begin on our timeline from here.
+Ensure that you have set your computer up using this [link]({{ site.baseurl }}/computer-setup)
+before proceeding.
+
 In this session, we will convert raw currents per DNA strand recorded by nanopore devices
 into DNA sequences (basecalling), find the best-fit location for each strand on a
 reference genome (alignment/genome mapping), and assess their quality (quality control).
@@ -123,8 +127,11 @@ or use the `zcat` command instead of the usual `cat` command to display their co
 
 #### Sequencing summary files contain summary statistics about each read
 
-TBD.
-<!-- TODO: explain what sequencing summary file is. -->
+Basecallers calculate summary statistics about each read and output them to a sequencing summary
+file in tab-separated values (TSV) format with column names.
+Some columns of interest are `read_id`, `sequence_length_template`
+(the length of the read in basepairs), `filename` (the file that contains the raw nanopore currents),
+and `mean_qscore_template` (average read quality).
 
 ### Running the basecalling commands
 
@@ -141,9 +148,6 @@ reads contain modified bases which are expected to interfere with basecalling ac
 
 <!-- TODO: TBD: Downloading carolin's dataset and setting up just the `60/` fast5 folder 
 at `~/nanomod_course_data/carolin_nmeth_18` -->
-
-<!-- TODO: TBD: Download the code to
-at `~/nanomod_course_scripts/nanopore-mod-course/code ` -->
 
 ```bash
 mkdir -p ~/nanomod_course_outputs/carolin_nmeth_18/
@@ -377,8 +381,8 @@ You should see a webpage whose layout and figures, but not the actual details, a
 
 ## Filter BAM file to include only primary reads
 
-We now filter the BAM file containing the alignments to only include primary alignments,
-or the best alignment per molecule.
+We now filter the BAM file containing the alignments to only include primary alignments
+i.e. the best alignment per molecule.
 When we call modifications, we will get one spatial profile of modification per alignment.
 So if we have multiple alignments per molecule, we will get multiple modification tracks
 per molecule.
