@@ -51,7 +51,7 @@ Marked (`#`) files and directories are [course customization]({{ site.baseurl }}
 ├── nav                        | Site navigation pages
 ├── public                     |
 |   ├── css                    | Style sheet for Hyde site theme
-|   └── favicon.ico            | Browser tab icon file 
+|   └── favicon.ico            | Browser tab icon file (we changed to favicon.png)
 |                              | Course Materials (Cont.)
 ├── readings                   |   Reading materials
 |   ├── LANGUAGE-descr.md      |     File name matches assignment
