@@ -194,7 +194,6 @@ the text with python/R.
 For options 2 and 3, you will need to know how a BAM file is structured, so the
 knowledge from this session comes in handy.
 For option 1, you need not know much about a BAM file.
-We are not going to make these tools now as it is beyond the scope of the course.
 
 ### Caution: historical mod BAM files were not well-written
 
