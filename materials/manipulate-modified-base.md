@@ -11,26 +11,30 @@ in a visualization software.
 By running these commands ourselves, we get quantitative output
 in a tabular format instead of an image format, and we can manipulate
 this data further in our own scripts/pipelines.
+These steps are all in the 'further analysis' section of our pipeline
+and must be tuned or tailored to the experiment at hand by the experimenter.
 
-The operations we will be looking at are:
+![Reference-unanchored pipeline with further analysis highlighted](ref_unanc_workflow_modcall_end.png)
+
+The operations we will be running on mod BAM files are:
 - thresholding
 - making histograms of modification probabilities
-- subsetting (either randomly, or by genomic location, or by mean density)
+- subsetting (either randomly, or by genomic location, or by mean modification density)
 - windowing modification calls
 - pileup of modification calls 
 
 ![List of manipulations with mod BAM](manipulate_mod_bam.png)
 
-We can achieve most of these operations using `modkit` and `samtools`.
+We can achieve most of these operations using the pre-existing packages `modkit` and `samtools`.
 For windowing and for measuring mean modification densities across reads,
-we will use our own tools due to an absence of readymade, pre-existing tools.
+we will use our own tools due to an absence of ready-made tools.
 In a later [session]({{ site.baseurl }}/materials/single-molecule-visualization),
-we will use `modbamtools` for further manipulation.
+we will use the package `modbamtools` for further manipulation.
 
-## Refresher: Examine mod BAM files with `modkit extract`
+## Refresher: convert mod BAM files to TSV using `modkit extract`
 
 As we have seen in a previous [session]({{ site.baseurl }}/materials/mod-bam-format),
-the raw mod BAM format is pretty hard to parse for a person.
+the raw mod BAM format is pretty hard to read for a person.
 It is much more convenient to convert mod BAM files into a tabular format using
 the `modkit extract` command.
 
@@ -51,15 +55,36 @@ position along the reference, contig on the reference, and modification probabil
 Thresholding is the process of converting soft modification calls to hard calls
 i.e transforming a probability of modification per base per sequenced strand to a binary yes/no
 (or a ternary yes/no/no etc. when multiple modifications are present).
-In reality, a base on a DNA strand can be either modified or unmodified.
-So, the probability of modification associated with every base in a mod BAM file
-is due to uncertainty in the measurement procedure and for some applications,
-this uncertainty is not important.
-A thresholding step gets binary calls by converting calls above a probability
-to 'yes' and calls below a probability to 'no', excluding bases where information
-is missing.
-The simplest threshold is 50% or 0.5.
-We can execute the thresholding step using `modkit`.
+The ground truth for an experimental sample is that every base on a DNA strand
+is either modified or unmodified.
+The probability of modification associated with every base in a mod BAM file
+is due to uncertainty in the measurement procedure and this accumulates from
+different stages of our experiment and subsequent analysis,
+all the way from sample preparation to modification calling on a computer.
+For some applications, we just want a simple yes/no answer to the modification question
+and this uncertainty is not important.
+
+There are two ways of thresholding, and they can be applied separately or together: 
+- thresholding directly on modification probabilities,
+- thresholding on model confidences.
+Although the two are closely related, we will mostly be dealing with just thresholding
+directly on probabilities.
+
+The probability curve of modification per base usually looks like the following image.
+Each point on the curve corresponds to a probability of modification `p_mod` and
+a probability that the base is unmodified `p_unmod`; these add up to 1.
+
+![Example probability curve of modification per base](probability_of_modification.png)
+
+To threshold directly on probabilities, we convert bases with the probability of
+modification `p_mod` above a threshold value into modified and bases with `p_mod` below
+that value into unmodified. The simplest threshold value is 0.5.
+If one wanted to make an informed choice about a threshold, one has to generate the histogram,
+examine it, and make a decision - we will cover this later in this session.
+
+![Schematic of thresholding on modification probabilities](normal_thresholding.png)
+
+We can execute the thresholding step with a threshold of 0.5 using `modkit`.
 
 ```bash
 input_mod_bam= # fill suitably
@@ -95,20 +120,38 @@ threshold= # fill with a number between 0 and 1.
 modkit call-mods --mod-threshold $mod_code:$threshold --filter-percentile 0 $input_bam $output_bam
 ```
 
-### (optional) Use two thresholds and move in-between bases to the missing category
+### (optional) Using model confidences as thresholds
 
-In our procedure thus far, bases with probabilities above and below a threshold
-are called as modified and unmodified respectively, and missing bases are left untouched.
-Another approach uses two thresholds and calls bases above the higher threshold as modified,
-calls bases below the lower threshold as unmodified,
-and moves the bases between the two thresholds to the missing category.
-The reasoning is that when a model assigns a modification probability close to
-zero or 1, the model is confident in its call. When a model assigns a probability
-close to 0.5, the model is not confident at all and is no better than the random baseline,
-which the practitioners of this approach regard as no different from missing information.
+Another way to perform thresholding is through model confidences.
+Model confidence is highest at bases with modification probabilities close
+to zero or one. 
+At these bases, the model is very confident that the base is unmodified
+or modified respectively.
+Model confidence is lowest at bases with modification probabilities close
+to 0.5.
+Here, the model is saying it can do no better than an unbiased coin toss.
+A schematic of confidence percentiles on a modification-probability curve
+is shown below.
+As you can see, model confidences grow as one moves away from the midpoint
+of 0.5 in either direction.
+Model confidence is not a new measurement - we are just asking which parts
+of the probability curve around the center have areas of 10%, 20% etc. of the whole curve.
+
+![Confidence zones](probability_of_modification_with_confidence_thresholds.png)
+
+One can threshold using the percentiles of confidence as shown below.
+In principle, we are moving high-confidence model calls to the modified
+or unmodified category and discarding the low-confidence model calls.
+This approach is similar to the simple thresholding we have discussed
+thus far but we use two thresholds here and the probabilities corresponding to the
+two thresholds is not known beforehand.
+
+![Example confidence threshold curve](confidence_thresholding.png)
+
 This thresholding is accomplished through the `--filter-percentile` and/or
-the `--filter-threshold` options of `modkit call-mods` in addition to the `--mod-threshold`
-parameter. We will not be discussing this further; you can refer to the modkit documentation
+the `--filter-threshold` options of `modkit call-mods`, which may be used standalone or
+in addition to the `--mod-threshold` parameter.
+We will not be discussing this further; you can refer to the modkit documentation
 [here](https://nanoporetech.github.io/modkit/advanced_usage.html#call-mods) if you are interested.
 
 
@@ -142,8 +185,7 @@ and `thresholds.tsv`.
 ## Subsetting mod BAM files with samtools
 
 Subsetting means we take a mod BAM file as input and produce a mod BAM file
-as output by accepting or rejecting each read based on some criterion.
-
+as output by accepting or rejecting each entire read based on some criterion.
 Whenever you zoom in to a region or click on a read in IGV, you are basically
 subsetting a mod BAM file by region or by read id.
 We will also discuss random subsetting which comes in handy when a BAM file
@@ -160,9 +202,10 @@ input_file= # fill with whatever input file you want to use
 samtools view -c $input_file
 ```
 
-Subset by region:
+### Subset by region
+
 Note that the subset will pick out entire reads that pass through a given region,
-not just the part of the read corresponding to the region. Any subset <!-- TODO -->
+not just the part of the read corresponding to the region. 
 ```bash
 contig=chrII
 start=80000
@@ -184,7 +227,10 @@ bedtools bamtobed -i $output_file | shuf | head -n 10
     # the output__file is only a few lines long.
 ```
 
-Subset by read id:
+### Subset by read id
+
+The following command makes a mod BAM file with only the read of the read id of interest.
+
 ```bash
 # fill the following values. 
 # use any suitable mod BAM file and some read id of interest you have recorded.
@@ -195,7 +241,11 @@ samtools view -b -e 'qname=="'$read_id'"' -o $output_file $input_file # perform 
 samtools view -c $output_file # count reads
 ```
 
-Get a random subset:
+### Subset randomly
+
+The following command makes a mod BAM file with a subset of randomly-chosen reads
+whose number is set by the input fraction.
+
 ```bash
 # fill the following values suitably. 
 # use any suitable mod BAM file
@@ -204,6 +254,17 @@ output_file=
 fraction=0.05
 samtools view -s $fraction -b -o $output_file $input_file # perform subset
 samtools view -c $output_file # count reads
+```
+
+### Subset by mean modification density
+
+<!-- TODO -->
+```bash
+./sample.test.awk sample.test.sam | samtools view -b | bedtools bamtobed -i - -tag XC
+```
+<!-- after making mod counts, can use commands like these  -->
+```bash
+samtools view -e '[XC]/qlen>0.02' -b -o testo.bam sample.bam
 ```
 
 ### Ways to perform pileup with samtools
@@ -227,18 +288,5 @@ Get modification
 introduce thresholding and windowing but need not get into details here.
 -->
 
-<!-- TODO -->
-```bash
-./sample.test.awk sample.test.sam | samtools view -b | bedtools bamtobed -i - -tag XC
-```
-<!-- after making mod counts, can use commands like these  -->
-```bash
-samtools view -e '[XC]/qlen>0.02' -b -o testo.bam sample.bam
-```
-
 <!-- TODO: can introduce modbedtools https://github.com/lidaof/modbedtools 
 https://doi.org/10.1016/j.xgen.2023.100455 -->
-
-<!-- TODO: 
-modkit sample-probs -n 1000 --out-dir ./test --hist --buckets 20 gm12878_ul_sup_megalodon_HP_chr20.bam
--->
