@@ -9,7 +9,7 @@ In this comprehensive two-day course, participants will learn how to use nanopor
 
 For Students
 : <a href="{{ site.baseurl}}/syllabus">
-  <i class="fa fa-file-text-o fa-fw"></i> Syllabus</a>
+  <i class="fa fa-file-text-o fa-fw"></i> Schedule/Syllabus</a>
 : <a href="{{ site.baseurl}}/computer-setup">
   <i class="fa fa-download fa-fw"></i> Setup</a>
 : <a href="{{ site.baseurl}}/START-for-self-guided-students">
