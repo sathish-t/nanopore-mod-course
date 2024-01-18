@@ -1,7 +1,7 @@
 ---
 layout: page
 element: notes
-title: Sequence alignment and pycoQC
+title: Basecalling, sequence alignment, and pycoQC
 ---
 
 The hands-on sessions begin on our timeline from here.
