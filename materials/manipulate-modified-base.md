@@ -67,12 +67,16 @@ and this uncertainty is not important.
 There are two ways of thresholding, and they can be applied separately or together: 
 - thresholding directly on modification probabilities,
 - thresholding on model confidences.
-Although the two are closely related, we will mostly be dealing with just thresholding
-directly on probabilities.
+
+We will be using just thresholding directly on probabilities, and leave
+thresholding on model confidences to optional sections below.
 
 The probability curve of modification per base usually looks like the following image.
 Each point on the curve corresponds to a probability of modification `p_mod` and
 a probability that the base is unmodified `p_unmod`; these add up to 1.
+The calls with probabilities close to zero or one are where the model in the modification
+caller is certain that the call is correct. The calls around 0.5 are where
+model uncertainty is the highest as it is doing no better than an unbiased coin toss.
 
 ![Example probability curve of modification per base](probability_of_modification.png)
 
@@ -135,7 +139,8 @@ is shown below.
 As you can see, model confidences grow as one moves away from the midpoint
 of 0.5 in either direction.
 Model confidence is not a new measurement - we are just asking which parts
-of the probability curve around the center have areas of 10%, 20% etc. of the whole curve.
+of the probability curve around the center have areas a fraction of the
+whole curve with the fraction set at 10%, 20% etc. 
 
 ![Confidence zones](probability_of_modification_with_confidence_thresholds.png)
 
@@ -170,17 +175,48 @@ bins in the histogram (`--buckets 10`), and wish to sample
 to save runtime; usually a fraction of the BAM file is sufficient
 for these calculations and we leave it to the experimenter to
 determine what that fraction is for their dataset).
+We will discuss the `-p` option in an optional subsection a little later.
 
 ```bash
 input_bam_file= # fill this suitably
-modkit sample-probs $input_bam_file -o ./histogram --hist --buckets 10 -n 1000
+modkit sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
+  $input_bam_file -o ./histogram --hist --buckets 10 -n 1000
 ```
 
 The output files are deposited in the `./histogram` folder.
 You should see three output files: `probabilities.txt`, `probabilities.tsv`
 and `thresholds.tsv`.
+The `probabilities` files report number of modified bases in ten buckets of
+modification probability `p_mod` from 0.5 - 1.0,
+and the same for the number of unmodified bases using the probability that
+the base is not modified `p_unmod = 1 - p_mod`.
+`probabilities.txt` also contains a histogram made with ASCII art
+(i.e. using the symbol ∎ to build horizontal bars of this histogram).
 
-<!-- TODO: fill what these files mean. what do we do about thresholds? -->
+Have a look at these files, and answer this question for yourself: what 
+would be a good modification probability value for thresholding?
+
+### (optional) thresholds.tsv: measure correspondence between model confidence thresholds and direct probability thresholds
+
+`thresholds.tsv` contains the table of conversion between model confidences and direct probability thresholds.
+This is illustrated in the schematic below, which shows that model confidences of 10% and below
+lie between modification probabilities of `t_1` and `0.5 - t_1`, confidences of 20% and below lie between
+`t_2` and `0.5-t_2` etc. So, thresholds.tsv contains a table that lists this correspondence.
+There are a few other details such as how the program deals with probability curves that are not symmetric about 0.5.
+We are not going to discuss this further; please experiment with this tool and read the 
+[documentation](https://nanoporetech.github.io/modkit/advanced_usage.html#sample-probs) to learn more.
+
+![Schematic of conversion of confidence threshold to probability thresholds](confidence_threshold_convert_to_normal_threshold.png)
+
+### (optional) Form modification histogram from data only at given genomic regions
+
+To form a histogram from data restricted to given genomic regions, form a BED file
+with these regions and pass it to `modkit sample-probs` with the `--include-bed`
+option.
+To form a BED file for particular motifs such as CG, you can use the `modkit motif-bed`
+command.
+Please refer to the modkit [documentation](https://nanoporetech.github.io/modkit/advanced_usage.html)
+for more details.
 
 ## Subsetting mod BAM files with samtools
 
@@ -202,7 +238,8 @@ Following are examples of where subsetting is useful.
 Before we perform any subset, we first count the total number of reads we have
 in a mod BAM file.
 
-Count number of reads
+### Count number of reads
+
 ```bash
 input_file= # fill with whatever input file you want to use
 samtools view -c $input_file
@@ -351,32 +388,119 @@ This logic could easily be implemented in python or R as well.
 We have chosen a tag starting with 'X' so as to not to interfere with other
 BAM tags.
 
-### Combining samtools filters
+### Combining several filters to form subsets with `samtools`
 
-Several filters we have discusssed above can be combined. 
+A powerful feature of `samtools` is that any of the commands we have used above
+can be combined to form complex queries that would have otherwise required
+a substantial amount of computer code to achieve.
+We give a sample of some of the possiblities below.
+Please read the documentation on `samtools view`
+[here](https://www.htslib.org/doc/samtools-view.html) and the documentation
+on filter expressions [here](https://www.htslib.org/doc/1.19/samtools.html#FILTER_EXPRESSIONS)
+to learn about the possibilities.
+
+```bash
+# NOTE: We are not filling the input variables below as these
+#       are just examples of what's possible with samtools.
+#       Please fill them if you want to run them yourself either
+#       now or later.
+
+# make a subset with reads passing through a given region with
+# at least 100 modifications and an alignment length of at least 10 kb
+samtools view -e '[XC]>100&&rlen>10000' -b -o $output_file $input_file $contig:$start-$end
+
+# make a subset with reads passing through given genes with
+# at least 1000 modifications
+samtools view -e '[XC]>1000' -b -o $output_file --region-file $genes_bed_file $input_file 
+
+# subset to get reads that have a low mean modification density
+# and then randomly select 10%.
+samtools view -e '[XC]/rlen<0.01' -s 0.1 -b -o $output_file $input_file
+```
+
+## Combining mod BAM tools leads to easy workflows
+
+Any tool that takes a mod BAM file as an input can also take a subset
+mod BAM file as input.
+Although the above statement sounds obvious, we give an example below
+of how powerful the combination of `modkit` and `samtools` is.
+Let us say we want to look at the modification profiles at a specific
+genomic feature, say transcription start sites.
+A sample way to do this follows.
+
+```bash
+# select only those reads that are highly modified
+# and pass through the given region
+samtools view -e '[XC]>100' -b -o $output_file \
+  --region-file $transcription_start_sites $input_file 
+
+# make histogram using only the part of the reads
+# that overlap with the given region
+modkit sample-probs $output_file -o ./histogram --hist --buckets 10 \
+  --include-bed $transcription_start_sites
+```
+
+## Windowing mod BAM files using custom scripts
+
+We will now learn how to make the data behind the windowed track that we saw in
+our earlier visualization [session]({{ site.baseurl }}/materials/genome-browser-visualization)
+when we made one-read modification plots.
+We will measure mean modification density per shoulder-to-shoulder windows of a given
+size in base pairs along a read and output it to a tab-separated file.
+We will use two custom python scripts that we have written as there are no
+ready-made tools for this purpose.
+
+```bash
+one_read_bam= # fill suitably with a mod BAM file with
+              # just one read in it
+
+# Extract modification information from the bam file
+# NOTE: the --force overwrites any pre-existing output files.
+modkit extract --force "$one_read_bam" "$one_read_bam".tsv
+
+# Use python scripts to extract raw data and window it
+mod_code=                  # use m for 5mC or T for BrdU etc.
+coords_flag=use_ref        # window using reference coordinates
+threshold=                 # threshold to call bases as modified
+window_size= # size of window in number of bases of interest
+             #(C for 5mC, T for BrdU etc.)
+
+python extract_raw_mod_data.py $mod_code $coords_flag "$one_read_bam".tsv "$one_read_bam"_rawVal.tsv
+python window_mod_data.py $threshold $window_size "$one_read_bam"_rawVal.tsv "$one_read_bam"_winVal.tsv
+```
+
+Please inspect the `"$one_read_bam"_winVal.tsv` file to see the windowed data.
+
+## Pileup of reference-anchored mod BAM files with `modkit` and `samtools`
+
+A pileup is any calculation that produces one number per base on a reference
+genome by performing an operation across all data available at that base
+across all reads that contain it.
+We have encountered pileups in the previous
+[session]({{ site.baseurl }}/materials/genome-browser-visualization)
+on visualization in genome browsers.
+
+![IGV view with pileup annotation](igv_overall_view_with_pileup_annotated.png)
 
 <!-- TODO: flesh this out more -->
 
-### Ways to perform pileup with samtools
+To get the coverage of a BAM file, do
+
+```bash
+input_mod_bam= # fill suitably
+bedtools genomecov -ibam $input_mod_bam -bga > coverage.bedgraph
+# inspect the first few lines
+head -n 20 coverage.bedgraph
+# inspect a few randomly chosen lines
+cat coverage.bedgraph | shuf | head -n 20
+```
 
 <!-- TODO: flesh this out more -->
+`modkit pileup --no-filtering --mod-thresholds T:0.03 dnascent.detect.mod.sorted.bam test.08jan24.bed`
 
-Get coverage
-`samtools coverage dnascent.detect.mod.sorted.bam`
+### (optional) Modification pileup with `samtools`
 
 Get modification
 `samtools mpileup -M dnascent.detect.mod.sorted.bam`
 
-### Pileup with modkit
-
-<!-- TODO: flesh this out more -->
-<!-- TODO: do we need --no-filtering? -->
-`modkit pileup --no-filtering --mod-thresholds T:0.03 dnascent.detect.mod.sorted.bam test.08jan24.bed`
-
-
-<!--
-introduce thresholding and windowing but need not get into details here.
--->
-
-<!-- TODO: can introduce modbedtools https://github.com/lidaof/modbedtools 
-https://doi.org/10.1016/j.xgen.2023.100455 -->
+## Final remarks
