@@ -184,14 +184,20 @@ and `thresholds.tsv`.
 
 ## Subsetting mod BAM files with samtools
 
-Subsetting means we take a mod BAM file as input and produce a mod BAM file
+We take a mod BAM file as input and produce a subset mod BAM file
 as output by accepting or rejecting each entire read based on some criterion.
-Whenever you zoom in to a region or click on a read in IGV, you are basically
-subsetting a mod BAM file by region or by read id.
-We will also discuss random subsetting which comes in handy when a BAM file
-is very large and we are interested in a calculation whose result depends
-very weakly on the number of reads, so it is sufficient to run the calculation
-on a randomly-selected subset of reads.
+We will discuss five types of subsetting in this section:
+- subset by genomic region.
+- subset by read id
+- subset randomly
+- subset by modification amount per read
+- any combination of the above
+
+Following are examples of where subsetting is useful.
+
+- to get a quick look at the data
+- to downsample a dataset before calculations for which a representative, small number of reads are sufficient.
+- to enrich for reads with some features e.g. highly modified, located near a gene of interest etc.
 
 Before we perform any subset, we first count the total number of reads we have
 in a mod BAM file.
@@ -204,13 +210,15 @@ samtools view -c $input_file
 
 ### Subset by region
 
-Note that the subset will pick out entire reads that pass through a given region,
-not just the part of the read corresponding to the region. 
+The following command makes a mod BAM file with only reads that pass through a given region.
+Note that the subset will pick out entire reads,
+not just the part of the read that overlaps with the region. 
+
 ```bash
-contig=chrII
-start=80000
-end=90000
-input_file= # fill with whatever input file you want to use
+contig= # fill with a suitable contig e.g. chrII
+start= # fill with a suitable start coordinate e.g 80000
+end= # fill with a suitable end coordinate e.g. 90000
+input_file= # fill with whatever input mod BAM file you want to use
 output_file= # fill with an output file name
 samtools view -b -o $output_file $input_file $contig:$start-$end # perform subset
 ```
@@ -222,10 +230,14 @@ and by examining their coordinates.
 samtools view -c $input_file      # count reads of input file
 samtools view -c $output_file     # count reads of output file
 bedtools bamtobed -i $output_file | shuf | head -n 10 
-    # look at a few output coordinates
+    # look at a few output coordinates using bedtools bamtobed
+    # to verify the reads overlap the region of interest.
     # you can run the bedtools command without the shuf and the head if
-    # the output__file is only a few lines long.
+    # the $output_file is only a few lines long.
 ```
+
+One can also subset by a list of regions; please follow the instructions in the `samtools view`
+[documentation](http://www.htslib.org/doc/samtools-view.html) if you are interested.
 
 ### Subset by read id
 
@@ -241,10 +253,14 @@ samtools view -b -e 'qname=="'$read_id'"' -o $output_file $input_file # perform 
 samtools view -c $output_file # count reads
 ```
 
+One can subset by a list of reads using the `-N` option.
+Please look at the `samtools view` documentation [here](http://www.htslib.org/doc/samtools-view.html).
+
 ### Subset randomly
 
 The following command makes a mod BAM file with a subset of randomly-chosen reads
-whose number is set by the input fraction.
+whose total number is set by the input fraction and
+the total number of reads in the input file.
 
 ```bash
 # fill the following values suitably. 
@@ -256,16 +272,90 @@ samtools view -s $fraction -b -o $output_file $input_file # perform subset
 samtools view -c $output_file # count reads
 ```
 
-### Subset by mean modification density
+### Subset by modification amount
 
-<!-- TODO -->
+An experimenter may wish to isolate the reads with a minimum number of modified bases
+in them for further analysis.
+Unfortunately, there is no off-the-shelf `samtools` command or otherwise to achieve this.
+We solve this problem using a custom script to generate mod BAM files with custom tags
+at the end of each line with modification counts.
+Then, samtools can be used to query this new mod BAM file to output the desired
+high-modification-count subset.
+
+We have implemented a custom script `count_mods_per_read.awk`
+written for the tool `awk` to append
+a numeric tag `XC` at the end of each thresholded mod BAM line.
+The tag contains the number of modifications in that mod BAM line.
+For example, the mod BAM line with the modification data `MM:Z:T+T?,0,0,0; ML:B:C,0,255,255`
+gets the tag `XC:i:2` as there are two modifications.
+
+The script is purely for demonstrative purposes and is not production-ready
+as it will not work with all types of mod BAM files e.g. non-thresholded ones,
+ones with multiple modifications, and a few others.
+We wanted a simple demonstration of how to leverage pre-existing tools and our knowledge
+of the mod BAM format to write tools ourselves when they are not available.
+So we have not added all the additional features to make the script a
+good production script for the sake of simplicity.
+
 ```bash
-./sample.test.awk sample.test.sam | samtools view -b | bedtools bamtobed -i - -tag XC
+cd ~/nanomod_course_scripts/nanopore-mod-course/code
+input_bam= # fill suitably with a thresholded modBAM file,
+           # or threshold one first with `modkit call-mods` as we've
+           # discussed earlier in this session and use it here
+bam_with_counts= # fill suitably
+samtools view -h $input_bam | awk -f count_mods_per_read.awk |\
+  samtools view -b -o $bam_with_counts
+# above line converts BAM -> SAM, runs script on it,
+# and converts back to BAM.
+# the output bam file contains the XC tag.
 ```
-<!-- after making mod counts, can use commands like these  -->
+
+Let us display a table of some reads, their alignment coordinates, and their modification
+counts using the following `bedtools bamtobed` command.
+The output data is in the BED format, with the fifth column
+containing the modification count from the XC tag (`-tag XC`).
+
 ```bash
-samtools view -e '[XC]/qlen>0.02' -b -o testo.bam sample.bam
+bedtools bamtobed -i $bam_with_counts -tag XC | shuf | head -n 20
+# you can drop the shuf and the head if the bam file is short enough
 ```
+
+The advantage of storing modification counts using a tag in
+the modBAM file is that one can use `samtools` to achieve
+the desired high-modification-count subset now.
+The following command extracts reads with at least 100 modified bases
+per read.
+
+```bash
+output_bam= # fill suitably
+samtools view -e '[XC]>100' -b -o $output_bam $bam_with_counts
+```
+
+One can combine other variables like alignment length with our modification
+count in samtools queries.
+We give an example below where we form a subset of reads with at least
+one modified base per 100 aligned bases.
+
+```bash
+output_bam= # fill suitably
+samtools view -e '[XC]/rlen>0.01' -b -o $output_bam $bam_with_counts
+```
+
+#### (optional) More details about the modification counting script
+
+We have written the script in the AWK programming language.
+The logic in the script is to read each line, isolate the column starting with ML,
+split by comma, count the number of 255s in it, put this information
+in an XC tag, and append it to the line.
+This logic could easily be implemented in python or R as well.
+We have chosen a tag starting with 'X' so as to not to interfere with other
+BAM tags.
+
+### Combining samtools filters
+
+Several filters we have discusssed above can be combined. 
+
+<!-- TODO: flesh this out more -->
 
 ### Ways to perform pileup with samtools
 
