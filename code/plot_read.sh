@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Written by Isabel Díez-Santos and Sathish Thiyagarajan
+# Written by Isabel Díez-Santos, Sathish Thiyagarajan, and ChatGPT.
 
 # Goal: to extract raw and windowed data from one read and to plot it.
 

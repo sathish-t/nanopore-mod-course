@@ -1,7 +1,7 @@
 import sys
 import pandas as pd
 
-# Written by Isabel Díez-Santos and Sathish Thiyagarajan
+# Written by Isabel Díez-Santos, Sathish Thiyagarajan, and ChatGPT.
 
 def window_mod_data(threshold, window_size, input_file, output_file):
     def convert_threshold(value):

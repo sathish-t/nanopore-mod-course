@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-# Written by Isabel Díez-Santos and Sathish Thiyagarajan
+# Written by Isabel Díez-Santos, Sathish Thiyagarajan, and ChatGPT.
 
 # Usage: Rscript ./plot_one_read_w_win.R plot_data plot.png
 
