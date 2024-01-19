@@ -1,7 +1,7 @@
 ---
 layout: page
 element: notes
-title: Genome browser visualization of base modification data
+title: Visualisation of base modification data - part I
 ---
 
 We have called modifications in a reference-anchored manner in the

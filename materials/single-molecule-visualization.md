@@ -1,7 +1,7 @@
 ---
 layout: page
 element: notes
-title: Single molecule base modification data visualisation
+title: Visualisation of base modification data - part II
 ---
 
-TBD single molecule base modification data visualisation.
+TBD Visualisation of base modification data - part II.

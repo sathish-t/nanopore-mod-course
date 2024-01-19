@@ -1,7 +1,7 @@
 ---
 layout: page
 element: notes
-title: Comparison of methods for single molecule base modification detection
+title: Alternative method for single molecule base modification detection
 ---
 
 Section in progress.
