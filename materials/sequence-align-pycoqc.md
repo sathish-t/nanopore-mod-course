@@ -6,7 +6,7 @@ title: Basecalling, sequence alignment, and pycoQC
 
 The hands-on sessions begin on our timeline from here.
 Ensure that you have set your computer up using this [link]({{ site.baseurl }}/computer-setup)
-before proceeding.
+and have the input data using this [link]({{ site.baseurl }}/data) before proceeding.
 
 In this session, we will convert raw currents per DNA strand recorded by nanopore devices
 into DNA sequences (basecalling), find the best-fit location for each strand on a
@@ -145,9 +145,6 @@ To use GPUs, one needs to specify the input parameter `--device cuda:n` where `n
 Normally, reads are split into pass
 and fail bins depending on their quality, but we allow all reads through (`--disable_qscore_filtering`) as our
 reads contain modified bases which are expected to interfere with basecalling accuracy.
-
-<!-- TODO: TBD: Downloading carolin's dataset and setting up just the `60/` fast5 folder 
-at `~/nanomod_course_data/carolin_nmeth_18` -->
 
 ```bash
 mkdir -p ~/nanomod_course_outputs/carolin_nmeth_18/
