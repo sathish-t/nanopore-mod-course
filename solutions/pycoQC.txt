@@ -1,0 +1,5 @@
+You should see that the file only contains reads from chrVI,
+and that all reads are longer than 30 kb.
+The dataset looks so because the instructors of the course
+have performed such a subsetting.
+You can confirm this by opening the file in IGV if you have time.
