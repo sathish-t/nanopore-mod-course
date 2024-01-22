@@ -5,8 +5,9 @@ title: Datasets
 
 ## Instructions
 
-We will be working with two datasets in this course:
-a yeast dataset on day 1 and the yeast and a human dataset on day 2.
+We will be working with two datasets in this course: a yeast DNA dataset
+with some thymidines substituted by BrdU and a human dataset of
+methylated DNA.
 The yeast dataset is at this [link](https://ckan.earlham.ac.uk/dataset/nat-meth-2019-subset-for-nanomod-course)
 and the human dataset is at this [link](https://labs.epi2me.io/cliveome_5mc_cfdna_celldna/).
 Please read on to see how to download the datasets and prepare them for use.
@@ -26,9 +27,9 @@ cp -r /mnt/trainings/BaseMod2024/* .
 ```
 
 You should now see two directories called `yeast` and `human`.
-Please go back to the session.
+Data preparation is now complete.
 
-### If you are a self-study students
+### If you are a self-study student
 
 #### Yeast
 
@@ -37,7 +38,8 @@ Please download the yeast dataset from this
 Please put it in a suitable folder and untar it using the command 
 
 ```bash
-tar -xzvf $filename # substitute filename suitably
+filename= # substitute filename suitably
+tar -xzvf $filename
 ```
 
 Then, move the contents of the resultant `for_ckan` folder to a suitable location.
@@ -48,13 +50,15 @@ Just remember to use the correct paths when executing the commands in each sessi
 #### Human
 
 The human dataset we are using is > 1 TB but we will be using only a small fraction of it.
-Due to sensitivities associated with human data, we are unable to provide you the subset
+As any human dataset is of a sensitive nature, we are unable to provide you the subset
 we are using directly and you will have to recreate it using the commands below.
+You will need to download tens of GB and use tens of minutes of computational time.
 
-To make a subset of the human data, please make a directory called `~/nanomod_course_data/human`.
+Please make a directory called `~/nanomod_course_data/human` to store the data.
 As stated in the yeast subsection above, you can use any other directory.
 Just remember to use the correct paths when executing commands in the course.
 
+We first make a subset of a mod BAM file as shown below.
 ```bash
 cd ~/nanomod_course_data/human
 mod_bam=http://ont-open-data.s3.amazonaws.com/cliveome_kit14_2022.05/gdna/basecalls/PAM63974/bonito_calls.bam
@@ -66,8 +70,7 @@ sort and index the file to form `bonito_calls.subset.sorted.bam` and `bonito_cal
 You will learn how to run these commands on day 1, so if you do not know how to run them,
 just come back to this section after day 1.
 
-Next, get a fast5 file and put it in `~/nanomod_course_data/human`.
-Convert it into pod5 and subsample at random to retain 20 reads.
+Next, we make a random subset of nanopore currents from a fast5 file after converting it to pod5.
 
 ```bash
 cd ~/nanomod_course_data/human
@@ -77,10 +80,12 @@ pod5 view ./PAM63974_pass_58881fec_60.pod5 --ids --no-header | shuf | head -n 20
 pod5 filter ./PAM63974_pass_58881fec_60.pod5 --ids twenty_read_ids.txt --output ./PAM63974_pass_58881fec_60.twenty_random_reads.pod5
 ```
 
-We will also be inspecting the output of the tool pycoQC run on the human data.
-We run the program ourselves and give the results to the course participants to minimize computer runtime.
-Unfortunately, we cannot host these files on the internet and 
-running the command will require downloading tens of GB of data.
+Next, we run pycoQC to judge the quality of the dataset.
+In the course run by the Earlham Institute, we run the program ourselves and
+give the results to the course participants to minimize computer runtime.
+Unfortunately, we cannot host these files on the internet and give them to you.
+The commands below require downloading tens of GB of data
+and tens of minutes of computational time.
 
 ```bash
 cd ~/nanomod_course_data/human
@@ -90,4 +95,4 @@ pycoQC -f sequencing_summary_PAM63974_58881fec.txt\
   -a bonito_calls.bam -o ./analysis.html -j ./analysis.json
 ```
 
-Please proceed to the course.
+Data preparation is now complete.
