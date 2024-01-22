@@ -147,17 +147,19 @@ and fail bins depending on their quality, but we allow all reads through (`--dis
 reads contain modified bases which are expected to interfere with basecalling accuracy.
 
 ```bash
-mkdir -p ~/nanomod_course_outputs/carolin_nmeth_18/
+input_dir=~/nanomod_course_data/yeast
+output_dir=~/nanomod_course_outputs/yeast
+model_file=dna_r9.4.1_450bps_fast.cfg
+  # a higher accuracy model file (_hac instead of _fast) above
+  # leads to longer run times.
+mkdir -p $output_dir
 
-guppy_basecaller --input_path ~/nanomod_course_data/carolin_nmeth_18/60 \
-    --save_path ~/nanomod_course_outputs/carolin_nmeth_18 \
-    --config dna_r9.4.1_450bps_hac.cfg --recursive -q 10 --disable_pings \
+guppy_basecaller --input_path $input_dir \
+    --save_path $output_dir \
+    --config $model_file --disable_pings \
     --num_callers 8 --cpu_threads_per_caller 2 --disable_qscore_filtering \
     --progress_stats_frequency 10
 ```
-
-We stop the job after five minutes or so using `Ctrl+C` (`Command+.` for mac users),
-after we've four fastq files.
 
 ## Alignment: locating sequenced DNA on a reference genome
 
@@ -293,10 +295,11 @@ files and the reference genome we downloaded above. The `-x map-ont` parameter i
 minimap2 to use alignment parameters optimized for nanopore data.
 
 ```bash
+reference=~/nanomod_course_references/sacCer3.fa
+input_fastq=~/nanomod_course_outputs/yeast/*.fastq
+output_sam=~/nanomod_course_outputs/yeast/aligned_reads.sam
 minimap2 -L -a -x map-ont -t 8 \
-  ~/nanomod_course_references/sacCer3.fa \
-  ~/nanomod_course_outputs/carolin_nmeth_18/*.fastq.* >\
-  ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sam
+  $reference $input_fastq > $output_sam
 ```
 
 Whenever BAM/SAM files are made, it is a good idea to sort and index them as many
@@ -304,10 +307,10 @@ tools require that BAM/SAM files are sorted and indexed.
 We can use samtools to do this.
 
 ```bash
-samtools sort -@ 8 -T /tmp \
-  -o ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam \
-  ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sam
-samtools index ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam
+input_sam=~/nanomod_course_outputs/yeast/aligned_reads.sam
+output_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam
+samtools sort -@ 8 -T /tmp -o $output_bam $input_sam
+samtools index $output_bam
 ```
 
 ## Preliminary inspection of alignments
@@ -342,7 +345,8 @@ quality-control reports.
 Count number of reads in the BAM file with `samtools`.
 
 ```bash
-samtools view -c ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam
+input_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam
+samtools view -c $input_bam
 ```
 
 Inspect a few alignment coordinates by converting BAM files to BED with `bedtools`.
@@ -350,7 +354,8 @@ The six columns in the output should be easy to understand.
 The fifth column, also known as the score, contains the alignment quality by default.
 
 ```bash
-bedtools bamtobed -i ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam | shuf | head -n 20
+input_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam
+bedtools bamtobed -i $input_bam | shuf | head -n 20
 # The shuf command performs a random shuffle on the input lines.
 # The head command then outputs the first 20 lines of its input.
 # The combined effect is to output 20 lines selected at random from the bedtools output.
@@ -364,20 +369,48 @@ aligned data. The program runs commands similar in spirit to the `samtools` and
 number of alignments etc. and plots like histograms of alignment lengths etc.
 
 ```bash
-pycoQC \
-    -f ~/nanomod_course_outputs/carolin_nmeth_18/sequencing_summary.txt \
-    -a ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam \
-    -o ~/nanomod_course_outputs/carolin_nmeth_18/pycoQC/analysis.html \
-    -j ~/nanomod_course_outputs/carolin_nmeth_18/pycoQC/analysis.json \
-    --quiet
+input_seq_sum=~/nanomod_course_outputs/yeast/sequencing_summary.txt
+input_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam
+output_html=~/nanomod_course_outputs/yeast/pycoQC/analysis.html
+output_json=~/nanomod_course_outputs/yeast/pycoQC/analysis.json
+pycoQC -f $input_seq_sum -a $input_bam -o $output_html \
+  -j $output_json --quiet
+```
+
+You should see some error messages! Why did we get them?
+Well, it is because we have only tens of reads in our BAM file!
+We had to choose small files so that our pipeline steps run pretty fast in the course.
+Let us use a more realistic BAM file and run pycoQC again!
+Let us have a quick look at one of the other BAM files in our input data.
+
+```bash
+input_bam=~/nanomod_course_data/yeast/subset_1.bam
+samtools view -c $input_bam
+```
+
+You should see many more reads from the output above.
+Let's run pycoQC with this BAM file.
+
+```bash
+input_seq_sum=~/nanomod_course_data/yeast/sequencing_summary.subset_1.txt
+input_bam=~/nanomod_course_data/yeast/subset_1.bam
+output_html=~/nanomod_course_outputs/yeast/pycoQC/analysis.subset_1.html
+output_json=~/nanomod_course_outputs/yeast/pycoQC/analysis.subset_1.json
+pycoQC -f $input_seq_sum -a $input_bam -o $output_html \
+  -j $output_json --quiet
 ```
 
 You can open the analysis.html file in your browser after the program has finished running.
 You should see a webpage whose layout and figures, but not the actual details, are similar to
 [this](https://a-slide.github.io/pycoQC/pycoQC/results/Guppy-2.3_basecall-1D_alignment-DNA.html).
 
+### Exercise
+
+We will run pycoQC on another BAM file in [this]({{ site.baseurl }}/exercises/pycoQC) exercise.
+
 ## Filter BAM file to include only primary reads
 
+Let us return to the BAM file with a few reads that we are running our pipeline on.
 We now filter the BAM file containing the alignments to only include primary alignments
 i.e. the best alignment per molecule.
 When we call modifications, we will get one spatial profile of modification per alignment.
@@ -386,8 +419,9 @@ per molecule.
 It is just simpler to just get rid of non-primary alignments at this stage.
 
 ```bash
+input_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam
+output_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.onlyPrim.bam
 samtools view -Sb --exclude-flags SECONDARY,SUPPLEMENTARY \
-  -o ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.onlyPrim.bam \
-  ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.bam;
-samtools index ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.onlyPrim.bam;
+  -o $output_bam $input_bam;
+samtools index $output_bam;
 ```
