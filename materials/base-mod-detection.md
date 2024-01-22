@@ -37,9 +37,12 @@ We now need to create an index needed by DNAscent — a plain text with two colu
 and the fast5 file with the corresponding time course of nanopore current.
 
 ```bash
-DNAscent index -f ~/nanomod_course_data/carolin_nmeth_18/60 \
-  -o ~/nanomod_course_outputs/carolin_nmeth_18/index.dnascent \
-  -s ~/nanomod_course_outputs/carolin_nmeth_18/sequencing_summary.txt
+input_fast5_dir=~/nanomod_course_data/yeast
+output_index=~/nanomod_course_outputs/yeast/index.dnascent
+input_seq_summ=~/nanomod_course_outputs/yeast/sequencing_summary.txt
+
+DNAscent index -f $input_fast5_dir -o $output_index \
+  -s $input_seq_summ
 ```
 
 ### Call modifications
@@ -53,18 +56,18 @@ The program uses a machine-learning approach where model parameters learned prev
 represent differences in nanopore current characteristics between thymidine and BrdU.
 
 The additional options below direct the program to use
-16 computational threads and to reject alignments below a mapping quality of 20 and
+8 computational threads and to reject alignments below a mapping quality of 20 and
 a genome-mapped length of 1000 bases. 
 By omitting the `--GPU` input parameter, we are running DNAscent in a slow, CPU-only mode
 as the virtual machines used in the course do not have GPUs to lower costs.
 
 ```bash
-DNAscent detect -b ~/nanomod_course_outputs/carolin_nmeth_18/aligned_reads.sorted.onlyPrim.bam \
-  -r ~/nanomod_course_references/sacCer3.fa \
- -i ~/nanomod_course_outputs/carolin_nmeth_18/index.dnascent \
- -o ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect \
- -t 16 \
- -q 20 -l 1000
+input_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.onlyPrim.bam
+ref_genome=~/nanomod_course_references/sacCer3.fa
+index=~/nanomod_course_outputs/yeast/index.dnascent
+output_detect=~/nanomod_course_outputs/yeast/dnascent.detect
+DNAscent detect -b $input_bam -r $ref_genome -i $index \
+ -o $output_detect -t 8 -q 20 -l 1000
 ```
 
 ## Call replication dynamics with DNAscent forkSense using single-molecule modification densities
@@ -84,10 +87,13 @@ Today, we will just learn how to execute the `forkSense` command and save the bi
 for tomorrow.
 
 ```bash
-DNAscent forkSense -d ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect\
- -o ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.forkSense \
- -t 16 \
- --markOrigins --markTerminations --markForks
+# for forkSense, we need to make sure we are in the correct directory
+# as there are lots of output files which go to the current directory.
+input_detect=~/nanomod_course_outputs/yeast/dnascent.detect
+output_forksense=~/nanomod_course_outputs/yeast/dnascent.forkSense
+cd ~/nanomod_course_outputs/yeast/
+DNAscent forkSense -d $input_detect -o $output_forksense \
+ -t 8 --markOrigins --markTerminations --markForks
 ```
 
 ## Conversion of DNAscent detect into the modBAM format
@@ -99,15 +105,17 @@ Mod BAM files are just BAM files with two additional tags per line that store
 modification information. We will discuss their structure later on in this session.
 
 ```bash
+input_detect=~/nanomod_course_outputs/yeast/dnascent.detect
+output_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.bam
 cd ~/nanomod_course_scripts/DNAscentTools
-< ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect \
-    python convert_detect_to_modBAM.py \
-      --op ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.bam --tag T
+< $input_detect python convert_detect_to_modBAM.py \
+  --op $output_mod_bam --tag T
 
 # sort and index the BAM files
-samtools sort -o ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.sorted.bam \
-  ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.bam
-samtools index ~/nanomod_course_outputs/carolin_nmeth_18/dnascent.detect.mod.sorted.bam
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.bam
+output_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam
+samtools sort -o $output_mod_bam $input_mod_bam
+samtools index $output_mod_bam
 ```
 
 ## Inspect modification data by conversion from modBAM to TSV format using modkit
@@ -128,8 +136,9 @@ the length of the read `read_length` etc.
 We can look up the full list in the official documentation [here](https://nanoporetech.github.io/modkit/intro_extract.html).
 
 ```bash
-cd ~/nanomod_course_outputs/carolin_nmeth_18/
-modkit extract dnascent.detect.mod.sorted.bam dnascent.detect.mod.sorted.bam.tsv
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam
+output_tsv=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam.tsv
+modkit extract $input_mod_bam $output_tsv
 ```
 
 ## Discussion of the modBAM file format
