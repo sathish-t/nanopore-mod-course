@@ -5,7 +5,7 @@ title: Computer Setup
 
 ## Instructions
 
-### If you are a participant in the training course
+### If you are a participant in the Earlham Institute training course
 
 You do not need to read any further than this section.
 You will be given login details to virtual machines by the organisers or the trainers.
