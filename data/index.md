@@ -91,6 +91,7 @@ and tens of minutes of computational time.
 cd ~/nanomod_course_data/human
 wget http://ont-open-data.s3.amazonaws.com/cliveome_kit14_2022.05/gdna/flowcells/ONLA29134/20220510_1127_5H_PAM63974_a5e7a202/sequencing_summary_PAM63974_58881fec.txt
 wget http://ont-open-data.s3.amazonaws.com/cliveome_kit14_2022.05/gdna/basecalls/PAM63974/bonito_calls.bam 
+wget http://ont-open-data.s3.amazonaws.com/cliveome_kit14_2022.05/gdna/basecalls/PAM63974/bonito_calls.bam.bai 
 pycoQC -f sequencing_summary_PAM63974_58881fec.txt\
   -a bonito_calls.bam -o ./analysis.html -j ./analysis.json
 ```
