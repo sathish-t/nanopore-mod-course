@@ -1,7 +1,7 @@
 ---
 layout: page
 element: notes
-title: Visualisation of base modification data - part I
+title: Visualization of base modification data - part I
 ---
 
 We have called modifications in a reference-anchored manner in the
@@ -38,11 +38,15 @@ Genome browsers cannot be used in a reference-unanchored workflow as they need a
 genome to produce visualizations.
 A related problem is that genome browsers ignore sections on reads corresponding to inserts
 i.e. sequences on the read which do not map to the genome.
+Genome browsers cannot show multiple modifications of some types on the same base,
+but this may change in the future.
 
 On the right, we have plotted a read using
 a custom script, which shows raw modification data (grey) and windowed modification
 data (red). Here, we can see details per read but we cannot see multiple reads at
 the same time. We can visualize reads in a reference-dependent or reference-independent manner.
+We can also visualize one type of modification at a time if our file has multiple types of modifications
+on the same base.
 
 We will explore the details of these visualizations and how to make
 them in this session.
@@ -98,34 +102,49 @@ bases marked as modified and unmodified.
 
 ![IGV view with individual modified bases](igv_individual_modified_bases.png)
 
+You may need to right click on the track and select "Show all bases" to see
+the bases overlaid on the green/grey colours in this view as shown in the
+figure below.
+
+![IGV view with all bases visible](igv_show_all_bases.png)
+
 We can look at the reads for a few more minutes to get familiar with the visualization.
 Pick one or a few read ids of reads that look interesting to you and whose lengths are
 in the tens of kbs and record the details such as read id and location on the genome
 somewhere.
 When we visualize single molecules, you can visualize these molecules you've picked out.
 
+### Exercise: Visualize reads around chrVI from a curated BAM file
+
+We will visualize another mod BAM file in IGV in
+[this]({{ site.baseurl }}/exercises/igv_visualize) exercise.
+
 ## Visualizing modifications across single reads with custom script
 
 We will now visualize a read of interest that you picked out with our custom script.
-Please run the command below, setting the input and output values suitably.
-
-<!-- TODO: finish input and output -->
+From now on in the course, our commands will contain a mix of input parameters,
+some set by us and some left blank.
+You need to set the ones left blank.
+Like in the code below, you can choose any `mod_bam` file
+with any `read_id` of interest,
+and put the plots in any `output_dir` you like.
 
 ```bash
 # change to the github repo of the course and go to the code folder
 cd ~/nanomod_course_scripts/nanopore-mod-course/code 
-mod_bam=
-read_id=
+mod_bam= # e.g. ~/nanomod_course_data/yeast/subset_2.mod.sorted.bam
+read_id= # e.g. afe17665-534f-41a1-a9e0-3c39022ea3b3
 mod_code=T
 ref_flag=use_ref
 threshold=0.5
-window_size=300
-output_dir=
+window_size=300 # 300T is roughly 1 kb. You can use other values here.
+output_dir= # e.g. ~/nanomod_course_outputs/yeast/plot_reads
 bash plot_read.sh $mod_bam $read_id $mod_code $ref_flag $threshold $window_size $output_dir
 ```
 
 You should see a figure whose elements look like those in the following figure, although
 the data will be different as you are visualizing a read that you picked out.
+The plot below was created using the example inputs in the code block above.
 
 ![Rain plot visualization](sample_rain_plot.png)
 
