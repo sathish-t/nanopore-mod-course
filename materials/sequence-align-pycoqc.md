@@ -150,8 +150,11 @@ reads contain modified bases which are expected to interfere with basecalling ac
 input_dir=~/nanomod_course_data/yeast
 output_dir=~/nanomod_course_outputs/yeast
 model_file=dna_r9.4.1_450bps_fast.cfg
-  # a higher accuracy model file (_hac instead of _fast) above
+  # NOTE: A higher accuracy model file (_hac instead of _fast) above
   # leads to longer run times.
+  # NOTE: The model file is internal to the guppy install, so
+  # please do not be confused if we do not have a file called
+  # 'dna_r9.4.1_450bps_fast.cfg' in our directory.
 mkdir -p $output_dir
 
 guppy_basecaller --input_path $input_dir \
@@ -160,6 +163,9 @@ guppy_basecaller --input_path $input_dir \
     --num_callers 8 --cpu_threads_per_caller 2 --disable_qscore_filtering \
     --progress_stats_frequency 10
 ```
+
+The above command produces a few files in the output directory.
+Inspect them and associate them with the file types we have been learning about thus far.
 
 ## Alignment: locating sequenced DNA on a reference genome
 
@@ -336,6 +342,18 @@ You should see two tracks immediately below the reference genome on top.
 Now, you can zoom in to the genome.
 Select any region of size around 10 to 50 kb and have a look at the result.
 
+### (optional) Increase visibility range in IGV
+
+You can see read details in IGV only when you zoom in to regions.
+You can set the size of the region at which details start to appear
+(visibility range threshold) using the instructions in the following two screenshots.
+We set it to 3000 kb; this slows IGV down but we can see details easier.
+Nanopore data generally consists of long reads (> 30 kb), so the larger
+the threshold the better.
+
+![Instructions on how to increase visibility in IGV](igv_increase_visibility_range_1.png)
+![Instructions on how to increase visibility in IGV](igv_increase_visibility_range_2.png)
+
 ### Inspecting alignments using samtools and bedtools
 
 We'll do a few more quality control checks before using command line tools like
@@ -403,6 +421,10 @@ pycoQC -f $input_seq_sum -a $input_bam -o $output_html \
 You can open the analysis.html file in your browser after the program has finished running.
 You should see a webpage whose layout and figures, but not the actual details, are similar to
 [this](https://a-slide.github.io/pycoQC/pycoQC/results/Guppy-2.3_basecall-1D_alignment-DNA.html).
+Double-click on the HTML file after you have navigated to its location in the file browser
+as shown in the image below.
+
+![Image of file browser with HTML file highlighted](screenshot_file_browser_pycoQC.png)
 
 ### Exercise
 

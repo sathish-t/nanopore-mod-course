@@ -269,8 +269,8 @@ samtools view -c $output_file     # count reads of output file
 bedtools bamtobed -i $output_file | shuf | head -n 10 
     # look at a few output coordinates using bedtools bamtobed
     # to verify the reads overlap the region of interest.
-    # you can run the bedtools command without the shuf and the head if
-    # the $output_file is only a few lines long.
+    # you can run the bedtools command without the shuf and the head
+    # if the $output_file is only a few lines long.
 ```
 
 One can also subset by a list of regions; please follow the instructions in the `samtools view`
@@ -282,7 +282,8 @@ The following command makes a mod BAM file with only the read of the read id of 
 
 ```bash
 # fill the following values. 
-# use any suitable mod BAM file and some read id of interest you have recorded.
+# use any suitable mod BAM file and some read id of interest
+# you have recorded.
 input_file=
 read_id=
 output_file=
@@ -407,15 +408,18 @@ to learn about the possibilities.
 
 # make a subset with reads passing through a given region with
 # at least 100 modifications and an alignment length of at least 10 kb
-samtools view -e '[XC]>100&&rlen>10000' -b -o $output_file $input_file $contig:$start-$end
+samtools view -e '[XC]>100&&rlen>10000' -b -o $output_file\
+  $input_file $contig:$start-$end
 
 # make a subset with reads passing through given genes with
 # at least 1000 modifications
-samtools view -e '[XC]>1000' -b -o $output_file --region-file $genes_bed_file $input_file 
+samtools view -e '[XC]>1000' -b -o $output_file \
+  --region-file $genes_bed_file $input_file 
 
 # subset to get reads that have a low mean modification density
 # and then randomly select 10%.
-samtools view -e '[XC]/rlen<0.01' -s 0.1 -b -o $output_file $input_file
+samtools view -e '[XC]/rlen<0.01' -s 0.1 -b -o $output_file \
+  $input_file
 ```
 
 ## Combining mod BAM tools leads to easy workflows
@@ -425,7 +429,8 @@ mod BAM file as input.
 Although the above statement sounds obvious, we give an example below
 of how powerful the combination of `modkit` and `samtools` is.
 Let us say we want to look at the modification profiles at a specific
-genomic feature, say transcription start sites.
+genomic feature, say transcription start sites which have been given
+to us in the bed file `$transcription_start_sites`.
 A sample way to do this follows.
 
 ```bash
@@ -440,7 +445,7 @@ modkit sample-probs $output_file -o ./histogram --hist --buckets 10 \
   --include-bed $transcription_start_sites
 ```
 
-## Windowing mod BAM files using custom scripts
+## (optional) Windowing mod BAM files using custom scripts
 
 We will now learn how to make the data behind the windowed track that we saw in
 our earlier visualization [session]({{ site.baseurl }}/materials/genome-browser-visualization)
@@ -463,44 +468,93 @@ mod_code=                  # use m for 5mC or T for BrdU etc.
 coords_flag=use_ref        # window using reference coordinates
 threshold=                 # threshold to call bases as modified
 window_size= # size of window in number of bases of interest
-             #(C for 5mC, T for BrdU etc.)
+             # e.g. 300
 
-python extract_raw_mod_data.py $mod_code $coords_flag "$one_read_bam".tsv "$one_read_bam"_rawVal.tsv
-python window_mod_data.py $threshold $window_size "$one_read_bam"_rawVal.tsv "$one_read_bam"_winVal.tsv
+python extract_raw_mod_data.py $mod_code $coords_flag\
+  "$one_read_bam".tsv "$one_read_bam"_rawVal.tsv
+python window_mod_data.py $threshold $window_size \
+  "$one_read_bam"_rawVal.tsv "$one_read_bam"_winVal.tsv
 ```
 
-Please inspect the `"$one_read_bam"_winVal.tsv` file to see the windowed data.
+Please see the windowed data in the `"$one_read_bam"_winVal.tsv` file.
 
 ## Pileup of reference-anchored mod BAM files with `modkit` and `samtools`
 
 A pileup is any calculation that produces one number per base on a reference
 genome by performing an operation across all data available at that base
-across all reads that contain it.
+across all reads passing through that base.
 We have encountered pileups in the previous
 [session]({{ site.baseurl }}/materials/genome-browser-visualization)
 on visualization in genome browsers.
 
 ![IGV view with pileup annotation](igv_overall_view_with_pileup_annotated.png)
 
-<!-- TODO: flesh this out more -->
-
-To get the coverage of a BAM file, do
+To get the grey track above, which is a count of the number of reads passing
+through each base also known as the coverage, do
 
 ```bash
-input_mod_bam= # fill suitably
-bedtools genomecov -ibam $input_mod_bam -bga > coverage.bedgraph
-# inspect the first few lines
-head -n 20 coverage.bedgraph
-# inspect a few randomly chosen lines
-cat coverage.bedgraph | shuf | head -n 20
+input_mod_bam=         # fill suitably
+output_dir=            # fill suitably
+mkdir -p "$output_dir" # make output directory if need be
+bedtools genomecov -ibam $input_mod_bam -bga >\
+  "$output_dir"/coverage.bedgraph
 ```
 
-<!-- TODO: flesh this out more -->
-`modkit pileup --no-filtering --mod-thresholds T:0.03 dnascent.detect.mod.sorted.bam test.08jan24.bed`
+Now, one can inspect a few lines from the output bedgraph
+
+```bash
+# inspect the first few lines
+head -n 20 "$output_dir"/coverage.bedgraph
+# inspect a few randomly chosen lines
+cat "$output_dir"/coverage.bedgraph | shuf | head -n 20
+```
+
+To get the green track above, which is a count of number of modifications
+per each base on the reference, do the following
+
+```bash
+input_mod_bam=         # fill suitably
+output_dir=            # fill suitably
+modkit pileup --no-filtering --mod-thresholds T:0.5\
+  $input_mod_bam "$output_dir"/pileup.bed
+```
+
+Now, one can inspect a few lines from the output file
+
+```bash
+# inspect the first few lines
+head -n 20 "$output_dir"/pileup.bed
+# inspect a few randomly chosen lines
+cat "$output_dir"/pileup.bed | shuf | head -n 20
+```
 
 ### (optional) Modification pileup with `samtools`
 
-Get modification
-`samtools mpileup -M dnascent.detect.mod.sorted.bam`
+One can also perform pileups of modification with `samtools`.
+The command is specified below.
+The output format is a little hard to understand and we will not be discussing this further.
+Please consult the documentation [here](https://www.htslib.org/doc/samtools-mpileup.html)
+if you want to learn more.
+
+```bash
+input_mod_bam= # fill suitably
+output_table= # fill suitably
+samtools mpileup -M $input_mod_bam > $output_table
+```
 
 ## Final remarks
+
+We have learned how to perform the following operations on mod BAM files:
+- thresholding
+- making histograms of modification probabilities
+- subsetting
+- windowing modification calls
+- pileup of modification calls 
+
+Most of these operations could be performed using pre-existing tools and
+can be incorporated easily into scripts.
+Occasionally, we ran into operations that could not be performed with
+pre-existing tools and had to write one ourselves.
+The tools we have learned here can be applied to any experiment
+where we detect DNA modifications if the output format of the modification
+pipeline is mod BAM.
