@@ -143,5 +143,13 @@ modkit extract $input_mod_bam $output_tsv
 
 ## Discussion of the modBAM file format
 
-We conclude this session with a [discussion]({{ site.baseurl }}/materials/mod-bam-format)
+The mod BAM format is not very easy to read for a person.
+Tools such as `modkit`, `samtools`, and `IGV` help us convert mod BAM files into an easily
+readable format such as a table or an image.
+You might find that such tools are adequate for your needs.
+If you do not, then knowledge of the format helps you write tools yourself
+and to perform some advanced manipulations.
+As the modification field is still developing,
+it is probable that you will come across such scenarios.
+Thus, we conclude this session with a [discussion]({{ site.baseurl }}/materials/mod-bam-format)
  of the mod BAM file format.
