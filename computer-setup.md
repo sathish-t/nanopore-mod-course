@@ -9,7 +9,10 @@ title: Computer Setup
 
 You do not need to read any further than this section.
 You will be given login details to virtual machines by the organisers or the trainers.
-You will just need to download the latest version of the course repository
+The trainers will show you how to login and how to access a terminal and a graphical
+user interface (GUI) on the virtual machines, and how to paste commands if you want
+to copy and paste commands from somewhere.
+You will need to download the latest version of the course repository
 and create a few directories (instructions follow after this paragraph).
 All other software and data required for the course is on the virtual machines, and
 the commands to execute each piece of software will work straight away
@@ -17,6 +20,7 @@ on your Linux command line or on the GUI after you log in.
 Please also consult the course prerequisites listed [here](https://www.earlham.ac.uk/events/detection-dna-base-modification-using-nanopore-sequencing).
 
 We need the latest version of the course repository.
+Please execute the following commands:
 
 ```bash
 cd ~/nanomod_course_scripts # go to the folder where scripts are stored
@@ -27,6 +31,13 @@ We store input data, scripts, references
 and outputs in the directories `~/nanomod_course_data`, `~/nanomod_course_scripts`,
 `~/nanomod_course_references` and `~/nanomod_course_outputs` respectively.
 Please make them if they do not exist using the `mkdir` command.
+
+Tip: Some of our commands are long and go over several lines.
+Make sure to maximize your terminal window to make these commands easy to view.
+
+Tip: In the course material, we do not always write "Run this command" before
+every command block. Please follow what the speaker is doing or make a judgement call
+about whether a block needs to be run.
 
 ### If you are a self-study student
 
