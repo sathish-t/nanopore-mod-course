@@ -35,7 +35,7 @@ Please make them if they do not exist using the `mkdir` command.
 Tip: Some of our commands are long and go over several lines.
 Make sure to maximize your terminal window to make these commands easy to view.
 
-Tip: In the course material, we do not always write "Run this command" before
+Tip: In the course material, we do not always write 'Run this command' before
 every command block. Please follow what the speaker is doing or make a judgement call
 about whether a block needs to be run.
 
