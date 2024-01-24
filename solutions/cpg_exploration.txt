@@ -1,0 +1,20 @@
+Solution 1
+==========
+
+Convert bonito_calls.subset.sorted.bam into a TSV file using modkit extract.
+Then, inspect a few lines from the query_kmer column.
+You will see in all of them, the third position is a C and the fourth position is a G.
+This tells us that a few randomly chosen lines
+contain modification probabilities at CpGs.
+You can repeat this a few times and convince yourself that all lines are like this.
+A precise way of quantifying this is to run the command below that prints
+all lines which do not fit the pattern 'any base-any base-C-G-any base'.
+You will find that out of the thousands of lines in the file, only 14 do not fit
+this pattern: one is the header and the other 13 are k-mers like 'TACG-'.
+
+```bash
+input_bam=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam
+output_tsv= # fill with some suitable location
+modkit extract $input_bam $output_tsv
+awk '{print $15}' $output_tsv | grep -c -v -E ^[AGCT]{1}[AGCT]{1}CG[AGCT]{1}$
+```

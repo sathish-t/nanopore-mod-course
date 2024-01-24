@@ -1,0 +1,45 @@
+1. Inspect the BAM file header using the command
+`samtools view -H ~/nanomod_course_data/human/bonito_calls.subset.sorted.bam | head -n 20`.
+You should see a line that starts with `@PG\tID:basecaller`.
+Upon inspecting this line, you will see that the bonito basecaller was used, and
+the exact parameters used in the command.
+Bonito is the 'research' basecaller of ONT.
+They say: "Bonito is an open source research basecaller for Oxford Nanopore reads.
+For anything other than basecaller training or method development please use dorado."
+(from https://github.com/nanoporetech/bonito)
+
+2. In the header, you will also see a line that looks like
+`samtools view -h -b -e rlen>=30000 ... chr20:58000000-60000000`.
+This tells us that the BAM file was made by picking up all alignments
+that were 30 kb or longer and passed through the coordinates
+58 million - 60 million on chr20.
+
+3. There are 622 reads in total in the BAM file.
+Use `samtools view -c bonito_calls.subset.sorted.bam`
+
+4. There are 622 reads in the BAM file excluding secondary and supplementary.
+As this number is equal to the answer of 3 above, all reads are primary.
+Use `samtools view -c --exclude-flags SECONDARY,SUPPLEMENTARY  bonito_calls.subset.sorted.bam`.
+
+Alternative solution 1
+======================
+You can also use pycoQC for 2 - 4, which reports total read count in a table,
+genomic coverage as a figure, and primary/secondary/supplementary counts as a figure.
+You may not get a precise answer for the part of Q2 about the genomic region
+covered by the BAM file.
+To use pycoQC, you need to first make a sequencing summary file and then run it.
+
+```bash
+input_mod_bam=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam
+output_summ_file=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam.summary.txt
+dorado summary $input_mod_bam > $output_summ_file
+# go to a suitable folder where pycoQC outputs can be stored.
+pycoQC -f $output_summ_file -a $input_mod_bam -o ./analysis.html -j ./analysis.json
+```
+
+Other alternative solutions
+===========================
+Use `bedtools bamtobed -i $mod_bam` and inspect the first few lines
+and the last few lines to answer Q2.
+Count number of lines in the output to answer Q3.
+Cannot answer Q4 using `bedtools bamtobed`.

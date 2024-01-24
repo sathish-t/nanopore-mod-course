@@ -1,0 +1,16 @@
+We've detailed a couple of solutions below.
+There may be other ways of solving the problem.
+
+Use our custom program to add the XC tag with modification counts
+to the end of each BAM line.
+Then, use `bedtools bamtobed -i $mod_bam -tag XC` to output reads in a
+tabular format with the modification count in the fifth column.
+Then, you can use one of two ways to find the most modified reads:
+(1) You can sort by the fifth column in descending order to find the most
+modified reads.
+(2) You can use samtools filters and iteratively restrict them.
+For example: `samtools view -c -e '[XC]>100'` counts reads with more than
+100 modifications.
+Keep increasing 100 till you get only a few reads or even only one read.
+Then inspect this subset mod BAM file with `bedtools bamtobed` or `awk`
+to get the read id(s).
