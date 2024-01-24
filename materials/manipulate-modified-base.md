@@ -299,6 +299,8 @@ Please look at the `samtools view` documentation [here](http://www.htslib.org/do
 The following command makes a mod BAM file with a subset of randomly-chosen reads
 whose total number is set by the input fraction and
 the total number of reads in the input file.
+Please note that this command does not work very well if the number of reads
+in the input file is very low (~ 1 - 100).
 
 ```bash
 # fill the following values suitably. 
