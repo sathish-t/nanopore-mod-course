@@ -29,8 +29,8 @@ Let us consider the example where the second and the third cytosines of the sequ
 modified to 5-methylcytosine (5mC) and the others are unmodified.
 The simplest way of storing this information is the self-explanatory list `C->5mC:2,3`.
 For reasons we will not get into here, what is stored is instead the *diff* of this list i.e. instead
-of storing positions of modified thymidines, we count the number of unmodified thymidines between 
-each successive pair of modified thymidines.
+of storing positions of modified cytosines, we count the number of unmodified cytosines between 
+each successive pair of modified cytosines.
 This is illustrated in the figure below.
 
 ![Picture demonstrating skip array](mm_skip_array_illustration.png)
@@ -94,10 +94,9 @@ The tag would then read (replace spaces with tabs) `MM:Z:C+m,1,0; MM:Z:G-m,0;`.
 
 ## Scenario 2: Soft modification calls with probabilities
 
-We dealt with a thresholded mod BAM file in the previous section. Here, we look at a non-thresholded
-format which is typically output by modification callers.
-We are required to store a probability of modification per base per read to a mod BAM file,
-so we need to store both a base coordinate and a number between 0 and 1 per coordinate.
+We dealt with a 'binary' mod BAM file in the previous section. Here, we look at a common
+format with a probability of modification per base typically output by modification callers.
+So, we need to store both a base coordinate and a number between 0 and 1 per coordinate.
 For base coordinates, we just use the 'skip' representation from the previous section.
 For probabilities, we convert them from a floating point number in the 0-1 range to an integer
 in the 0-255 range and store them using a second tag that begins with `ML:B:C`.
