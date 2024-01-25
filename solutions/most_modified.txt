@@ -14,3 +14,25 @@ For example: `samtools view -c -e '[XC]>100'` counts reads with more than
 Keep increasing 100 till you get only a few reads or even only one read.
 Then inspect this subset mod BAM file with `bedtools bamtobed` or `awk`
 to get the read id(s).
+
+The code for this is
+```bash
+cd ~/nanopore-mod-course/code
+input_mod_bam= # set suitably
+mod_bam_with_counts= # set suitably
+samtools view -h $input_mod_bam | awk -f count_mods_per_read.awk |\
+  samtools view -b -o $mod_bam_with_counts
+```
+
+For option (1), do
+```bash
+bedtools bamtobed -i $mod_bam_with_counts -tag XC |\
+  sort -k 5,5nr | head
+```
+
+For option (2), keep trying the following command with ever-increasing
+number of modifications (i.e. keep increasing the number 100 in the command below)
+```bash
+samtools view -b -e '[XC]>100' $mod_bam_with_counts |\
+  bedtools bamtobed -i - -tag XC | head
+```
