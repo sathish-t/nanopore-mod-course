@@ -38,8 +38,6 @@ Genome browsers cannot be used in a reference-unanchored workflow as they need a
 genome to produce visualizations.
 A related problem is that genome browsers ignore sections on reads corresponding to inserts
 i.e. sequences on the read which do not map to the genome.
-Genome browsers cannot show multiple modifications of some types on the same base,
-but this may change in the future.
 
 On the right, we have plotted a read using
 a custom script, which shows raw modification data (grey) and windowed modification
@@ -47,6 +45,8 @@ data (red). Here, we can see details per read but we cannot see multiple reads a
 the same time. We can visualize reads in a reference-dependent or reference-independent manner.
 We can also visualize one type of modification at a time if our file has multiple types of modifications
 on the same base.
+Genome browsers can visualize multiple modifications on the same base in some cases like
+5mC and 5hmC.
 
 We will explore the details of these visualizations and how to make
 them in this session.
