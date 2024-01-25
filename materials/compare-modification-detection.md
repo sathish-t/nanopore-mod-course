@@ -8,25 +8,41 @@ In this session, we will perform reference-independent modification calling
 on a dataset of human DNA that naturally contains cytosines modified due to methylation.
 We will use the basecaller `dorado` that can perform basecalling and modification
 calling when we issue a single command.
-We will follow the pipeline illustrated below.
+We will follow the pipeline illustrated below and we will execute all the steps
+in this session.
 
 ![Schematic of reference-unanchored pipeline](dorado_workflow.png)
 
 As you can see from the figure, there are a few differences compared to the pipeline
 we followed for the yeast dataset:
 - The input format for nanopore currents is `pod5` instead of `fast5`.
-- We are using the basecaller `dorado` instead of `guppy` and `dorado` performs the job
-of `guppy`, `DNAscent`, and `minimap2` combined.
+- We are using the basecaller `dorado` instead of `guppy`.
+- `dorado` performs the job of `guppy` (basecalling) and `DNAscent` (modification calling)
+in the `dorado basecaller` command and the job of `minimap2` (alignment) in the
+`dorado aligner` command.
 - Modification calling and basecalling are performed with a single `dorado basecaller` command,
-although modification calling still follows basecalling.
+although they are not concurrent - modification calling is still bolted onto the output of basecalling.
 - We get a mod BAM file directly from the modification caller,
-so we do not need to perform any file format conversions.
+so we do not need to perform any file format conversions to mod BAM.
 - The workflow is reference-unanchored, so alignment is optional and follows modification calling.
 Alignment is done through the `dorado aligner` command although it is just a different name for `minimap2`
 which is doing the job under the hood.
+The input to the alignment step is a mod BAM file and the output is another mod BAM file.
+
+As the final result of our pipeline is a mod BAM file, all the tools that we have discussed
+so far that work on mod BAM files carry over.
+If you stop the analysis before the optional alignment step, then the unaligned mod BAM file
+can still be used as input to `modkit`, `samtools` etc. but you cannot use these files in any
+reference-dependent analysis such as IGV visualization, subsetting by region in samtools etc.
+
+In this session, we will run the pipeline, get the final mod BAM file, and then you can
+explore the file yourself using the tools we have discussed thus far in the course
+or do a guided exploration by trying to solve one or more of the exercises at the end of the session.
 
 We will be using a subset of the 'Cliveome' [dataset](https://labs.epi2me.io/cliveome_5mc_cfdna_celldna/)
-developed by Oxford NanoporeTech.
+developed by Oxford NanoporeTech. The DNA is from the cells of the CTO of ONT, Clive Brown, and
+we are re-creating a published pipeline.
+
 We had performed a subset and some file conversions and calculations before the course began;
 the steps are listed [here]({{ site.baseurl }}/data#Human) and you can read them later.
 We have already copied this data to the location `~/nanomod_course_data/human/`
@@ -90,8 +106,9 @@ Note down the program speed in number of samples per second.
 
 You can compare the dorado basecalling rate we have recorded in samples
 per second to the ONT benchmarks listed [here](https://aws.amazon.com/blogs/hpc/benchmarking-the-oxford-nanopore-technologies-basecallers-on-aws/).
-How much slower are we? Please note that some of ONT's benchmarks were performed
-on computers with many GPUs which are expensive (see the cost tables at the link)!
+Please note that some of ONT's benchmarks were performed
+on expensive computers with many GPUs (see the cost tables at the link)!
+Our virtual machines do not have GPUs to minimize costs.
 
 ### Dorado pipelines produce only BAM files but no fastq or sequencing summary files
 
@@ -148,15 +165,31 @@ What base follows the cytosine of interest?
 
 ### Download the reference genome 
 
-We need to download a reference human genome using the following steps.
-Please note that `.fna` files are just a type of a fasta file.
+We need to download a reference human genome.
+We have already downloaded it and stored it at `~/nanomod_course_data/human/references_backup`.
+If you are a self-study student and want to download it, please use the following commands.
 
 ```bash
+# DO NOT run commands in this block if you are a student in EI's
+# course. Only run them if you are a self-study student.
 cd ~/nanomod_course_references
 url=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids
 wget "$url"/GCA_000001405.15_GRCh38_full_analysis_set.fna.fai
 wget "$url"/GCA_000001405.15_GRCh38_full_analysis_set.fna.gz   
 gunzip GCA_000001405.15_GRCh38_full_analysis_set.fna.gz
+```
+
+If you are a participant in the Earlham Institute's training course, then use
+the following commands to create hard links from `~/nanomod_course_references`
+to `~/nanomod_course_data/human/references_backup` using the following commands.
+Creating links between directories saves disk space compared with copying files
+from one directory to another.
+
+```bash
+# DO NOT run commands in this block if you are a self-study student.
+# Only run them if you are a student in EI's training course.
+ln ~/nanomod_course_data/human/references_backup/GCA_000001405.15_GRCh38_full_analysis_set.fna GCA_000001405.15_GRCh38_full_analysis_set.fna
+ln ~/nanomod_course_data/human/references_backup/GCA_000001405.15_GRCh38_full_analysis_set.fna.fai GCA_000001405.15_GRCh38_full_analysis_set.fna.fai
 ```
 
 ### Perform alignment
