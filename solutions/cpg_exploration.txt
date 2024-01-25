@@ -1,3 +1,5 @@
+Ans: Yes.
+
 Solution 1
 ==========
 
@@ -5,12 +7,32 @@ Convert bonito_calls.subset.sorted.bam into a TSV file using modkit extract.
 Then, inspect a few lines from the query_kmer column.
 You will see in all of them, the third position is a C and the fourth position is a G.
 This tells us that a few randomly chosen lines
-contain modification probabilities at CpGs.
+contain modification probabilities only at CpGs.
 You can repeat this a few times and convince yourself that all lines are like this.
-A precise way of quantifying this is to run the command below that prints
+
+```bash
+mod_bam=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam
+output_tsv= # fill suitably
+modkit extract $mod_bam $output_tsv
+cat $output_tsv | shuf | head -n 10
+# do the above line a few times and look at the 15th column.
+# you should always see a C and a G in the third and the fourth positions
+# of the query 5-mer.
+```
+
+Solution 2
+==========
+
+You are not expected to have figured this out as this involves a linux
+command line tool `grep` that you may not be familiar with.
+
+This solution build upon Solution 1.
+A precise way of answering the question is to run the command below that prints
 all lines which do not fit the pattern 'any base-any base-C-G-any base'.
 You will find that out of the thousands of lines in the file, only 14 do not fit
-this pattern: one is the header and the other 13 are k-mers like 'TACG-'.
+this pattern: one is the header and the other 13 are k-mers like 'TACG-',
+which have a central 'CG'. So, the conclusion is that all k-mers have
+a C and a G in the third and the fourth positions.
 
 ```bash
 input_bam=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam
