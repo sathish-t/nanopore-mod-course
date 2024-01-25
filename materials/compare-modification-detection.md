@@ -165,31 +165,20 @@ What base follows the cytosine of interest?
 
 ### Download the reference genome 
 
-We need to download a reference human genome.
-We have already downloaded it and stored it at `~/nanomod_course_data/human/references_backup`.
-If you are a self-study student and want to download it, please use the following commands.
+We need to download a reference human genome which is a few GB.
+Please use the commands below.
+If you are a student in the Earlham Institute training course,
+please note that there is a backup of the reference located at
+` ~/nanomod_course_data/human/references_backup/` which we can use
+if the download is taking too much time.
+
 
 ```bash
-# DO NOT run commands in this block if you are a student in EI's
-# course. Only run them if you are a self-study student.
 cd ~/nanomod_course_references
 url=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids
 wget "$url"/GCA_000001405.15_GRCh38_full_analysis_set.fna.fai
 wget "$url"/GCA_000001405.15_GRCh38_full_analysis_set.fna.gz   
 gunzip GCA_000001405.15_GRCh38_full_analysis_set.fna.gz
-```
-
-If you are a participant in the Earlham Institute's training course, then use
-the following commands to create hard links from `~/nanomod_course_references`
-to `~/nanomod_course_data/human/references_backup` using the following commands.
-Creating links between directories saves disk space compared with copying files
-from one directory to another.
-
-```bash
-# DO NOT run commands in this block if you are a self-study student.
-# Only run them if you are a student in EI's training course.
-ln ~/nanomod_course_data/human/references_backup/GCA_000001405.15_GRCh38_full_analysis_set.fna GCA_000001405.15_GRCh38_full_analysis_set.fna
-ln ~/nanomod_course_data/human/references_backup/GCA_000001405.15_GRCh38_full_analysis_set.fna.fai GCA_000001405.15_GRCh38_full_analysis_set.fna.fai
 ```
 
 ### Perform alignment
