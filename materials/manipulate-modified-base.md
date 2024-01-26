@@ -21,9 +21,8 @@ The operations we will be running on mod BAM files are:
 - making histograms of modification probabilities
 - subsetting (either randomly, or by genomic location, or by mean modification density)
 - windowing modification calls
-- pileup of modification calls 
 
-![List of manipulations with mod BAM](manipulate_mod_bam.png)
+![List of manipulations with mod BAM](manipulate_mod_bam_no_pileup_or_viz.png)
 
 We can achieve most of these operations using the pre-existing packages `modkit` and `samtools`.
 For windowing and for measuring mean modification densities across reads,
@@ -480,70 +479,6 @@ python window_mod_data.py $threshold $window_size \
 
 Please see the windowed data in the `"$one_read_bam"_winVal.tsv` file.
 
-## Pileup of reference-anchored mod BAM files with `modkit` and `samtools`
-
-A pileup is any calculation that produces one number per base on a reference
-genome by performing an operation across all data available at that base
-across all reads passing through that base.
-We have encountered pileups in the previous
-[session]({{ site.baseurl }}/materials/genome-browser-visualization)
-on visualization in genome browsers.
-
-![IGV view with pileup annotation](igv_overall_view_with_pileup_annotated.png)
-
-To get the grey track above, which is a count of the number of reads passing
-through each base also known as the coverage, do
-
-```bash
-input_mod_bam=         # fill suitably
-output_dir=            # fill suitably
-mkdir -p "$output_dir" # make output directory if need be
-bedtools genomecov -ibam $input_mod_bam -bga >\
-  "$output_dir"/coverage.bedgraph
-```
-
-Now, one can inspect a few lines from the output bedgraph
-
-```bash
-# inspect the first few lines
-head -n 20 "$output_dir"/coverage.bedgraph
-# inspect a few randomly chosen lines
-cat "$output_dir"/coverage.bedgraph | shuf | head -n 20
-```
-
-To get the green track above, which is a count of number of modifications
-per each base on the reference, do the following
-
-```bash
-input_mod_bam=         # fill suitably
-output_dir=            # fill suitably
-modkit pileup --no-filtering --mod-thresholds T:0.5\
-  $input_mod_bam "$output_dir"/pileup.bed
-```
-
-Now, one can inspect a few lines from the output file
-
-```bash
-# inspect the first few lines
-head -n 20 "$output_dir"/pileup.bed
-# inspect a few randomly chosen lines
-cat "$output_dir"/pileup.bed | shuf | head -n 20
-```
-
-### (optional) Modification pileup with `samtools`
-
-One can also perform pileups of modification with `samtools`.
-The command is specified below.
-The output format is a little hard to understand and we will not be discussing this further.
-Please consult the documentation [here](https://www.htslib.org/doc/samtools-mpileup.html)
-if you want to learn more.
-
-```bash
-input_mod_bam= # fill suitably
-output_table= # fill suitably
-samtools mpileup -M $input_mod_bam > $output_table
-```
-
 ## Final remarks
 
 We have learned how to perform the following operations on mod BAM files:
@@ -551,7 +486,6 @@ We have learned how to perform the following operations on mod BAM files:
 - making histograms of modification probabilities
 - subsetting
 - windowing modification calls
-- pileup of modification calls 
 
 Most of these operations could be performed using pre-existing tools and
 can be incorporated easily into scripts.
