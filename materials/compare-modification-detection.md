@@ -169,7 +169,7 @@ We need to download a reference human genome which is a few GB.
 Please use the commands below.
 If you are a student in the Earlham Institute training course,
 please note that there is a backup of the reference located at
-` ~/nanomod_course_data/human/references_backup/` which we can use
+`~/nanomod_course_data/human/references_backup/` which we can use
 if the download is taking too much time.
 
 
