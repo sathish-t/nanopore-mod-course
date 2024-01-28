@@ -191,6 +191,14 @@ and the same for the number of unmodified bases using the probability that
 the base is not modified `p_unmod = 1 - p_mod`.
 `probabilities.txt` also contains a histogram made with ASCII art
 (i.e. using the symbol ∎ to build horizontal bars of this histogram).
+In `probabilities.txt`, the top set of rows marked with the code `T` correspond
+to the modified base (`p_mod`) whereas the bottom set of rows marked with the
+code `T` correspond to the unmodified base (`p_unmod`).
+This confusion is due to the fact that we marked modifications using the
+ambiguous mod BAM tag `T+T`.
+`probabilities.tsv` suffers from the same problem, and you can figure
+out which rows correspond to the modified bases and which to the unmodified
+by comparing numbers with `probabilities.txt`.
 
 Have a look at these files, and answer this question for yourself: what 
 would be a good modification probability value for thresholding?
@@ -207,11 +215,32 @@ We are not going to discuss this further; please experiment with this tool and r
 
 ![Schematic of conversion of confidence threshold to probability thresholds](confidence_threshold_convert_to_normal_threshold.png)
 
-### (optional) Form modification histogram from data only at given genomic regions
+### Form modification histogram from data only at given genomic regions
 
-To form a histogram from data restricted to given genomic regions, form a BED file
-with these regions and pass it to `modkit sample-probs` with the `--include-bed`
-option.
+To form a histogram from data restricted to given genomic regions, pass a BED file
+containing these regions to `modkit sample-probs` with the `--include-bed`
+option. In the command block below, we look for modification probabilities in
+the regions `chrI:100000-200000` and `chrVII:500000-600000`. In other words,
+the program calculates statistics from bases on reads that fall in either
+region.
+
+```bash
+input_bam_file= # fill this suitably
+regions_bed_file= # we are going to make this file
+
+# one can use any regions and any number of regions in the commands
+# below. The '.' in the sixth column means we include both +
+# and - strands in our calculation.
+echo -e "chrI\t100000\t200000\tA\t1000\t." > $region_file;   
+echo -e "chrVII\t500000\t600000\tB\t1000\t." >> $region_file;
+
+modkit sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
+  $input_bam_file -o ./histogram_subset --hist --buckets 10 -n 1000 \
+  --include-bed $regions_bed_file
+```
+
+## (optional) Use `modkit motif-bed` to form bed files for motifs
+
 To form a BED file for particular motifs such as CG, you can use the `modkit motif-bed`
 command.
 Please refer to the modkit [documentation](https://nanoporetech.github.io/modkit/advanced_usage.html)
@@ -322,8 +351,8 @@ Then, samtools can be used to query this new mod BAM file to output the desired
 high-modification-count subset.
 
 We have implemented a custom script `count_mods_per_read.awk`
-written for the tool `awk` to append
-a numeric tag `XC` at the end of each thresholded mod BAM line.
+written for the tool `awk` that takes a thresholded mod BAM file as input
+and makes an output file by appending a numeric tag `XC` at the end of each line.
 The tag contains the number of modifications in that mod BAM line.
 For example, the mod BAM line with the modification data `MM:Z:T+T?,0,0,0; ML:B:C,0,255,255`
 gets the tag `XC:i:2` as there are two modifications.
@@ -349,7 +378,8 @@ samtools view -h $input_bam | awk -f count_mods_per_read.awk |\
 # the output bam file contains the XC tag.
 ```
 
-Let us display a table of some reads, their alignment coordinates, and their modification
+Let us display a table of some reads, their alignment coordinates,
+and their modification
 counts using the following `bedtools bamtobed` command.
 The output data is in the BED format, with the fifth column
 containing the modification count from the XC tag (`-tag XC`).
@@ -373,7 +403,7 @@ samtools view -e '[XC]>100' -b -o $output_bam $bam_with_counts
 One can combine other variables like alignment length with our modification
 count in samtools queries.
 We give an example below where we form a subset of reads with at least
-one modified base per 100 aligned bases.
+one modified base per 100 aligned bases on average.
 
 ```bash
 output_bam= # fill suitably
@@ -395,56 +425,28 @@ BAM tags.
 A powerful feature of `samtools` is that any of the commands we have used above
 can be combined to form complex queries that would have otherwise required
 a substantial amount of computer code to achieve.
-We give a sample of some of the possiblities below.
+For example: to get reads longer than 10 kb with more than 100 modifications, do
+`samtools view -e '[XC]>100&&rlen>10000'`.
 Please read the documentation on `samtools view`
 [here](https://www.htslib.org/doc/samtools-view.html) and the documentation
 on filter expressions [here](https://www.htslib.org/doc/1.19/samtools.html#FILTER_EXPRESSIONS)
 to learn about the possibilities.
 
-```bash
-# NOTE: We are not filling the input variables below as these
-#       are just examples of what's possible with samtools.
-#       Please fill them if you want to run them yourself either
-#       now or later.
-
-# make a subset with reads passing through a given region with
-# at least 100 modifications and an alignment length of at least 10 kb
-samtools view -e '[XC]>100&&rlen>10000' -b -o $output_file\
-  $input_file $contig:$start-$end
-
-# make a subset with reads passing through given genes with
-# at least 1000 modifications
-samtools view -e '[XC]>1000' -b -o $output_file \
-  --region-file $genes_bed_file $input_file 
-
-# subset to get reads that have a low mean modification density
-# and then randomly select 10%.
-samtools view -e '[XC]/rlen<0.01' -s 0.1 -b -o $output_file \
-  $input_file
-```
-
 ## Combining mod BAM tools leads to easy workflows
 
-Any tool that takes a mod BAM file as an input can also take a subset
-mod BAM file as input.
-Although the above statement sounds obvious, we give an example below
-of how powerful the combination of `modkit` and `samtools` is.
-Let us say we want to look at the modification profiles at a specific
-genomic feature, say transcription start sites which have been given
-to us in the bed file `$transcription_start_sites`.
-A sample way to do this follows.
+It is important to remember that any tool that takes a mod BAM file
+as an input can also take a subset mod BAM file as input.
+One can easily write sophisticated scripts combining tools
+such as `modkit` and `samtools` to achieve some tasks 
+without going through the hassle of processing a raw mod BAM file
+using a programming language.
 
-```bash
-# select only those reads that are highly modified
-# and pass through the given region
-samtools view -e '[XC]>100' -b -o $output_file \
-  --region-file $transcription_start_sites $input_file 
+## Exercise
 
-# make histogram using only the part of the reads
-# that overlap with the given region
-modkit sample-probs $output_file -o ./histogram --hist --buckets 10 \
-  --include-bed $transcription_start_sites
-```
+We will use what we have learned thus far in this session to identify a
+highly-modified region in our subset mod BAM file
+`~/nanomod_course_data/yeast/subset_2.sorted.bam` in
+[this]({{ site.baseurl }}/exercises/most_modified_region) exercise.
 
 ## (optional) Windowing mod BAM files using custom scripts
 
