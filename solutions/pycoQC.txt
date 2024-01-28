@@ -3,3 +3,4 @@ and that all reads are longer than 30 kb.
 The dataset looks so because the instructors of the course
 have performed such a subsetting.
 You can confirm this by opening the file in IGV if you have time.
+You should see that all reads overlap the region chrVI:150000-250000.
