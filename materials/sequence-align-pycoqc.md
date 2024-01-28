@@ -283,6 +283,33 @@ are 0-based in BED6):
 chr1 10 15 acde070d-8c4c-4f0d-9d8a-142843c10333 50 +
 ```
 
+BED files are also used to represent features on a reference genome.
+For example, let's say there are genes called `ABC1` and `DEF1` on a reference
+genome in the regions `chr1:15000-20000` and `chr2:30000-34000`, with coding
+sequences on the reference and its complement respectively.
+Written as a BED file, this looks like this
+
+```text
+chr1 15000 20000
+chr2 30000 34000
+```
+
+or like this if you want to include names and transcription directions
+(the score column has been arbitrarily set to 1000).
+
+```text
+chr1 15000 20000 ABC1 1000 +
+chr2 30000 34000 DEF1 1000 -
+```
+
+or like this if you want to include names and leave the
+transcription direction ambiguous.
+
+```text
+chr1 15000 20000 ABC1 1000 .
+chr2 30000 34000 DEF1 1000 .
+```
+
 ### Running the alignment commands
 
 We will first obtain the sacCer3 (_S. cerevisiae_) reference genome
