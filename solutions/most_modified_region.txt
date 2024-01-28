@@ -1,0 +1,57 @@
+Ans: chrVI:190000-200000
+
+Step 1: Isolate reads with modifications.
+
+Use our script to form a mod BAM file with the XC tag
+containg read modifcation counts.
+Then, we isolate the modified strands.
+We use the criterion that on average at least 5 thymidines
+per every 100 thymidines must be modified.
+So the modification rate must be at least 5% when we count only
+thymidines, or 1.25% when we count all four canonical DNA bases.
+Any other reasonable criterion is ok.
+
+```bash
+input_mod_bam=~/nanomod_course_data/yeast/subset_2.sorted.bam
+thresholded_mod_bam= # fill suitably
+modified_reads_mod_bam= # fill suitably
+
+# perform thresholding
+modkit call-mods --no-filtering $input_mod_bam $thresholded_mod_bam
+
+cd ~/nanomod_course_scripts/nanopore-mod-course/code
+
+# count number of modifications per read and select
+# those where average modification rate > 1.25% as explained
+# above
+samtools view -h $thresholded_mod_bam | awk -f count_mods_per_read.awk |\
+ samtools view -b -e '[XC]/rlen>0.0125' -o $modified_reads_mod_bam
+```
+
+Step 2:
+
+One can subset this to retain reads above a read length or subsample
+it to include only a fraction
+e.g.: `samtools view -s 0.2 -e 'rlen>40000' -o $op_bam $modified_reads_mod_bam`.
+This is an optional step.
+We are not doing this as a part of this solution.
+
+Step 3:
+
+The command below produces statistics of the region chrVI:150000-160000.
+Note down the statistics in the file `probabilities.txt` in the directory
+./histogram_exercise and repeat this command for the other regions.
+Remember that the top and the bottom rows of the file correspond to
+the modified base and the unmodified base respectively.
+
+```bash
+region_file= # fill suitably
+echo -e "chrVI\t150000\t160000\tA\t1000\t." > $region_file;   
+
+# cd to a suitable folder
+
+modkit sample-probs $modified_reads_mod_bam -o ./histogram_exercise \
+  --hist --buckets 2 --include-bed $region_file --force
+# --force above just overwrites files
+# in the ./histogram_exercise directory
+```
