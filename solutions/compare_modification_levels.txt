@@ -1,0 +1,75 @@
+As stated in the question, there are several ways to solve the problem.
+We are going to use the following algorithm:
+
+1. We create two bed files, one for initiation sites
+and one for termination sites by cleaning up the output of forkSense.
+
+2. Then, we create a mod BAM subset with just the newly synthesized DNA
+by excluding reads where average modification density is
+close to the false-positive rate of modification calling.
+We performed a similar step in the most modified region exercise
+earlier. We have not quantified the false-positive rate in the
+course; we will use a reasonable guess.
+
+3. Then, we are going to run `modkit sample-probs` using these
+regions as input, and examine the histogram of modification
+probabilities.
+
+This strategy is approximate as we have called
+origins and terminations on single molecules using forkSense,
+but we are calculating modification densities over all
+reads passing through these sites using `modkit sample-probs`.
+Performing the exact calculation will involve a lot of manual
+work as you will have to create one-read subsets, or you will
+need to know some programming.
+This illustrates the limitations we are up against when we
+want to do sophisticated single-molecule data processing
+in the DNA modification field.
+
+```bash
+# clean forkSense files
+input_origin_bed=~/nanomod_course_outputs/yeast/origins_DNAscent_forkSense.bed
+cleaned_origin_bed= # fill suitably
+awk -v OFS="\t" '{print $1, $2, $3, $4, 100, $8=="fwd"?"+":"-"}' \
+  $input_origin_bed > $cleaned_origin_bed
+
+input_termination_bed=~/nanomod_course_outputs/yeast/terminations_DNAscent_forkSense.bed
+cleaned_termination_bed= # fill suitably
+awk -v OFS="\t" '{print $1, $2, $3, $4, 100, $8=="fwd"?"+":"-"}' \
+  $input_termination_bed > $cleaned_termination_bed
+
+# set input and output files for the rest of the script
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam
+thresholded_mod_bam= # fill suitably
+modified_reads_mod_bam= # fill suitably
+modified_reads_mod_bam_adjust_tag= # fill suitably
+
+# perform thresholding
+modkit call-mods --no-filtering $input_mod_bam $thresholded_mod_bam
+
+# go to the code folder where our modification-counting script is located
+cd ~/nanomod_course_scripts/nanopore-mod-course/code
+
+# count number of modifications per read and select
+# those where average modification rate > 1.25%
+# (we have assumed the false positive rate is 1.25%).
+samtools view -h $thresholded_mod_bam | awk -f count_mods_per_read.awk |\
+ samtools view -b -e '[XC]/rlen>0.0125' -o $modified_reads_mod_bam
+
+# adjust the tag of the modified-read mod bam file
+modkit adjust-mods --convert T B $modified_reads_mod_bam $modified_reads_mod_bam_adjust_tag
+samtools index $modified_reads_mod_bam_adjust_tag
+
+# sample modification rates at origins and terminations.
+# first, cd to a suitable directory where the histogram directories
+# will be deposited.
+modkit sample-probs $modified_reads_mod_bam_adjust_tag -o ./histogram_exercise_origin \
+  --hist --buckets 2 --include-bed $cleaned_origin_bed --force
+
+modkit sample-probs $modified_reads_mod_bam_adjust_tag -o ./histogram_exercise_terminations \
+  --hist --buckets 2 --include-bed $cleaned_termination_bed --force
+```
+
+You should see in the two `probabilities.tsv` files in the respective
+histogram folders that the ratio of modified to unmodified bases is larger
+at the initiation sites than at the termination sites.
