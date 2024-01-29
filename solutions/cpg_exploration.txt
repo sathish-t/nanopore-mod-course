@@ -38,5 +38,5 @@ a C and a G in the third and the fourth positions.
 input_bam=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam
 output_tsv= # fill with some suitable location
 modkit extract $input_bam $output_tsv
-awk '{print $15}' $output_tsv | grep -c -v -E ^[AGCT]{1}[AGCT]{1}CG[AGCT]{1}$
+awk '{print $15}' $output_tsv | grep -v -E ^[AGCT]{1}[AGCT]{1}CG[AGCT]{1}$
 ```
