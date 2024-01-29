@@ -15,6 +15,7 @@ Any other reasonable criterion is ok.
 input_mod_bam=~/nanomod_course_data/yeast/subset_2.sorted.bam
 thresholded_mod_bam= # fill suitably
 modified_reads_mod_bam= # fill suitably
+modified_reads_mod_bam_adjust_tag= # fill suitably
 
 # perform thresholding
 modkit call-mods --no-filtering $input_mod_bam $thresholded_mod_bam
@@ -41,16 +42,20 @@ Step 3:
 The command below produces statistics of the region chrVI:150000-160000.
 Note down the statistics in the file `probabilities.txt` in the directory
 ./histogram_exercise and repeat this command for the other regions.
-Remember that the top and the bottom rows of the file correspond to
-the modified base and the unmodified base respectively.
 
 ```bash
+# adjust the tag of the modified-read mod bam file
+modkit adjust-mods --convert T B $modified_reads_mod_bam \
+  $modified_reads_mod_bam_adjust_tag
+samtools index $modified_reads_mod_bam_adjust_tag
+
 region_file= # fill suitably
 echo -e "chrVI\t150000\t160000\tA\t1000\t." > $region_file;   
 
-# cd to a suitable folder
+# cd to a suitable directory which can hold
+# the histogram_exercise directory
 
-modkit sample-probs $modified_reads_mod_bam -o ./histogram_exercise \
+modkit sample-probs $modified_reads_mod_bam_adjust_tag -o ./histogram_exercise \
   --hist --buckets 2 --include-bed $region_file --force
 # --force above just overwrites files
 # in the ./histogram_exercise directory

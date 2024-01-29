@@ -176,10 +176,35 @@ for these calculations and we leave it to the experimenter to
 determine what that fraction is for their dataset).
 We will discuss the `-p` option in an optional subsection a little later.
 
+NOTE: The `modkit sample-probs` command produces tabular files
+with rows labeled with either an unmodified one-letter code or
+a modified one-letter code.
+In the case of 5mC methylation which is coded
+as `C+m`, the rows are labelled either `C` or `m`.
+In the case of a generic modification such as `T+T`,
+which we use to label our BrdU data,
+we run into problems because both the modified and
+the unmodified rows are labeled `T`.
+This is a problem with the `modkit sample-probs` tool.
+To get around the problem, before using this tool, we change
+the `T+T` code to `T+B` using `modkit adjust-mods`.
+This is not a good idea in general as `B` means not `A` in the
+standard one-letter nucleotide code list.
+But, as the modification field is still developing, we occasionally
+run into these problems and have to use such workarounds.
+
 ```bash
-input_bam_file= # fill this suitably
+input_mod_bam= # fill this suitably
+input_mod_bam_adjust_tag= # fill this suitably
+
+# convert mod BAM from using T+T to T+B
+modkit adjust-mods --convert T B $input_mod_bam \
+  $input_mod_bam_adjust_tag
+samtools index $input_mod_bam_adjust_tag
+
+# sample probabilities and make a histogram
 modkit sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
-  $input_bam_file -o ./histogram --hist --buckets 10 -n 1000
+  $input_mod_bam_adjust_tag -o ./histogram --hist --buckets 10 -n 1000
 ```
 
 The output files are deposited in the `./histogram` folder.
@@ -191,14 +216,6 @@ and the same for the number of unmodified bases using the probability that
 the base is not modified `p_unmod = 1 - p_mod`.
 `probabilities.txt` also contains a histogram made with ASCII art
 (i.e. using the symbol ∎ to build horizontal bars of this histogram).
-In `probabilities.txt`, the top set of rows marked with the code `T` correspond
-to the modified base (`p_mod`) whereas the bottom set of rows marked with the
-code `T` correspond to the unmodified base (`p_unmod`).
-This confusion is due to the fact that we marked modifications using the
-ambiguous mod BAM tag `T+T`.
-`probabilities.tsv` suffers from the same problem, and you can figure
-out which rows correspond to the modified bases and which to the unmodified
-by comparing numbers with `probabilities.txt`.
 
 Have a look at these files, and answer this question for yourself: what 
 would be a good modification probability value for thresholding?
@@ -225,8 +242,13 @@ the program calculates statistics from bases on reads that fall in either
 region.
 
 ```bash
-input_bam_file= # fill this suitably
+input_mod_bam= # fill this suitably
+input_mod_bam_adjust_tag= # fill this suitably
 regions_bed_file= # we are going to make this file
+
+# convert mod BAM from using T+T to T+B
+modkit adjust-mods --convert T B $input_mod_bam \
+  $input_mod_bam_adjust_tag
 
 # one can use any regions and any number of regions in the commands
 # below. The '.' in the sixth column means we include both +
@@ -234,8 +256,9 @@ regions_bed_file= # we are going to make this file
 echo -e "chrI\t100000\t200000\tA\t1000\t." > $region_file;   
 echo -e "chrVII\t500000\t600000\tB\t1000\t." >> $region_file;
 
+# sample probabilities and make a histogram
 modkit sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
-  $input_bam_file -o ./histogram_subset --hist --buckets 10 -n 1000 \
+  $input_mod_bam_adjust_tag -o ./histogram_subset --hist --buckets 10 -n 1000 \
   --include-bed $regions_bed_file
 ```
 
