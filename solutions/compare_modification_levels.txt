@@ -73,3 +73,16 @@ modkit sample-probs $modified_reads_mod_bam_adjust_tag -o ./histogram_exercise_t
 You should see in the two `probabilities.tsv` files in the respective
 histogram folders that the ratio of modified to unmodified bases is larger
 at the initiation sites than at the termination sites.
+
+Alternate solution 1
+====================
+You can also use `modbamtools calcMeth` instead of `modkit sample-probs`
+in the last two commands of the previous solution and get
+a modification level per initiation or termination site.
+
+Alternative solution 2
+======================
+You can visualize the corresponding molecules where origins or terminations
+were found using our single-molecule plotting program or IGV or modbamtools
+and see that initiation sites have more modifications than termination sites.
+This is a qualitative solution.
