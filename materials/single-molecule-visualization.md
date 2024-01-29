@@ -67,6 +67,9 @@ standard deviation of modification, and the coverage.
 This calculation offers us an alternate to `modkit sample-probs` as
 the style of the input options is slightly different.
 
+Although the command is called `modbamtools calcMeth`, it works
+on our yeast dataset with BrdU-substituted DNA as well.
+
 ## Pileup of reference-anchored mod BAM files with `modkit`
 
 A pileup is any calculation that produces one number per base on a reference
