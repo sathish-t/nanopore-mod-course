@@ -4,8 +4,12 @@ element: notes
 title: Visualisation of base modification data - part II
 ---
 
-In this session, we will learn to use `modbamtools` another visualization package,
+This is the final hands-on session in our timeline.
+In this session, we will learn to use another visualization package `modbamtools`,
 and learn how to do pileups.
+At the end of the lesson, you can do an exercise to explore what you have learnt
+in all the hands-on sessions in this course further or you can explore all the mod BAM
+files we have generated and the commands you have used on your own.
 
 ![Visualizations with mod BAM](manipulate_mod_bam_visualize_II.png)
 
@@ -41,7 +45,7 @@ we can compare the methylation pattern between the two examples.
 We have chosen a green-grey colour scheme for our plots here compared
 with the red-blue of the tutorial.
 
-## Calculation of modification statistics with modbamtools
+## Calculation of modification statistics with `modbamtools`
 
 One can calculate modification statistics across several regions with `modbamtools`.
 
@@ -124,16 +128,52 @@ information as coverage is just a count of number of reads
 passing through each position on the reference irrespective
 of whether they contain modifications or not.
 
-### (optional) Modification pileup with `samtools`
+### Modification pileup with `samtools`
 
 One can also perform pileups of modification with `samtools`.
 The command is specified below.
-The output format is a little hard to understand and we will not be discussing this further.
+The output format is a little hard to understand and we will discuss its main features.
 Please consult the documentation [here](https://www.htslib.org/doc/samtools-mpileup.html)
 if you want to learn more.
 
 ```bash
-input_mod_bam= # fill suitably
+input_mod_bam=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam
 output_file= # fill suitably
-samtools mpileup -M $input_mod_bam > $output_file
+samtools mpileup -M $input_mod_bam \
+  -r chr20:58815000-58895000 > $output_file
+# we are restricting the pileup above to the specified region
 ```
+
+We discuss the columns in the output file using the following three representative lines:
+
+```text
+chr20   58815129        N       17      gGGgggGgGgggggGgg       @EJB7E>{9>KGC@9@D
+chr20   58815130        N       17      cC[+m255]C[+m255]cccC[+m255]cC[+m2]cccccC[+m255]cc      CCFB7E=F3AGDH=9CD
+chr20   58815131        N       17      g[+m255]GGg[+m255]g[+m255]g[+m255]Gg[+m222]Gg[+m255]g[+m255]g[+m255]g[+m255]g[+m255]Gg[+m255]g[+m255]   CAGC=F=D2@J@D:9DD
+```
+
+- The first two columns are the contig and the position on the reference.
+- The third column is the base at the reference, given here as the
+  generic N as we have not supplied a reference genome in the input to the command.
+- The fourth column is the number of reads passing through the position.
+- The fifth column contains a series of bases.
+  - The number of upper and lower case bases equals the number of
+    forward-mapping and reverse-mapping reads at that position respectively.
+  - If a read contains a modification, the corresponding base has square brackets
+    appended to it. The modification code and probability from 0-255 appear
+    in the square brackets (Recall from earlier that probabilities are stored
+    as numbers from 0-255 and not as numbers from 0-1 in a mod BAM file).
+- The sixth column has the base quality encoded as ASCII characters as we have
+  discussed in a previous [session]({{ site.baseurl }}/materials/sequence-align-pycoqc)
+  on sequence alignment.
+
+This pileup command is useful if you want to do some sophisticated analysis
+beyond the measures offered by `modkit` and `modbamtools`.
+You can pass this as an input to a program written in python or R or any other
+text processing tool.
+
+## Exercise: Measuring modification levels in our yeast dataset
+
+In [this]({{ site.baseurl }}/exercises/compare_modification_levels) exercise,
+we will measure modification levels at initiation sites and termination sites
+in our yeast dataset and compare them.
