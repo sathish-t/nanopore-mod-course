@@ -58,14 +58,6 @@ pycoQC -f $input_seq_sum -a $input_bam -o $output_html \
 This is a question of style. Although we prefer style 2 above,
 you can execute the command in whichever way you want.
 
-### General tips
-
-- Some of our commands are long and go over several lines.
-Make sure to maximize your terminal window to make these commands easy to view.
-- In the course material, we do not always write 'Run this command' before
-every command block. Please follow what the speaker is doing or make a judgement call
-about whether a block needs to be run.
-
 ### If you are a participant in the Earlham Institute training course
 
 You do not need to read any further than this section.
@@ -92,6 +84,22 @@ We store input data, scripts, references
 and outputs in the directories `~/nanomod_course_data`, `~/nanomod_course_scripts`,
 `~/nanomod_course_references` and `~/nanomod_course_outputs` respectively.
 Please make them if they do not exist using the `mkdir` command.
+
+#### Following along in the course
+
+In the hands-on sessions, you should see a screen with a side-by-side view of
+this course website and a terminal or a GUI window in the
+video from the videoconferencing software.
+The instructor will execute commands from this course website
+in the terminal or the GUI window.
+You can log in to a virtual machine and type commands along with the instructor.
+
+Some of our commands are long and go over several lines.
+Please make sure to maximize your terminal window to make these commands easy to view.
+
+In the course material, we do not always write 'Run this command' before
+every command block. Please follow what the speaker is doing or make a judgement call
+about whether a block needs to be run.
 
 ### If you are a self-study student
 
