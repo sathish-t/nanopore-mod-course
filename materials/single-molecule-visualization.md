@@ -51,6 +51,8 @@ One can calculate modification statistics across several regions with `modbamtoo
 
 ```bash
 region_file= # fill suitably
+# Use a non-existent filename above.
+# We will populate this file using the echo commands below.
 echo -e "chr20\t58100000\t58200000" > $region_file;   
 echo -e "chr20\t59100000\t59200000" >> $region_file;
 
@@ -126,10 +128,10 @@ head -n 20 "$output_dir"/coverage.bedgraph
 cat "$output_dir"/coverage.bedgraph | shuf | head -n 20
 ```
 
-This method will work even if the BAM file has no modification
-information as coverage is just a count of number of reads
-passing through each position on the reference irrespective
-of whether they contain modifications or not.
+This method will work even if all the reads in the BAM file
+do not have any modifications.
+This is because coverage is just a count of the number of reads
+passing through each position on the reference.
 
 ### Modification pileup with `samtools`
 
@@ -166,6 +168,9 @@ chr20   58815131        N       17      g[+m255]GGg[+m255]g[+m255]g[+m255]Gg[+m2
     appended to it. The modification code and probability from 0-255 appear
     in the square brackets (Recall from earlier that probabilities are stored
     as numbers from 0-255 and not as numbers from 0-1 in a mod BAM file).
+  - The column contains additional information if there are insertions or
+    deletions at this base in the reference. We are not going to discuss
+    this here. 
 - The sixth column has the base quality encoded as ASCII characters as we have
   discussed in a previous [session]({{ site.baseurl }}/materials/sequence-align-pycoqc)
   on sequence alignment.
