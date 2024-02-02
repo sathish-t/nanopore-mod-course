@@ -271,4 +271,4 @@ file in a guided way.
 
 - [Exploring an unknown BAM file]({{ site.baseurl }}/exercises/bam_exploration).
 - [Are all C methylations at CpG sites?]({{ site.baseurl }}/exercises/cpg_exploration).
-- [Find the most modified reads]({{ site.baseurl }}/exercises/most_modified).
+- [Find the most modified reads]({{ site.baseurl }}/exercises/most_modified_read).
