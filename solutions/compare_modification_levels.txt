@@ -15,12 +15,12 @@ course; we will use a reasonable guess.
 regions as input, and examine the histogram of modification
 probabilities.
 
-This strategy is approximate as we have called
+This is an approximate solution as we have called
 origins and terminations on single molecules using forkSense,
-but we are calculating modification densities over all
+but we are calculating modification densities over all the
 reads passing through these sites using `modkit sample-probs`.
-Performing the exact calculation will involve a lot of manual
-work as you will have to create one-read subsets, or you will
+Performing the exact calculation will involve some manual
+work as you will have to create subsets of reads, or you will
 need to know some programming.
 This illustrates the limitations we are up against when we
 want to do sophisticated single-molecule data processing
@@ -74,8 +74,8 @@ You should see in the two `probabilities.tsv` files in the respective
 histogram folders that the ratio of modified to unmodified bases is larger
 at the initiation sites than at the termination sites.
 
-Alternate solution 1
-====================
+Alternative solution 1
+======================
 You can also use `modbamtools calcMeth` instead of `modkit sample-probs`
 in the last two commands of the previous solution and get
 a modification level per initiation or termination site.
