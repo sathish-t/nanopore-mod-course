@@ -5,6 +5,67 @@ title: Computer Setup
 
 ## Instructions
 
+### Style of computer commands used in the course
+
+In the course material, we follow the style of naming all the input parameters
+to each command. For example, let's say we want to see the contents of a file
+with DNA data located at `~/somewhere/someplace/somedata.txt` using the `cat`
+command. The usual style of running this command is
+
+```bash
+# do not run this command! It's for illustrative purposes only.
+cat ~/somewhere/someplace/somedata.txt
+```
+
+However, in the course, we declare a variable called `dna_data`
+first which contains the path to the file. Then, we pass this
+variable as an input to the command as shown below.
+
+```bash
+# do not run this command! It's for illustrative purposes only.
+dna_data=~/somewhere/someplace/somedata.txt
+cat $dna_data
+```
+
+It is easier to see what the command is doing in our style as we have
+a name associated with the file i.e. instead of thinking 'we are viewing
+the contents of a file located at this path', we think 'we are viewing dna data'.
+
+This becomes even more relevant
+when we run commands with many input parameters; see the two styles of running
+the same command below.
+
+```bash
+# style 1
+# do not run this command! It's for illustrative purposes only.
+pycoQC -f ~/nanomod_course_outputs/yeast/sequencing_summary.txt \
+   -a ~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam \
+   -o ~/nanomod_course_outputs/yeast/pycoQC/analysis.html \
+  -j ~/nanomod_course_outputs/yeast/pycoQC/analysis.json --quiet
+```
+
+```bash
+# style 2
+# do not run this command! It's for illustrative purposes only.
+input_seq_sum=~/nanomod_course_outputs/yeast/sequencing_summary.txt
+input_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam
+output_html=~/nanomod_course_outputs/yeast/pycoQC/analysis.html
+output_json=~/nanomod_course_outputs/yeast/pycoQC/analysis.json
+pycoQC -f $input_seq_sum -a $input_bam -o $output_html \
+  -j $output_json --quiet
+```
+
+This is a question of style. Although we prefer style 2 above,
+you can execute the command in whichever way you want.
+
+### General tips
+
+- Some of our commands are long and go over several lines.
+Make sure to maximize your terminal window to make these commands easy to view.
+- In the course material, we do not always write 'Run this command' before
+every command block. Please follow what the speaker is doing or make a judgement call
+about whether a block needs to be run.
+
 ### If you are a participant in the Earlham Institute training course
 
 You do not need to read any further than this section.
@@ -31,13 +92,6 @@ We store input data, scripts, references
 and outputs in the directories `~/nanomod_course_data`, `~/nanomod_course_scripts`,
 `~/nanomod_course_references` and `~/nanomod_course_outputs` respectively.
 Please make them if they do not exist using the `mkdir` command.
-
-Tip: Some of our commands are long and go over several lines.
-Make sure to maximize your terminal window to make these commands easy to view.
-
-Tip: In the course material, we do not always write 'Run this command' before
-every command block. Please follow what the speaker is doing or make a judgement call
-about whether a block needs to be run.
 
 ### If you are a self-study student
 
