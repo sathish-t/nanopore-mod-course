@@ -52,7 +52,7 @@ We will explore the details of these visualizations and how to make
 them in this session.
 In the next session on [manipulation of modification data]({{ site.baseurl }}/materials/manipulate-modified-base),
 we will discuss how to do the equivalent of some of the analyses
-that goes on behind the scenes to make these visualizations (subsetting, thresholding, pileup etc.)
+that goes on behind the scenes to make these visualizations (subsetting, thresholding, pileup, etc.)
 so that we can incorporate the commands in our own scripts.
 
 ## Visualizing modification calls with IGV
