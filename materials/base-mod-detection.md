@@ -70,6 +70,20 @@ DNAscent detect -b $input_bam -r $ref_genome -i $index \
  -o $output_detect -t 8 -q 20 -l 1000
 ```
 
+After the program has finished running, inspect the first few lines of the output
+file using the `head` command
+
+```bash
+output_detect=~/nanomod_course_outputs/yeast/dnascent.detect
+head -n 30 $output_detect
+```
+
+You should see:
+- a few header lines starting with `#`
+- data from each read starts with `>` and has information about its alignment
+- the following lines give genomic alignment coordinate, BrdU probability,
+and k-mer (on the reference strand)
+
 ## Call replication dynamics with DNAscent forkSense using single-molecule modification densities
 
 After modifications are called, one can ask general questions common to all modification experiments
@@ -87,8 +101,8 @@ Today, we will just learn how to execute the `forkSense` command and save the bi
 for tomorrow.
 
 ```bash
-# for forkSense, we need to make sure we are in the correct directory
-# as there are lots of output files which go to the current directory.
+# Please change to the output directory using the cd command.
+# There are lots of output files which go to the output directory.
 input_detect=~/nanomod_course_outputs/yeast/dnascent.detect
 output_forksense=~/nanomod_course_outputs/yeast/dnascent.forkSense
 cd ~/nanomod_course_outputs/yeast/

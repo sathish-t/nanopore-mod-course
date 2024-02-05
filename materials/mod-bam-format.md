@@ -42,7 +42,8 @@ So, the modification tag reads `MM:Z:C+m,1,0;`.
 In addition to the information that we need to execute 1 skip and 0 skips (`,1,0`), the tag tells
 us that we are looking at cytosine modifications (`C`), the modification under
 question is 5-methylcytosine (`m`), and that modification information is on the
-same strand as basecalling (`+`). Put together, the BAM line might look like (spaces have replaced tabs for simplicity):
+same strand as basecalling (`+`). Put together, the BAM line might look like (spaces have been
+replaced by tabs for simplicity):
 
 ```text
 1578e830-9886-46c8-977b-f0645dac040b 4 * 0 255 * * 0 0 TCGCCTAGCG * MM:Z:C+m,1,0;
@@ -78,7 +79,7 @@ But in this 'hard call' representation, 'missing' is equivalent to 'unmodified'.
 ### (optional) Multiple types of modifications are present
 
 Let us consider the scenario where both 5mC and 5hmC modifications are present in the sample sequence `TCGCCTAGCG`.
-The tag might read (a space has replaced a tab for simplicity) `MM:Z:C+m,1,0; MM:Z:C+h,3;`.
+The tag might read (a space has been replaced by a tab for simplicity) `MM:Z:C+m,1,0; MM:Z:C+h,3;`.
 The interpretation is that the second and third cytosines (execute one skip and zero skips) have been modified to 5mC and
 the fourth (execute three skips) has been modified to 5hmC.
 

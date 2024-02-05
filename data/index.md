@@ -7,11 +7,12 @@ title: Datasets
 
 We will be working with two datasets in this course: a yeast DNA dataset
 with some thymidines substituted by BrdU and a human dataset of
-methylated DNA.
-The yeast DNA was sequenced using the R9 pore chemistry, and the human
-DNA with R10.
+methylated DNA. The yeast DNA was sequenced using an R9 workflow,
+whereas the human DNA was sequenced using an R10 workflow.
 The yeast dataset is at this [link](https://ckan.earlham.ac.uk/dataset/nat-meth-2019-subset-for-nanomod-course)
 and the human dataset is at this [link](https://labs.epi2me.io/cliveome_5mc_cfdna_celldna/).
+We will infer single-molecule DNA replication dynamics from BrdU-incorporation patterns in
+the yeast DNA dataset, and infer methylation patterns from the human dataset.
 Please read on to see how to download the datasets and prepare them for use.
 
 ### If you are a participant in the Earlham Institute training course
