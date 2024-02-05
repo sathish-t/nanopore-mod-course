@@ -78,6 +78,9 @@ You should see two tracks immediately below the reference genome on top.
 
 Now, we have to choose the option of 'Color by modification'.
 Please follow the instructions in the figure below.
+You may have some issues if you are using a Mac trackpad; please
+see the helpful images [here]{{ site.baseurl }}/materials/mac_trackpad_1.png)
+and [here]({{ site.baseurl }}/materials/mac_trackpad_2.png).
 
 ![Instructions on how to colour by modification](igv_colour_by_mod.png)
 
