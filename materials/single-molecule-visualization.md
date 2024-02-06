@@ -16,7 +16,8 @@ files we have generated and the commands you have used on your own.
 ## Visualizing reads and percent modification rates with modbamtools 
 
 ```bash
-out_dir= # set to suitable directory
+out_dir=~/nanomod_course_outputs/human/modbamtools
+  # set to suitable directory
 mkdir -p $out_dir # make directory if it does not exist
 
 modbamtools plot -r chr20:58815000-58895000 \
@@ -133,7 +134,7 @@ do not have any modifications.
 This is because coverage is just a count of the number of reads
 passing through each position on the reference.
 
-### Modification pileup with `samtools`
+### (optional) Modification pileup with `samtools`
 
 One can also perform pileups of modification with `samtools`.
 The command is specified below.
@@ -180,7 +181,7 @@ beyond the measures offered by `modkit` and `modbamtools`.
 You can pass this as an input to a program written in python or R or any other
 text processing tool.
 
-## Exercise: Measuring modification levels in our yeast dataset
+## (optional) Exercise: Measuring modification levels in our yeast dataset
 
 In [this]({{ site.baseurl }}/exercises/compare_modification_levels) exercise,
 we will measure modification levels at initiation sites and termination sites
