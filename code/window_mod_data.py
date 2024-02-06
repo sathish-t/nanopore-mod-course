@@ -56,7 +56,7 @@ def window_mod_data(threshold, window_size, input_file, output_file):
     })
 
     # if there are multiple read ids, throw error
-    if windowed_data["read_id"].value_counts() != 1:
+    if len(windowed_data["read_id"].unique()) != 1:
         raise ValueError("Input must contain one unique read id")
 
     # Write the windowed data to the output file
