@@ -30,30 +30,10 @@ we will use our own tools due to an absence of ready-made tools.
 In a later [session]({{ site.baseurl }}/materials/single-molecule-visualization),
 we will use the package `modbamtools` for further manipulation.
 
-## Refresher: convert mod BAM files to TSV using `modkit extract`
-
-As we have seen in a previous [session]({{ site.baseurl }}/materials/mod-bam-format),
-the raw mod BAM format is pretty hard to read for a person.
-It is much more convenient to convert mod BAM files into a tabular format using
-the `modkit extract` command.
-
-```bash
-input_bam_file= # fill with a suitable file
-modkit extract $input_bam_file -
-# - means the output goes to the standard output i.e. the screen.
-# if your file is too large, pipe output through shuf and head.
-# e.g. modkit extract $input_bam_file - | shuf | head -n 20
-```
-
-Please pay close attention to the first, second, third, fourth, and eleventh columns
-which contain data corresponding to the read id, position along the read,
-position along the reference, contig on the reference, and modification probability.
-
 ## Simple thresholding of mod BAM files with `modkit`
 
 Thresholding is the process of converting soft modification calls to hard calls
-i.e transforming a probability of modification per base per sequenced strand to a binary yes/no
-(or a ternary yes/no/no etc. when multiple modifications are present).
+i.e transforming a probability of modification per base per sequenced strand to a binary yes/no.
 The ground truth for an experimental sample is that every base on a DNA strand
 is either modified or unmodified.
 The probability of modification associated with every base in a mod BAM file
@@ -99,11 +79,6 @@ Run `modkit extract` on the input and output mod bam files.
 You will see that the modification probability is now either
 a value very close to zero or a value very close to one.
 
-The reason we do not get zero or one is because mod BAM probabilities
-are discretized by 1/256. So, modkit outputs the midpoint of
-the first and the last interval as the lowest and the highest
-probabilities respectively.
-
 ### (optional) Multiple modifications
 
 Please note that if there are multiple modifications, a base
@@ -116,11 +91,12 @@ Now `call-mods` assigned the state with the highest measured probability to the 
 If we want to use a threshold other than 0.5, the syntax is 
 
 ```bash
-input_bam= # fill suitably
-output_bam= # fill suitably
+input_mod_bam= # fill suitably
+output_mod_bam= # fill suitably
 mod_code= # fill with mod code. e.g.: T for our BrdU data, m for 5mC.
 threshold= # fill with a number between 0 and 1.
-modkit call-mods --mod-threshold $mod_code:$threshold --filter-percentile 0 $input_bam $output_bam
+modkit call-mods --mod-threshold $mod_code:$threshold \
+  --filter-percentile 0 $input_mod_bam $output_mod_bam
 ```
 
 ### (optional) Using model confidences as thresholds
@@ -203,6 +179,7 @@ modkit adjust-mods --convert T B $input_mod_bam \
 samtools index $input_mod_bam_adjust_tag
 
 # sample probabilities and make a histogram
+cd ~/nanomod_course_outputs/yeast
 modkit sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
   $input_mod_bam_adjust_tag -o ./histogram --hist --buckets 10 -n 1000
 ```
@@ -253,10 +230,11 @@ modkit adjust-mods --convert T B $input_mod_bam \
 # one can use any regions and any number of regions in the commands
 # below. The '.' in the sixth column means we include both +
 # and - strands in our calculation.
-echo -e "chrI\t100000\t200000\tA\t1000\t." > $region_file;   
-echo -e "chrVII\t500000\t600000\tB\t1000\t." >> $region_file;
+echo -e "chrI\t100000\t200000\tA\t1000\t." > $regions_bed_file;   
+echo -e "chrVII\t500000\t600000\tB\t1000\t." >> $regions_bed_file;
 
 # sample probabilities and make a histogram
+cd ~/nanomod_course_outputs/yeast
 modkit sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
   $input_mod_bam_adjust_tag -o ./histogram_subset --hist --buckets 10 -n 1000 \
   --include-bed $regions_bed_file
@@ -289,14 +267,14 @@ Following are examples of where subsetting is useful.
 Before we perform any subset, we first count the total number of reads we have
 in a mod BAM file.
 
-### Count number of reads
+### (optional) Count number of reads
 
 ```bash
-input_file= # fill with whatever input file you want to use
-samtools view -c $input_file
+input_mod_bam= # fill with whatever input file you want to use
+samtools view -c $input_mod_bam
 ```
 
-### Subset by region
+### (optional) Subset by region
 
 The following command makes a mod BAM file with only reads that pass through a given region.
 Note that the subset will pick out entire reads,
@@ -306,28 +284,28 @@ not just the part of the read that overlaps with the region.
 contig= # fill with a suitable contig e.g. chrII
 start= # fill with a suitable start coordinate e.g 80000
 end= # fill with a suitable end coordinate e.g. 90000
-input_file= # fill with whatever input mod BAM file you want to use
-output_file= # fill with an output file name
-samtools view -b -o $output_file $input_file $contig:$start-$end # perform subset
+input_mod_bam= # fill with whatever input mod BAM file you want to use
+output_mod_bam= # fill with an output file name
+samtools view -b -o $output_mod_bam $input_mod_bam $contig:$start-$end # perform subset
 ```
 
 Let's do a quick check that our subset worked by counting the number of reads
 and by examining their coordinates.
 
 ```bash
-samtools view -c $input_file      # count reads of input file
-samtools view -c $output_file     # count reads of output file
-bedtools bamtobed -i $output_file | shuf | head -n 10 
+samtools view -c $input_mod_bam      # count reads of input file
+samtools view -c $output_mod_bam     # count reads of output file
+bedtools bamtobed -i $output_mod_bam | shuf | head -n 10 
     # look at a few output coordinates using bedtools bamtobed
     # to verify the reads overlap the region of interest.
     # you can run the bedtools command without the shuf and the head
-    # if the $output_file is only a few lines long.
+    # if the $output_mod_bam is only a few lines long.
 ```
 
 One can also subset by a list of regions; please follow the instructions in the `samtools view`
 [documentation](http://www.htslib.org/doc/samtools-view.html) if you are interested.
 
-### Subset by read id
+### (optional) Subset by read id
 
 The following command makes a mod BAM file with only the read of the read id of interest.
 
@@ -335,17 +313,18 @@ The following command makes a mod BAM file with only the read of the read id of 
 # fill the following values. 
 # use any suitable mod BAM file and some read id of interest
 # you have recorded.
-input_file=
+input_mod_bam=
 read_id=
-output_file=
-samtools view -b -e 'qname=="'$read_id'"' -o $output_file $input_file # perform subset
-samtools view -c $output_file # count reads
+output_mod_bam=
+samtools view -b -e 'qname=="'$read_id'"' -o $output_mod_bam \
+  $input_mod_bam # perform subset
+samtools view -c $output_mod_bam # count reads
 ```
 
 One can subset by a list of reads using the `-N` option.
 Please look at the `samtools view` documentation [here](http://www.htslib.org/doc/samtools-view.html).
 
-### Subset randomly
+### (optional) Subset randomly
 
 The following command makes a mod BAM file with a subset of randomly-chosen reads
 whose total number is set by the input fraction and
@@ -356,11 +335,12 @@ in the input file is very low (~ 1 - 100).
 ```bash
 # fill the following values suitably. 
 # use any suitable mod BAM file
-input_file=
-output_file=
+input_mod_bam=
+output_mod_bam=
 fraction=0.05
-samtools view -s $fraction -b -o $output_file $input_file # perform subset
-samtools view -c $output_file # count reads
+samtools view -s $fraction -b -o $output_mod_bam \
+  $input_mod_bam # perform subset
+samtools view -c $output_mod_bam # count reads
 ```
 
 ### Subset by modification amount
@@ -491,12 +471,12 @@ modkit extract --force "$one_read_bam" "$one_read_bam".tsv
 
 # Use python scripts to extract raw data and window it
 mod_code=                  # use m for 5mC or T for BrdU etc.
-coords_flag=use_ref        # window using reference coordinates
+ref_flag=use_ref        # window using reference coordinates
 threshold=                 # threshold to call bases as modified
 window_size= # size of window in number of bases of interest
              # e.g. 300
 
-python extract_raw_mod_data.py $mod_code $coords_flag\
+python extract_raw_mod_data.py $mod_code $ref_flag\
   "$one_read_bam".tsv "$one_read_bam"_rawVal.tsv
 python window_mod_data.py $threshold $window_size \
   "$one_read_bam"_rawVal.tsv "$one_read_bam"_winVal.tsv
