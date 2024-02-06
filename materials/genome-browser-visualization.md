@@ -124,30 +124,24 @@ We will visualize another mod BAM file in IGV in
 
 ## Visualizing modifications across single reads with custom script
 
-We will now visualize a read of interest that you picked out with our custom script.
-From now on in the course, our commands will contain a mix of input parameters,
-some set by us and some left blank.
-You need to set the ones left blank.
-Like in the code below, you can choose any `mod_bam` file
-with any `read_id` of interest,
-and put the plots in any `output_dir` you like.
+We will now visualize a read of interest with our custom script.
 
 ```bash
 # change to the github repo of the course and go to the code folder
-cd ~/nanomod_course_scripts/nanopore-mod-course/code 
-mod_bam= # e.g. ~/nanomod_course_data/yeast/subset_2.mod.sorted.bam
-read_id= # e.g. afe17665-534f-41a1-a9e0-3c39022ea3b3
-mod_code=T
-ref_flag=use_ref
-threshold=0.5
-window_size=300 # 300T is roughly 1 kb. You can use other values here.
-output_dir= # e.g. ~/nanomod_course_outputs/yeast/plot_reads
+cd ~/nanomod_course_scripts/nanopore-mod-course/code
+# define the variables for the script
+mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam 
+read_id=40222373-a3e9-4918-aff1-3031f7cb6ec2
+mod_code=T # T is for any T modification
+ref_flag=use_ref # reference genome coordinates
+threshold=0.5 # threhold for modification calling
+window_size=300 # 300T is roughly 1 kb
+output_dir=~/nanomod_course_outputs/yeast/plot_reads
+# run the script
 bash plot_read.sh $mod_bam $read_id $mod_code $ref_flag $threshold $window_size $output_dir
 ```
 
-You should see a figure whose elements look like those in the following figure, although
-the data will be different as you are visualizing a read that you picked out.
-The plot below was created using the example inputs in the code block above.
+You should see the following figure.
 
 ![Rain plot visualization](sample_rain_plot.png)
 
