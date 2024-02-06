@@ -18,10 +18,10 @@ we followed for the yeast dataset:
 - The input format for nanopore currents is `pod5` instead of `fast5`.
 - We are using the basecaller `dorado` instead of `guppy`.
 - `dorado` performs the job of `guppy` (basecalling) and `DNAscent` (modification calling)
-in the `dorado basecaller` command and the job of `minimap2` (alignment) in the
+in the `dorado basecaller` command and calls `minimap2` (alignment) in the
 `dorado aligner` command.
-- Modification calling and basecalling are performed with a single `dorado basecaller` command,
-although they are not concurrent - modification calling is still bolted onto the output of basecalling.
+- Modification calling and basecalling are performed with a single `dorado basecaller` command.
+- Modification calling is still bolted onto the output of basecalling.
 - We get a mod BAM file directly from the modification caller,
 so we do not need to perform any file format conversions to mod BAM.
 - The workflow is reference-unanchored, so alignment is optional and follows modification calling.
@@ -40,11 +40,11 @@ explore the file yourself using the tools we have discussed thus far in the cour
 or do a guided exploration by trying to solve one or more of the exercises at the end of the session.
 
 We will be using a subset of the 'Cliveome' [dataset](https://labs.epi2me.io/cliveome_5mc_cfdna_celldna/)
-developed by Oxford NanoporeTech. The DNA is from the cells of the CTO of ONT, Clive Brown, and
+released by Oxford NanoporeTech. The DNA is from the cells of the CTO of ONT, Clive Brown, and
 we are re-creating a published pipeline.
 
 We had performed a subset and some file conversions and calculations before the course began;
-the steps are listed [here]({{ site.baseurl }}/data#Human) and you can read them later.
+the steps are listed [here]({{ site.baseurl }}/data) and you can read them later.
 We have already copied this data to the location `~/nanomod_course_data/human/`
 at the beginning of the course.
 
@@ -102,7 +102,7 @@ dorado basecaller $model_files $input_dir \
 
 Note down the program speed in number of samples per second.
 
-### Comparing our modification-calling speed with ONT's benchmarks
+### (optional) Comparing our modification-calling speed with ONT's benchmarks
 
 You can compare the dorado basecalling rate we have recorded in samples
 per second to the ONT benchmarks listed [here](https://aws.amazon.com/blogs/hpc/benchmarking-the-oxford-nanopore-technologies-basecallers-on-aws/).
@@ -227,15 +227,13 @@ samtools view -c  --exclude-flags SECONDARY,SUPPLEMENTARY\
 bedtools bamtobed -i $input_mod_bam # inspect alignment coordinates
 ```
 
-## Perform quality control with pycoQC
+## (optional) Perform quality control with pycoQC
 
 Like in a previous [session]({{ site.baseurl }}/materials/sequence-align-pycoqc)
 on yeast, if we run quality control on the ten-read alignment file we have
 been making, we will get warnings and poor statistics.
-Due to the sensitive nature of human data, we are unable to store and
-provide you with a sizeable subset of the Cliveome dataset using
-which we can run pycoQC.
-So, we have run pycoQC ourselves and give you the resultant reports.
+So, we have run pycoQC ourselves on the entire Cliveome dataset
+and have given you the resultant reports.
 Please go to the directory `~/nanomod_course_data/human` and open
 the `analysis.html` file and have a look.
 
@@ -243,10 +241,12 @@ For your reference, we mention the pycoQC command used to
 generate these reports below
 
 ```bash
-# DO NOT run these commands.
+# DO NOT RUN THESE COMMANDS!
 # They are for your reference only.
 # To run them, you need to download and prepare the 'Cliveome'
-# dataset as described here: {{ site.baseurl }}/data#Human
+# dataset as described in the dataset preparation page
+# (to access this page, go to Home and look for the link
+#  Datasets under 'For Students').
 # You can do so on your own computer (not the virtual machines
 # used in the course) if you want to.
 # For now, we just give you the results of the pycoQC step.
@@ -262,6 +262,9 @@ pycoQC -f $seq_summ -a $alignment_bam -o ./analysis.html -j ./analysis.json
 For further analysis, we have prepared a subset of the Cliveome dataset by choosing
 reads passing through a specific region of the human genome.
 It is located at `~/nanomod_course_data/human/bonito_calls.subset.sorted.bam`.
+Although this file's name ends in `.bam`, it is a mod BAM file.
+So all the downstream analysis and visualizations tools we have discussed thus far in
+the course can be used to analyse and visualize this file respectively.
 
 You can now explore the BAM file yourself using the tools we have talked about
 so far. Or you can do one or some of the exercises below to explore the BAM
