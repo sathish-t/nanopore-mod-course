@@ -86,7 +86,8 @@ output_dir=~/nanomod_course_outputs/human
 mkdir -p $output_dir
 ```
 
-We can basecall and modification call ten of our reads (`-n 10`) with 5mC methylation.
+We can basecall and modification call ten of our reads (`-n 10`) with
+5mC methylation at CpG sites (`--modified-bases 5mCG`).
 NOTE: the `-b 10 -c 1000` are internal `dorado` parameters which we've chosen to fit
 our virtual machines, and we are running in the slower CPU-only mode.
 This step will take approximately ten minutes.

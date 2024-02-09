@@ -8,3 +8,5 @@ Using the data in the BAM file `~/nanomod_course_data/human/bonito_calls.subset.
 answer the question 'Are only CpG sites methylated'?
 There are several ways of answering this question, some qualitative and some quantitative.
 You can answer it in any way you like!
+As we had used the flag `--modified-bases 5mCG` with `dorado`, we expect
+the answer to this question to be 'yes'.
