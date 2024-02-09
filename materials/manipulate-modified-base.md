@@ -14,7 +14,7 @@ this data further in our own scripts/pipelines.
 These steps are all in the 'further analysis' section of our pipeline
 and must be tuned or tailored to the experiment at hand by the experimenter.
 
-![Reference-unanchored pipeline with further analysis highlighted](ref_unanc_workflow_modcall_end.png)
+![Reference-anchored pipeline with further analysis highlighted](ref_anc_workflow_modcall_end.png)
 
 The operations we will be running on mod BAM files are:
 - thresholding

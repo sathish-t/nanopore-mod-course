@@ -15,7 +15,7 @@ Some of these tools will work irrespective of whether we use a reference-depende
 approach to call modifications.
 We are at the 'further analysis' stage on our pipeline figure below.
 
-![Reference-unanchored pipeline with further analysis highlighted](ref_unanc_workflow_modcall_end.png)
+![Reference-anchored pipeline with further analysis highlighted](ref_anc_workflow_modcall_end.png)
 
 In this session, we will visualize modification data in mod BAM files (see figure below) using (1) genome
 browsers (left) where we can rapidly scan data visually across different reads and different

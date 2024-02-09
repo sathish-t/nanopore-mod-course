@@ -21,7 +21,7 @@ in newly synthesized DNA by BrdU. We are going to sequence the DNA and call modi
 on it over the next few sessions as described by the genomics pipeline image below.
 We will perform the steps highlighted with an asterisk in this session.
 
-![Reference-unanchored pipeline with basecalling and alignment highlighted](ref_unanc_workflow_basecall_align.png)
+![Reference-anchored pipeline with basecalling and alignment highlighted](ref_anc_workflow_basecall_align.png)
 
 ## Basecalling: converting nanopore currents into DNA sequences
 

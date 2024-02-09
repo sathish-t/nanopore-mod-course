@@ -14,7 +14,7 @@ modification information.
 Along the way, we will also learn the mod bam file format.
 We will be performing the steps highlighted with an asterisk in the pipeline figure below.
 
-![Reference-unanchored pipeline with modification-calling highlighted](ref_unanc_workflow_modcall.png)
+![Reference-anchored pipeline with modification-calling highlighted](ref_anc_workflow_modcall.png)
 
 ## Running DNAscent to produce modification calls along each sequenced DNA strand
 
