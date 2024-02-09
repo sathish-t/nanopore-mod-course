@@ -248,9 +248,22 @@ BrdUs in different k-mer environments.
 Alignment software that finds the best-fit location of a given sequence on a linear reference genome.
 - [Installation and documentation](https://github.com/lh3/minimap2)
 
+## pod5
+
+ONT-written package for reading and writing files in the pod5 format.
+- [Installation and documentation](https://github.com/nanoporetech/pod5-file-format)
+
 ## Programming languages
 
 We will run scripts written in python and R.
 As these are very popular and have many methods of installation, we are not going to discuss them here.
 Please remember to install the required [modules](#software-modules-used-in-python-and-r) on top
 of the base installs of each package.
+
+## Other software
+
+We will discuss the other software packages as and when we encounter them in the course.
+- [Installation and documentation for modbamtools](https://rrazaghi.github.io/modbamtools/)
+- [Installation and documentation for samtools](https://www.htslib.org)
+- [Installation and documentation for bedtools](https://bedtools.readthedocs.io/en/latest/)
+- [Installation and documentation for pycoQC](https://github.com/a-slide/pycoQC)

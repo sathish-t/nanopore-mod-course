@@ -96,7 +96,8 @@ A specialized program called `forkSense` that ships with DNAscent detects gradie
 across a read, and associates these with the movement of replication forks.
 After fork calls are made, locations on the genome from which forks emerged are marked as
 origins of replication, and locations where forks terminate are marked as termination sites.
-Please see the figure below from Müller et al., Nat. Methods (2019).
+Please see the figure below, reproduced from Müller et al., Nat. Methods (2019) at
+[this](https://www.nature.com/articles/s41592-019-0394-y) link.
 
 ![Muller et al figure showing origins and BrdU, Thymidine addition](muller_origins.png)
 
