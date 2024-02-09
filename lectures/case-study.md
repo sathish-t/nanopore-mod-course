@@ -4,8 +4,8 @@ element: lecture
 title: "Case study: Using nanopore sequencing to study DNA replication dynamics"
 ---
 
-Presented live during the training course.
-
+We are providing a brief summary of the lectures presented live during the training course.
+For the hands-on sessions, all materials are provided in the respective web pages.
 
 ### Conclusions
 
