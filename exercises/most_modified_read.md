@@ -1,7 +1,7 @@
 ---
 layout: exercise
 topic: Modification analysis
-title: Most modified
+title: Most modified read
 ---
 
 Find the most modified reads in the BAM file
