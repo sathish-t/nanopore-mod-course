@@ -31,6 +31,8 @@ def extract_raw_mod_data(input_file, mod_code, position):
     else:
         raise ValueError("Invalid position provided. Position must be: not_use_ref or use_ref")
 
+    filtered_data = filtered_data[filtered_data[start_col] >= 0]
+
     output_data = filtered_data[['read_id', start_col, 'mod_qual']].copy()
     output_data['end'] = filtered_data[start_col] + 1
     output_data['label'] = 'rawVal'
