@@ -195,13 +195,15 @@ For options 2 and 3, you will need to know how a BAM file is structured, so the
 knowledge from this session comes in handy.
 For option 1, you need not know much about a BAM file.
 
-<details>
+<details markdown="1">
   
-<summary> 
+<summary markdown="span"> 
 
-### Caution: historical mod BAM files were not well-written
+Problems with historical mod BAM files
 
 </summary>
+
+### Caution: historical mod BAM files were not well-written
 
 Historically, researchers did not use the `?` or `.` notations or one-letter modification
 codes correctly.
