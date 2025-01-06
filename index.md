@@ -30,6 +30,9 @@ For Instructors
 The material is designed to be modify and remixed to create your own courses. Collaborative development and contributions by others are welcome. 
 
 
+For the 2024 version of this course website, please go [here](https://tgac.github.io/nanopore-mod-course-2024).
+
+
 The author(s) acknowledge funding from the Biotechnology and Biological
 Sciences Research Council (BBSRC), part of UK Research and Innovation, Core
 Capability Grant BB/CCG1720/1 and the work delivered via the BBSRC National
