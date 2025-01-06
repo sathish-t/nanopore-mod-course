@@ -4,6 +4,9 @@ element: notes
 title: Mod BAM file format
 ---
 
+*This page is considered optional for the Earlham Institute's training course and will likely not be covered live.
+It is provided as additional reading material for those interested.*
+
 We discuss here how single-molecule modification data is stored in BAM files using the `MM` and `ML` tags
 at the end of each line.
 We are going to be building upon our knowledge of the BAM file format, so please
