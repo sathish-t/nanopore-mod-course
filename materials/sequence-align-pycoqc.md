@@ -46,6 +46,14 @@ session.
 In this section, we will first look at the input and output file formats used by basecallers,
 and then run the basecalling commands on nanopore data from yeast.
 
+<details markdown="1">
+
+<summary markdown="span">
+
+Optional: Input and output file formats used by basecallers
+
+</summary>
+
 ### Input and output file formats used by basecallers
 
 Basecallers use nanopore currents and model parameters as inputs and produce one DNA sequence
@@ -133,6 +141,8 @@ Some columns of interest are `read_id`, `sequence_length_template`
 (the length of the read in basepairs), `filename` (the file that contains the raw nanopore currents),
 and `mean_qscore_template` (average read quality).
 
+</details>
+
 ### Running the basecalling commands
 
 We do the basecalling using guppy as shown below. The options specify input file paths,
@@ -208,6 +218,14 @@ first four bases were a match but the last base was a mismatch.
 We will not discuss details of how an aligner works or how to read these so-called CIGAR strings
 that report alignment information in this course.
 
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: BAM file format
+
+</summary>
+
 ### Input and output file formats used by minimap2
 
 Aligners can use multiple file formats for input and output.
@@ -248,13 +266,23 @@ For more information about the columns and the optional tags, please consult the
 specifications [here](https://samtools.github.io/hts-specs/SAMv1.pdf) and
 [here](https://samtools.github.io/hts-specs/SAMtags.pdf).
 
-### (optional) BAM/SAM file format is versatile
+### BAM/SAM file format is versatile
 
 BAM files are versatile and can store many types of data. The format is the output of choice
 for many other types of software programs such as basecallers and modification callers as well.
 Their outputs would deviate from the example line shown above by removing bits of data.
 For e.g. one can forego alignment information altogether by setting the flag to 4 and
 a few other columns to 0 or *, or forego basecalling information by setting the sequence to *.
+
+</details>
+
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: Introduction to Samtools and Bedtools
+
+</summary>
 
 ### Samtools: a collection of programs that operate primarily on BAM files
 
@@ -309,6 +337,8 @@ transcription direction ambiguous.
 chr1 15000 20000 ABC1 1000 .
 chr2 30000 34000 DEF1 1000 .
 ```
+
+</details>
 
 ### Running the alignment commands
 
@@ -369,7 +399,15 @@ You should see two tracks immediately below the reference genome on top.
 Now, you can zoom in to the genome.
 Select any region of size around 10 to 50 kb and have a look at the result.
 
-### (optional) Increase visibility range in IGV
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: increase visibility range in IGV
+
+</summary>
+
+### Increase visibility range in IGV
 
 You can see read details in IGV only when you zoom in to regions.
 You can set the size of the region at which details start to appear
@@ -380,6 +418,8 @@ the threshold the better.
 
 ![Instructions on how to increase visibility in IGV](igv_increase_visibility_range_1.png)
 ![Instructions on how to increase visibility in IGV](igv_increase_visibility_range_2.png)
+
+</details>
 
 ### Inspecting alignments using samtools and bedtools
 
@@ -453,9 +493,19 @@ as shown in the image below.
 
 ![Image of file browser with HTML file highlighted](screenshot_file_browser_pycoQC.png)
 
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional exercise
+
+</summary>
+
 ### Exercise
 
 We will run pycoQC on another BAM file in [this]({{ site.baseurl }}/exercises/pycoQC) exercise.
+
+</details>
 
 ## Filter BAM file to include only primary reads
 
