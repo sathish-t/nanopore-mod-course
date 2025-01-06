@@ -106,7 +106,15 @@ head -n 20 "$output_dir"/pileup.bed
 cat "$output_dir"/pileup.bed | shuf | head -n 20
 ```
 
-### (optional) Coverage using `bedtools`
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: coverage using bedtools
+
+</summary>
+
+### Coverage using `bedtools`
 
 An alternate way to get the coverage,
 which is a count of the number of reads passing
@@ -134,7 +142,17 @@ do not have any modifications.
 This is because coverage is just a count of the number of reads
 passing through each position on the reference.
 
-### (optional) Modification pileup with `samtools`
+</details>
+
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: modification pileup with samtools
+
+</summary>
+
+### Modification pileup with `samtools`
 
 One can also perform pileups of modification with `samtools`.
 The command is specified below.
@@ -181,8 +199,20 @@ beyond the measures offered by `modkit` and `modbamtools`.
 You can pass this as an input to a program written in python or R or any other
 text processing tool.
 
-## (optional) Exercise: Measuring modification levels in our yeast dataset
+</details>
+
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: exercise
+
+</summary>
+
+## Exercise: Measuring modification levels in our yeast dataset
 
 In [this]({{ site.baseurl }}/exercises/compare_modification_levels) exercise,
 we will measure modification levels at initiation sites and termination sites
 in our yeast dataset and compare them.
+
+</details>
