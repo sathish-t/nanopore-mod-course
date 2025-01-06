@@ -197,7 +197,7 @@ For option 1, you need not know much about a BAM file.
 
 <details>
   
-<summary> Caution: historical mod BAM files were not well-written </summary>
+<summary> ### Caution: historical mod BAM files were not well-written </summary>
 
 Historically, researchers did not use the `?` or `.` notations or one-letter modification
 codes correctly.
