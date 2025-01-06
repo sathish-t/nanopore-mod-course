@@ -199,7 +199,7 @@ For option 1, you need not know much about a BAM file.
   
 <summary markdown="span"> 
 
-### Problems with historical mod BAM files
+Problems with historical mod BAM files
 
 </summary>
 
