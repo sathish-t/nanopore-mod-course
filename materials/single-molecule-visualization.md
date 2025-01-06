@@ -205,7 +205,7 @@ text processing tool.
 
 <summary markdown="span"> 
 
-Optional: exercise
+Optional exercise
 
 </summary>
 

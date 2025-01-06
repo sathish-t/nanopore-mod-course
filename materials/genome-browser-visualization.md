@@ -117,10 +117,20 @@ in the tens of kbs and record the details such as read id and location on the ge
 somewhere.
 When we visualize single molecules, you can visualize these molecules you've picked out.
 
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional exercise
+
+</summary>
+
 ### Exercise: Visualize reads around chrVI from a curated BAM file
 
 We will visualize another mod BAM file in IGV in
 [this]({{ site.baseurl }}/exercises/igv_visualize) exercise.
+
+</details>
 
 ## Visualizing modifications across single reads with custom script
 

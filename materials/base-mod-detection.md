@@ -174,6 +174,14 @@ output_tsv=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam.tsv
 modkit extract $input_mod_bam $output_tsv
 ```
 
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: the modBAM format
+
+</summary>
+
 ## Discussion of the modBAM file format
 
 The mod BAM format is not very easy to read for a person.
@@ -186,3 +194,5 @@ As the modification field is still developing,
 it is probable that you will come across such scenarios.
 Thus, we conclude this session with a [discussion]({{ site.baseurl }}/materials/mod-bam-format)
  of the mod BAM file format.
+
+ </details>
