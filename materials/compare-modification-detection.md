@@ -103,13 +103,31 @@ dorado basecaller $model_files $input_dir \
 
 Note down the program speed in number of samples per second.
 
-### (optional) Comparing our modification-calling speed with ONT's benchmarks
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: modification calling speeds
+
+</summary>
+
+### Comparing our modification-calling speed with ONT's benchmarks
 
 You can compare the dorado basecalling rate we have recorded in samples
 per second to the ONT benchmarks listed [here](https://aws.amazon.com/blogs/hpc/benchmarking-the-oxford-nanopore-technologies-basecallers-on-aws/).
 Please note that some of ONT's benchmarks were performed
 on expensive computers with many GPUs (see the cost tables at the link)!
 Our virtual machines do not have GPUs to minimize costs.
+
+</details>
+
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: generating sequencing summary files
+
+</summary>
 
 ### Dorado pipelines produce only BAM files but no fastq or sequencing summary files
 
@@ -131,10 +149,22 @@ dorado summary $input_mod_bam > $output_summ_file
 You can get a fastq file if you want using the command
 `samtools bam2fq $input_mod_bam > $output_fastq` but we will not be doing it here.
 
-### (optional) Dorado can detect multiple types of methylation
+</details>
+
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: multiple modification detection
+
+</summary>
+
+### Dorado can detect multiple types of methylation
 
 We are not going to call both 5hmC and 5mC methylation here, but you can use the flag
 `--modified-bases 5mCG_5hmCG` to do so.
+
+</details>
 
 ## Inspect results of modification calling
 
@@ -164,6 +194,14 @@ What base follows the cytosine of interest?
 
 ## Perform alignment post-modification calling
 
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: downloading the reference genome
+
+</summary>
+
 ### Download the reference genome 
 
 We need to download a reference human genome which is a few GB.
@@ -181,6 +219,8 @@ wget "$url"/GCA_000001405.15_GRCh38_full_analysis_set.fna.fai
 wget "$url"/GCA_000001405.15_GRCh38_full_analysis_set.fna.gz   
 gunzip GCA_000001405.15_GRCh38_full_analysis_set.fna.gz
 ```
+
+</details>
 
 ### Perform alignment
 
@@ -228,10 +268,21 @@ samtools view -c  --exclude-flags SECONDARY,SUPPLEMENTARY\
 bedtools bamtobed -i $input_mod_bam # inspect alignment coordinates
 ```
 
-## (optional) Perform quality control with pycoQC
+<details markdown="1">
 
-Like in a previous [session]({{ site.baseurl }}/materials/sequence-align-pycoqc)
-on yeast, if we run quality control on the ten-read alignment file we have
+<summary markdown="span"> 
+
+Optional: Quality control
+
+</summary>
+
+## Perform quality control with pycoQC
+
+Quality control on the yeast dataset was covered in an optional part
+of a previous [session]({{ site.baseurl }}/materials/sequence-align-pycoqc);
+you can do that part first if you wish.
+
+Similar to that lesson, if we run quality control on the ten-read alignment file we have
 been making, we will get warnings and poor statistics.
 So, we have run pycoQC ourselves on the entire Cliveome dataset
 and have given you the resultant reports.
@@ -258,6 +309,8 @@ alignment_bam="$input_dir"/cliveome_kit14_2022.05/gdna/basecalls/PAM63974/bonito
 pycoQC -f $seq_summ -a $alignment_bam -o ./analysis.html -j ./analysis.json
 ```
 
+</details>
+
 ## Further analysis
 
 For further analysis, we have prepared a subset of the Cliveome dataset by choosing
@@ -271,8 +324,18 @@ You can now explore the BAM file yourself using the tools we have talked about
 so far. Or you can do one or some of the exercises below to explore the BAM
 file in a guided way.
 
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional exercises
+
+</summary>
+
 ### Exercises
 
 - [Exploring an unknown BAM file]({{ site.baseurl }}/exercises/bam_exploration).
 - [Are all C methylations at CpG sites?]({{ site.baseurl }}/exercises/cpg_exploration).
 - [Find the most modified reads]({{ site.baseurl }}/exercises/most_modified_read).
+
+</details>

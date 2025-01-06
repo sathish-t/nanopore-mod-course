@@ -446,6 +446,14 @@ bedtools bamtobed -i $input_bam | shuf | head -n 20
 # The combined effect is to output 20 lines selected at random from the bedtools output.
 ```
 
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: Quality control
+
+</summary>
+
 ## Quality control
 
 We will use `pycoQC` to produce quality-control reports of our basecalled and
@@ -492,6 +500,8 @@ Double-click on the HTML file after you have navigated to its location in the fi
 as shown in the image below.
 
 ![Image of file browser with HTML file highlighted](screenshot_file_browser_pycoQC.png)
+
+</details>
 
 <details markdown="1">
 

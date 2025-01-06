@@ -18,6 +18,14 @@ We will be performing the steps highlighted with an asterisk in the pipeline fig
 
 ## Running DNAscent to produce modification calls along each sequenced DNA strand
 
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: downloading a plugin required by DNAscent
+
+</summary>
+
 ### Preparations to call modifications
 
 We first need to download a plugin to help DNAscent read the later versions of fast5 files.
@@ -44,6 +52,8 @@ input_seq_summ=~/nanomod_course_outputs/yeast/sequencing_summary.txt
 DNAscent index -f $input_fast5_dir -o $output_index \
   -s $input_seq_summ
 ```
+
+</details>
 
 ### Call modifications
 
