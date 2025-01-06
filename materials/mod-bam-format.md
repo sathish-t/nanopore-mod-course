@@ -195,10 +195,14 @@ For options 2 and 3, you will need to know how a BAM file is structured, so the
 knowledge from this session comes in handy.
 For option 1, you need not know much about a BAM file.
 
-### Caution: historical mod BAM files were not well-written
+<details>
+  
+<summary> Caution: historical mod BAM files were not well-written </summary>
 
 Historically, researchers did not use the `?` or `.` notations or one-letter modification
 codes correctly.
 In other words, questions like 'are missing bases unmodified or missing?',
 'what base is modified?' may not be straightforward to answer and you may need to inspect
 the BAM files yourself using the materials learned in this session.
+
+</details>
