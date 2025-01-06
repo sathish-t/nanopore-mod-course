@@ -22,6 +22,9 @@ The operations we will be running on mod BAM files are:
 - subsetting (either randomly, or by genomic location, or by mean modification density)
 - windowing modification calls
 
+We will cover some of these in the main lesson.
+Those interested can learn the others in the optional sections.
+
 ![List of manipulations with mod BAM](manipulate_mod_bam_no_pileup_or_viz.png)
 
 We can achieve most of these operations using the pre-existing packages `modkit` and `samtools`.
@@ -79,12 +82,30 @@ Run `modkit extract` on the input and output mod bam files.
 You will see that the modification probability is now either
 a value very close to zero or a value very close to one.
 
-### (optional) Multiple modifications
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: multiple modifications
+
+</summary>
+
+### Multiple modifications
 
 Please note that if there are multiple modifications, a base
 can exist in more than two states: unmodified, modification of the first type,
 modification of the second type etc. 
 Now `call-mods` assigned the state with the highest measured probability to the base.
+
+</details>
+
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: syntax for thresholds other than 50%
+
+</summary>
 
 ### Syntax for thresholds other than 50%
 
@@ -99,7 +120,17 @@ modkit call-mods --mod-threshold $mod_code:$threshold \
   --filter-percentile 0 $input_mod_bam $output_mod_bam
 ```
 
-### (optional) Using model confidences as thresholds
+</details>
+
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: using model confidences as thresholds
+
+</summary>
+
+### Using model confidences as thresholds
 
 Another way to perform thresholding is through model confidences.
 Model confidence is highest at bases with modification probabilities close
@@ -134,6 +165,15 @@ in addition to the `--mod-threshold` parameter.
 We will not be discussing this further; you can refer to the modkit documentation
 [here](https://nanoporetech.github.io/modkit/advanced_usage.html#call-mods) if you are interested.
 
+</details>
+
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: constructing histograms of modification probabilities
+
+</summary>
 
 ## Histograms of modification probabilities using `modkit`
 
@@ -197,7 +237,7 @@ the base is not modified `p_unmod = 1 - p_mod`.
 Have a look at these files, and answer this question for yourself: what 
 would be a good modification probability value for thresholding?
 
-### (optional) thresholds.tsv: measure correspondence between model confidence thresholds and direct probability thresholds
+### thresholds.tsv: measure correspondence between model confidence thresholds and direct probability thresholds
 
 `thresholds.tsv` contains the table of conversion between model confidences and direct probability thresholds.
 This is illustrated in the schematic below, which shows that model confidences of 10% and below
@@ -240,12 +280,14 @@ modkit sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
   --include-bed $regions_bed_file
 ```
 
-## (optional) Use `modkit motif-bed` to form bed files for motifs
+## Use `modkit motif-bed` to form bed files for motifs
 
 To form a BED file for particular motifs such as CG, you can use the `modkit motif-bed`
 command.
 Please refer to the modkit [documentation](https://nanoporetech.github.io/modkit/advanced_usage.html)
 for more details.
+
+</details>
 
 ## Subsetting mod BAM files with samtools
 
@@ -267,14 +309,22 @@ Following are examples of where subsetting is useful.
 Before we perform any subset, we first count the total number of reads we have
 in a mod BAM file.
 
-### (optional) Count number of reads
+### Count number of reads
 
 ```bash
 input_mod_bam= # fill with whatever input file you want to use
 samtools view -c $input_mod_bam
 ```
 
-### (optional) Subset by region
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: subset by genomic region, read id, or in a random manner
+
+</summary>
+
+### Subset by region
 
 The following command makes a mod BAM file with only reads that pass through a given region.
 Note that the subset will pick out entire reads,
@@ -305,7 +355,7 @@ bedtools bamtobed -i $output_mod_bam | shuf | head -n 10
 One can also subset by a list of regions; please follow the instructions in the `samtools view`
 [documentation](http://www.htslib.org/doc/samtools-view.html) if you are interested.
 
-### (optional) Subset by read id
+### Subset by read id
 
 The following command makes a mod BAM file with only the read of the read id of interest.
 
@@ -324,7 +374,7 @@ samtools view -c $output_mod_bam # count reads
 One can subset by a list of reads using the `-N` option.
 Please look at the `samtools view` documentation [here](http://www.htslib.org/doc/samtools-view.html).
 
-### (optional) Subset randomly
+### Subset randomly
 
 The following command makes a mod BAM file with a subset of randomly-chosen reads
 whose total number is set by the input fraction and
@@ -342,6 +392,8 @@ samtools view -s $fraction -b -o $output_mod_bam \
   $input_mod_bam # perform subset
 samtools view -c $output_mod_bam # count reads
 ```
+
+</details>
 
 ### Subset by modification amount
 
@@ -413,7 +465,15 @@ output_bam= # fill suitably
 samtools view -e '[XC]/rlen>0.01' -b -o $output_bam $bam_with_counts
 ```
 
-#### (optional) More details about the modification counting script
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: more details about the modification counting script
+
+</summary>
+
+#### More details about the modification counting script
 
 We have written the script in the AWK programming language.
 The logic in the script is to read each line, isolate the column starting with ML,
@@ -423,9 +483,11 @@ This logic could easily be implemented in python or R as well.
 We have chosen a tag starting with 'X' so as to not to interfere with other
 BAM tags.
 
+</details>
+
 ### Combining several filters to form subsets with `samtools`
 
-A powerful feature of `samtools` is that any of the commands we have used above
+A powerful feature of `samtools` is that commands 
 can be combined to form complex queries that would have otherwise required
 a substantial amount of computer code to achieve.
 For example: to get reads longer than 10 kb with more than 100 modifications, do
@@ -444,6 +506,14 @@ such as `modkit` and `samtools` to achieve some tasks
 without going through the hassle of processing a raw mod BAM file
 using a programming language.
 
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional exercise
+
+</summary>
+
 ## Exercise
 
 We will use what we have learned thus far in this session to identify a
@@ -451,7 +521,17 @@ highly-modified region in our subset mod BAM file
 `~/nanomod_course_data/yeast/subset_2.sorted.bam` in
 [this]({{ site.baseurl }}/exercises/most_modified_region) exercise.
 
-## (optional) Windowing mod BAM files using custom scripts
+</details>
+
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: windowing mod BAM files using custom scripts
+
+</summary>
+
+## Windowing mod BAM files using custom scripts
 
 We will now learn how to make the data behind the windowed track that we saw in
 our earlier visualization [session]({{ site.baseurl }}/materials/genome-browser-visualization)
@@ -484,6 +564,8 @@ python window_mod_data.py $threshold $window_size \
 
 Please see the windowed data in the `"$one_read_bam"_winVal.tsv` file.
 
+</details>
+
 ## Final remarks
 
 We have learned how to perform the following operations on mod BAM files:
@@ -491,6 +573,8 @@ We have learned how to perform the following operations on mod BAM files:
 - making histograms of modification probabilities
 - subsetting
 - windowing modification calls
+
+We covered some of these in the main lesson and some in the optional sections.
 
 Most of these operations could be performed using pre-existing tools and
 can be incorporated easily into scripts.
