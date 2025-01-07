@@ -31,7 +31,7 @@ characteristic currents produced by different DNA k-mers as they translocate thr
 These programs segment the current corresponding to one DNA strand, assign a k-mer per segment,
 and stitch k-mers together into one sequence. We will use two basecallers: `guppy` in this session
 and the more-recent `dorado` in a [later]({{ site.baseurl }}/materials/compare-modification-detection)
-session.
+session. The workflow is similar in either case and whether you are using R9 or R10 flowcells for sequencing.
 
 Basecallers can be run on the nanopore device during sequencing and/or can be run later on a computer.
 For most purposes, on-device basecalling is sufficient. If a higher accuracy is desired or
