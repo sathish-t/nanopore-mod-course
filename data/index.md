@@ -19,18 +19,8 @@ Please read on to see how to download the datasets and prepare them for use.
 
 You do not need to read any further than this section.
 You will be given login details to virtual machines by the organisers or the trainers.
-The input data you need has already been downloaded onto your computer.
-You need to copy it into the correct location.
-Please execute the following commands
-
-```bash
-mkdir -p ~/nanomod_course_data
-cd ~/nanomod_course_data
-cp -r /mnt/trainings/BaseMod2024/* .
-```
-
-You should now see two directories called `yeast` and `human`.
-Data preparation is now complete.
+The input data you need has already been downloaded onto your virtual machine.
+No further action is needed.
 
 ### If you are a self-study student
 
