@@ -41,6 +41,10 @@ ls $HDF5_PLUGIN_PATH
 rm ont-vbz-hdf-plugin-1.0.1-Linux-x86_64.tar.gz # if you see the output above, then cleanup by removing the tarball.
 ```
 
+</details>
+
+### Creating a DNAscent index
+
 We now need to create an index needed by DNAscent — a plain text with two columns: read id
 and the fast5 file with the corresponding time course of nanopore current.
 
@@ -52,8 +56,6 @@ input_seq_summ=~/nanomod_course_outputs/yeast/sequencing_summary.txt
 DNAscent index -f $input_fast5_dir -o $output_index \
   -s $input_seq_summ
 ```
-
-</details>
 
 ### Call modifications
 

@@ -340,8 +340,6 @@ chr2 30000 34000 DEF1 1000 .
 
 </details>
 
-### Running the alignment commands
-
 <details markdown="1">
 
 <summary markdown="span"> 
@@ -349,6 +347,8 @@ chr2 30000 34000 DEF1 1000 .
 Optional: Downloading the reference genome
 
 </summary>
+
+### Downloading the reference genome
 
 We will first obtain the sacCer3 (_S. cerevisiae_) reference genome
 and make a corresponding fasta index file.
@@ -362,6 +362,8 @@ samtools faidx sacCer3.fa
 ```
 
 </details>
+
+### Running the alignment commands
 
 We perform alignment using `minimap2` with 8 threads, using the basecalled fastq
 files and the reference genome we downloaded above. The `-x map-ont` parameter instructs
