@@ -113,9 +113,8 @@ Please see the figure below, reproduced from Müller et al., Nat. Methods (2019)
 
 ![Muller et al figure showing origins and BrdU, Thymidine addition](muller_origins.png)
 
-We will look into these features more in a [session]({{ site.baseurl }}/lectures/case-study) tomorrow.
-Today, we will just learn how to execute the `forkSense` command and save the biological interpretations
-for tomorrow.
+In the course, we will just learn how to execute the `forkSense` command.
+Please discuss the biological interpretations with the instructors if you are interested.
 
 ```bash
 # Please change to the output directory using the cd command.
