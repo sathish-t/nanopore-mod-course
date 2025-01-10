@@ -51,13 +51,13 @@ with the red-blue of the tutorial.
 One can calculate modification statistics across several regions with `modbamtools`.
 
 ```bash
-region_file= # fill suitably
+region_file=~/nanomod_course_outputs/human/modbamtools/regions.bed
 # Use a non-existent filename above.
 # We will populate this file using the echo commands below.
 echo -e "chr20\t58100000\t58200000" > $region_file;   
 echo -e "chr20\t59100000\t59200000" >> $region_file;
 
-output_bed_file= # fill suitably
+output_bed_file=~/nanomod_course_outputs/human/modbamtools/regions.mod.bed
 
 modbamtools calcMeth --bed $region_file \
     --threads 3 \
@@ -91,8 +91,9 @@ Per base on the reference genome, we can calculate
 - the fraction of modified reads
 
 ```bash
-input_mod_bam=         # fill suitably
-output_dir=            # fill suitably
+input_mod_bam=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam
+output_dir=~/nanomod_course_data/human/modkit_pileup
+mkdir -p $output_dir
 modkit pileup --no-filtering --mod-thresholds m:0.5\
   $input_mod_bam "$output_dir"/pileup.bed
 ```
@@ -105,6 +106,8 @@ head -n 20 "$output_dir"/pileup.bed
 # inspect a few randomly chosen lines
 cat "$output_dir"/pileup.bed | shuf | head -n 20
 ```
+
+You can find more details on what the columns mean in the modkit [documentation](https://github.com/nanoporetech/modkit).
 
 <details markdown="1">
 

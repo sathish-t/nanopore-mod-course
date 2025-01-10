@@ -128,7 +128,6 @@ DNAscent forkSense -d $input_detect -o $output_forksense \
 
 The above command will produce a few plain-text output files.
 Inspect them using `shuf` and `head`; their names should be self-explanatory.
-We will discuss them further in the [session]({{ site.baseurl }}/lectures/case-study) tomorrow.
 
 ## Conversion of DNAscent detect into the modBAM format
 

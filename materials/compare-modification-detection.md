@@ -69,6 +69,16 @@ Found 1 batches, 20 reads
 
 ## Basecalling and modification calling
 
+<details markdown="1">
+
+<summary markdown="span"> 
+
+Optional: Downloading dorado models
+
+</summary>
+
+### Downloading dorado models
+
 We need to download the model `dorado` uses for basecalling and modification calling.
 We will put them in a suitable directory.
 
@@ -78,6 +88,8 @@ model_config=dna_r10.4.1_e8.2_400bps_hac@v3.5.2
 mkdir -p $dorado_model_dir
 dorado download --model $model_config --directory $dorado_model_dir
 ```
+
+</details>
 
 We make a directory to store our modification calls.
 
@@ -206,11 +218,6 @@ Optional: downloading the reference genome
 
 We need to download a reference human genome which is a few GB.
 Please use the commands below.
-If you are a student in the Earlham Institute training course,
-please note that there is a backup of the reference located at
-`~/nanomod_course_data/human/references_backup/` which we can use
-if the download is taking too much time.
-
 
 ```bash
 cd ~/nanomod_course_references

@@ -73,8 +73,8 @@ examine it, and make a decision - we will cover this later in this session.
 We can execute the thresholding step with a threshold of 0.5 using `modkit`.
 
 ```bash
-input_mod_bam= # fill suitably
-output_mod_bam= # fill suitably
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam
+output_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.bam
 modkit call-mods --no-filtering $input_mod_bam $output_mod_bam
 ```
 
@@ -312,7 +312,7 @@ in a mod BAM file.
 ### Count number of reads
 
 ```bash
-input_mod_bam= # fill with whatever input file you want to use
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.bam
 samtools view -c $input_mod_bam
 ```
 
@@ -422,11 +422,10 @@ good production script for the sake of simplicity.
 
 ```bash
 cd ~/nanomod_course_scripts/nanopore-mod-course/code
-input_bam= # fill suitably with a thresholded modBAM file,
-           # or threshold one first with `modkit call-mods` as we've
-           # discussed earlier in this session and use it here
-bam_with_counts= # fill suitably
-samtools view -h $input_bam | awk -f count_mods_per_read.awk |\
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.bam
+samtools view -c $input_mod_bam
+bam_with_counts=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.w_counts.bam
+samtools view -h $input_mod_bam | awk -f count_mods_per_read.awk |\
   samtools view -b -o $bam_with_counts
 # above line converts BAM -> SAM, runs script on it,
 # and converts back to BAM.
@@ -451,7 +450,7 @@ The following command extracts reads with at least 100 modified bases
 per read.
 
 ```bash
-output_bam= # fill suitably
+output_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.highmod.bam
 samtools view -e '[XC]>100' -b -o $output_bam $bam_with_counts
 ```
 
@@ -461,7 +460,7 @@ We give an example below where we form a subset of reads with at least
 one modified base per 100 aligned bases on average.
 
 ```bash
-output_bam= # fill suitably
+output_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.high_mod_dens.bam
 samtools view -e '[XC]/rlen>0.01' -b -o $output_bam $bam_with_counts
 ```
 
