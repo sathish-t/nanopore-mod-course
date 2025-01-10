@@ -92,7 +92,7 @@ Per base on the reference genome, we can calculate
 
 ```bash
 input_mod_bam=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam
-output_dir=~/nanomod_course_data/human/modkit_pileup
+output_dir=~/nanomod_course_outputs/human/modkit_pileup
 mkdir -p $output_dir
 modkit pileup --no-filtering --mod-thresholds m:0.5\
   $input_mod_bam "$output_dir"/pileup.bed
