@@ -6,8 +6,8 @@ Click [here](https://sathish-t.github.io/nanopore-mod-course) to see the site ge
 This repository was forked from a Data Carpentry [repository](https://github.com/datacarpentry/semester-biology)
 and is under active development. Some of the text in this README is from the README of that repository.
 
-For the 2024 version of this course website, please go [here](https://tgac.github.io/nanopore-mod-course-2024).
-For the 2024 repository, please go [here](https://github.com/tgac/nanopore-mod-course-2024).
+For the 2024 version of this course website, please go [here](https://earlhaminst.github.io/nanopore-mod-course-2024).
+For the 2024 repository, please go [here](https://github.com/earlhaminst/nanopore-mod-course-2024).
 
 ## Where is everything
 
