@@ -95,8 +95,6 @@ about whether a block needs to be run.
 We run our programs on the Linux command line and inspect the outputs either on the command
 line or in the Linux desktop. We use the software packages below.
 Please also consult the course prerequisites listed [here](https://www.earlham.ac.uk/events/detection-dna-base-modification-using-nanopore-sequencing).
-Please note that you are not expected to know how to code in python or R.
-You would only need to be able to run programs written in these languages.
 
 ```bash
 bedtools -version
@@ -105,25 +103,21 @@ DNAscent --version | head -n 1
 # Version: 2.0.2
 dorado --version
 # 0.3.4+5f5cd02
-guppy_basecaller --version | head -n 1
-# : Guppy Basecalling Software, (C) Oxford Nanopore Technologies, Limited. Version 5.0.7+2332e8d
 minimap2 --version
 # 2.24-r1122
 modbamtools --version
 # modbamtools, version 0.4.8
 modkit --version
 # mod_kit 0.2.3
+nanalogue --version
+# nanalogue 0.1.9
 pod5 --version
 # Pod5 version: 0.3.2
 pycoQC --version
 # pycoQC v2.5.2
-python --version
-# Python 3.10.2
 samtools --version | head -n 2
 # samtools 1.18
 # Using htslib 1.18
-R --version | head -n 1
-# R version 4.1.2 (2021-11-01) -- "Bird Hippie"
 aws --version
 # aws-cli/2.14.5 Python/3.11.6 Linux/5.4.0-167-generic exe/x86_64.centos.7 prompt/off
 git --version
@@ -138,18 +132,7 @@ tar --version | head -n 1
 
 We need IGV v2.16.2 or later, which can be downloaded [here](https://igv.org/download/html/download.html).
 
-We need the [DNAscentTools](https://github.com/DNAReplicationLab/DNAscentTools/) repository.
-Get the latest version using the command below and then checkout to the version denoted by the commit
-string `6bacc1f`.
-
-```bash
-mkdir -p ~/nanomod_course_scripts
-# we store scripts in the above folder.
-cd ~/nanomod_course_scripts
-git clone https://github.com/DNAReplicationLab/DNAscentTools.git
-cd DNAscentTools/
-git checkout 6bacc1f
-```
+We need nanalogue-gui v0.2.7 or later, which can be downloaded [here](https://github.com/sathish-t/nanalogue-gui/releases).
 
 We need the latest version of the course repository.
 
@@ -175,26 +158,6 @@ mkdir -p ~/nanomod_course_references
 mkdir -p ~/nanomod_course_outputs
 ```
 
-#### Software modules used in python and R
-
-We need the following software modules on top of the base installs of python and R.
-
-In Python, we need:
-- h5py
-- modbampy
-- numpy
-- scikit-learn
-- scipy
-- pandas 
-- pysam
-
-In R, we need:
-- ggplot2
-- hexbin
-- devtools
-- ggthemes
-
-
 ## Descriptions of software packages and links to their documentation and installation instructions
 
 We list the software packages we use with a brief description and useful links below.
@@ -208,11 +171,20 @@ using a set of learned model parameters that associates bases with current chara
 Input formats are fast5 or pod5. Output format is .bam by default and other formats if requested.
 - [Installation and documentation](https://github.com/nanoporetech/dorado)
 
-## Guppy
+## Nanalogue
 
-Oxford NanoporeTech's basecaller. Less advanced than dorado. Please follow this
-[link](https://help.nanoporetech.com/en/articles/6628042-how-do-i-install-stand-alone-guppy) to install it.
+Tool to parse and analyse BAM/Mod BAM files with a single-molecule focus.
+Extracts and processes information from BAM files, with a particular focus on
+single-molecule aspects and DNA/RNA modifications.
+- [Installation and documentation](https://github.com/DNAReplicationLab/nanalogue)
+- [Cookbook](https://www.nanalogue.com)
 
+## Nanalogue-gui
+
+Electron GUI for interactive sequence data analysis and curation with a focus
+on single molecules and DNA/RNA modifications.
+Provides QC, Swipe (annotation curation), Locate Reads, and AI Chat modes.
+- [Installation and documentation](https://github.com/sathish-t/nanalogue-gui)
 
 ## Modkit
 
@@ -241,13 +213,6 @@ Alignment software that finds the best-fit location of a given sequence on a lin
 
 ONT-written package for reading and writing files in the pod5 format.
 - [Installation and documentation](https://github.com/nanoporetech/pod5-file-format)
-
-## Programming languages
-
-We will run scripts written in python and R.
-As these are very popular and have many methods of installation, we are not going to discuss them here.
-Please remember to install the required [modules](#software-modules-used-in-python-and-r) on top
-of the base installs of each package.
 
 ## Other software
 
