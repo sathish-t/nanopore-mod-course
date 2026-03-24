@@ -1,0 +1,189 @@
+BootStrap: yum
+OSVersion: 9
+MirrorURL: https://repo.almalinux.org/almalinux/9/BaseOS/$basearch/os/
+Include: yum
+
+# Singularity definition file for the nanopore base modification course.
+#
+# Based on a previous def file by ST, which in turn drew on similar singularity
+# files created internally by the NBI Research Computing team.
+#
+# DNAscent is NOT built here — it has its own singularity image available at
+# https://cloud.sylabs.io/library/mboemo/dnascent/dnascent
+# Pull it separately:
+#   mkdir -p ${HOME}/nanomod_course_singularity_img_collection
+#   singularity pull ${HOME}/nanomod_course_singularity_img_collection/dnascent.sif library://mboemo/dnascent/dnascent:4.1.1
+#
+# nanalogue-gui is NOT built here either — it is an Electron app installed
+# separately. See https://github.com/sathish-t/nanalogue-gui for instructions.
+# We expect it to be installed at ~/nanomod_course_software/nanalogue-gui
+# and launched via the wrapper function in .bashrc.
+#
+# It is up to the user to make sure their usage is consistent with the licenses
+# of the various software packages.
+#
+# List of packages / tools:
+# bedtools 2.31.1
+# dorado 1.4.0
+# minimap2 2.30
+# modbamtools 0.4.8
+# modkit 0.6.1
+# nanalogue 0.1.9
+# pod5 0.3.36
+# pycoQC 2.5.2
+# samtools 1.23.1
+# aws-cli 2.34.15
+# System tools: git, wget, gunzip, tar (from base OS)
+
+%environment
+    # samtools
+    export PATH=/opt/software/samtools/bin:$PATH
+    # minimap2
+    export PATH=/opt/software/minimap2/minimap2-2.30_x64-linux:$PATH
+    # bedtools
+    export PATH=/opt/software/bedtools2/bin:$PATH
+    # dorado
+    export PATH=/opt/software/dorado/bin:$PATH
+    # uv-installed python tools (pycoQC, pod5)
+    export UV_TOOL_BIN_DIR=/opt/software/uv_tools/bin
+    export PATH=$PATH:/opt/software/uv_tools/bin
+    # modbamtools (isolated venv)
+    export PATH=$PATH:/opt/software/venv_modbamtools/bin
+    # modkit
+    export PATH=$PATH:/opt/software/modkit/dist_modkit_v0.6.1_481e3c9
+    # nanalogue
+    export NANALOGUE_INSTALL_DIR=/opt/nanalogue
+    export PATH=$PATH:/opt/nanalogue
+
+%post
+    # --------------------------------------------------------------------------
+    # Basics
+    # --------------------------------------------------------------------------
+    mkdir -p /opt/software
+    cd /opt/software
+    dnf -y update
+    dnf -y install wget git tar xz gzip bzip2 which \
+        langpacks-en_GB.noarch findutils \
+        perl perl-Digest-MD5 \
+        unzip jq vi
+
+    # --------------------------------------------------------------------------
+    # Build tools (consolidated early so all later compilations can rely on them)
+    # --------------------------------------------------------------------------
+    dnf -y groupinstall "Development Tools"
+    dnf -y install gcc gcc-c++ make cmake \
+        libffi-devel openssl-devel \
+        zlib-devel bzip2-devel xz-devel \
+        readline-devel ncurses-devel sqlite-devel \
+        libcurl-devel tk-devel libxcrypt-compat
+
+    # --------------------------------------------------------------------------
+    # Minimap2 2.30
+    # --------------------------------------------------------------------------
+    pwd=$(pwd)
+    mkdir -p /opt/software/minimap2
+    cd /opt/software/minimap2
+    curl -L https://github.com/lh3/minimap2/releases/download/v2.30/minimap2-2.30_x64-linux.tar.bz2 | tar -jxvf -
+    cd $pwd
+
+    # --------------------------------------------------------------------------
+    # Samtools 1.23.1
+    # --------------------------------------------------------------------------
+    cd /opt/software
+    wget https://github.com/samtools/samtools/releases/download/1.23.1/samtools-1.23.1.tar.bz2
+    tar xvf samtools-1.23.1.tar.bz2
+    rm -rf samtools-1.23.1.tar.bz2
+    cd samtools-1.23.1
+    ./configure --prefix=/opt/software/samtools/
+    make
+    make install
+    export PATH=/opt/software/samtools/bin:$PATH
+    cd ..
+    rm -rf samtools-1.23.1
+    cd /opt/software/
+
+    # --------------------------------------------------------------------------
+    # uv — fast Python package manager (used to install Python CLI tools
+    # in isolated environments, avoiding dependency conflicts)
+    # --------------------------------------------------------------------------
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    export PATH=$HOME/.local/bin:$PATH
+    export UV_TOOL_BIN_DIR=/opt/software/uv_tools/bin
+    export UV_TOOL_DIR=/opt/software/uv_tools/environments
+    export UV_PYTHON_INSTALL_DIR=/opt/software/uv_python
+    mkdir -p $UV_TOOL_BIN_DIR $UV_TOOL_DIR $UV_PYTHON_INSTALL_DIR
+
+    # --------------------------------------------------------------------------
+    # pycoQC 2.5.2 and pod5 0.3.36 (via uv tool install — isolated venvs)
+    # --------------------------------------------------------------------------
+    uv tool install pycoQC==2.5.2 --python 3.10
+    uv pip install -p /opt/software/uv_tools/environments/pycoqc "setuptools<75"
+    uv tool install pod5==0.3.36 --python 3.10
+
+    # --------------------------------------------------------------------------
+    # modbamtools 0.4.8 (manual venv — modbampy needs setuptools at build
+    # time but doesn't declare it, so uv tool install fails)
+    # --------------------------------------------------------------------------
+    uv venv /opt/software/venv_modbamtools --python 3.10.5
+    uv pip install -p /opt/software/venv_modbamtools pip "setuptools<75" wheel cffi
+    /opt/software/venv_modbamtools/bin/pip install --no-build-isolation modbamtools==0.4.8
+
+    # --------------------------------------------------------------------------
+    # bedtools 2.31.1
+    # --------------------------------------------------------------------------
+    pwd=$(pwd)
+    cd /opt/software
+    wget https://github.com/arq5x/bedtools2/releases/download/v2.31.1/bedtools-2.31.1.tar.gz
+    tar -zxvf bedtools-2.31.1.tar.gz
+    cd bedtools2
+    make
+    cd ..
+    rm bedtools-2.31.1.tar.gz
+    cd $pwd
+
+    # --------------------------------------------------------------------------
+    # Dorado 1.4.0 (pre-built binary, CPU+CUDA bundled)
+    # --------------------------------------------------------------------------
+    pwd=$(pwd)
+    cd /opt/software
+    wget https://cdn.oxfordnanoportal.com/software/analysis/dorado-1.4.0-linux-x64.tar.gz
+    tar xzf dorado-1.4.0-linux-x64.tar.gz
+    rm -f dorado-1.4.0-linux-x64.tar.gz
+    mv dorado-1.4.0-linux-x64 dorado
+    cd $pwd
+
+    # --------------------------------------------------------------------------
+    # modkit 0.6.1 (pre-built binary)
+    # --------------------------------------------------------------------------
+    pwd=$(pwd)
+    cd /opt/software
+    wget https://github.com/nanoporetech/modkit/releases/download/v0.6.1/modkit_v0.6.1_u16_x86_64.tar.gz
+    mkdir -p modkit
+    tar xzf modkit_v0.6.1_u16_x86_64.tar.gz -C modkit
+    rm -f modkit_v0.6.1_u16_x86_64.tar.gz
+    cd $pwd
+
+    # --------------------------------------------------------------------------
+    # nanalogue 0.1.9
+    # --------------------------------------------------------------------------
+    export NANALOGUE_INSTALL_DIR=/opt/nanalogue
+    mkdir -p /opt/nanalogue
+    export PATH=$PATH:/opt/nanalogue
+    curl -fsSL https://raw.githubusercontent.com/DNAReplicationLab/nanalogue/main/install.sh | sh -s -- -y
+
+    # --------------------------------------------------------------------------
+    # AWS CLI 2.34.15
+    # --------------------------------------------------------------------------
+    pwd=$(pwd)
+    cd /tmp
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.34.15.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    ./aws/install
+    rm -rf awscliv2.zip aws
+    cd $pwd
+
+    # --------------------------------------------------------------------------
+    # Cleanup
+    # --------------------------------------------------------------------------
+    dnf clean all
+    rm -rf /var/cache/dnf

@@ -6,3 +6,6 @@ Gemfile.lock
 *.Rhistory
 .jekyll-metadata
 node_modules/
+*.img
+*.sif
+ignore*

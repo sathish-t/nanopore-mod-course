@@ -96,38 +96,57 @@ We run our programs on the Linux command line and inspect the outputs either on 
 line or in the Linux desktop. We use the software packages below.
 Please also consult the course prerequisites listed [here](https://www.earlham.ac.uk/events/detection-dna-base-modification-using-nanopore-sequencing).
 
+This repository contains two files to help you get set up:
+- [`software.def`]({{ site.github.repo }}/blob/main/software.def)
+  — a Singularity definition file that builds a container image
+  with all the software packages listed below
+  (except DNAscent, which has its own
+  [Singularity image](https://cloud.sylabs.io/library/mboemo/dnascent/dnascent)).
+- [`.bashrc`]({{ site.github.repo }}/blob/main/.bashrc)
+  — a shell configuration file that defines convenient wrapper
+  functions so that each command (e.g. `samtools`, `modkit`)
+  transparently runs inside the Singularity container.
+
+To build the main software image and pull the DNAscent image,
+run the following commands.
+Please note that the software packages may require around 10 GB
+of disk space.
+
+```bash
+sudo singularity build software.img software.def
+singularity pull DNAscent.sif library://mboemo/dnascent/dnascent:4.1.1
+```
+
 ```bash
 bedtools -version
-# bedtools v2.29.2
+# bedtools v2.31.1
 DNAscent --version | head -n 1
-# Version: 2.0.2
+# Version: 4.1.1
 dorado --version
-# 0.3.4+5f5cd02
+# 1.4.0+ba44a013
 minimap2 --version
-# 2.24-r1122
+# 2.30-r1287
 modbamtools --version
 # modbamtools, version 0.4.8
 modkit --version
-# mod_kit 0.2.3
+# modkit 0.6.1
 nanalogue --version
 # nanalogue 0.1.9
 pod5 --version
-# Pod5 version: 0.3.2
+# Pod5 version: 0.3.36
 pycoQC --version
 # pycoQC v2.5.2
 samtools --version | head -n 2
-# samtools 1.18
-# Using htslib 1.18
+# samtools 1.23.1
+# Using htslib 1.23.1
 aws --version
-# aws-cli/2.14.5 Python/3.11.6 Linux/5.4.0-167-generic exe/x86_64.centos.7 prompt/off
+# aws-cli/2.34.15
+# The following are system tools. Any reasonable version will suffice.
+# They run from the host OS, not the container.
 git --version
-# git version 2.25.1
 wget --version | head -n 1
-# GNU Wget 1.20.3 built on linux-gnu.
 gunzip --version | head -n 1
-# gunzip (gzip) 1.10
 tar --version | head -n 1
-# tar (GNU tar) 1.30
 ```
 
 We need IGV v2.16.2 or later, which can be downloaded [here](https://igv.org/download/html/download.html).
