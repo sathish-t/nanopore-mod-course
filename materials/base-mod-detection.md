@@ -158,7 +158,7 @@ So, before the discussion, let us convert the mod BAM file into the easy-to-unde
 format so that we can get a quick look at our modification calls.
 We will be using the `modkit` program developed by ONT that takes mod BAM files as input
 and produces tabulated data or summary statistics as output.
-One of the functions provided is `modkit extract`.
+One of the functions provided is `modkit extract full`.
 
 Please run the code below and inspect the output tsv file.
 The most important columns are `read_id`, `forward_read_position`, and `mod_qual` as these answer
@@ -171,7 +171,7 @@ We can look up the full list in the official documentation [here](https://nanopo
 ```bash
 input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam
 output_tsv=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam.tsv
-modkit extract $input_mod_bam $output_tsv
+modkit extract full $input_mod_bam $output_tsv
 ```
 
 <details markdown="1">

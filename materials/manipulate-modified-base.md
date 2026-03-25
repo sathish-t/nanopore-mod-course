@@ -75,10 +75,10 @@ We can execute the thresholding step with a threshold of 0.5 using `modkit`.
 ```bash
 input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam
 output_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.bam
-modkit call-mods --no-filtering $input_mod_bam $output_mod_bam
+modkit modbam call-mods --no-filtering $input_mod_bam $output_mod_bam
 ```
 
-Run `modkit extract` on the input and output mod bam files.
+Run `modkit extract full` on the input and output mod bam files.
 You will see that the modification probability is now either
 a value very close to zero or a value very close to one.
 
@@ -116,7 +116,7 @@ input_mod_bam= # fill suitably
 output_mod_bam= # fill suitably
 mod_code= # fill with mod code. e.g.: T for our BrdU data, m for 5mC.
 threshold= # fill with a number between 0 and 1.
-modkit call-mods --mod-threshold $mod_code:$threshold \
+modkit modbam call-mods --mod-threshold $mod_code:$threshold \
   --filter-percentile 0 $input_mod_bam $output_mod_bam
 ```
 
@@ -160,7 +160,7 @@ two thresholds is not known beforehand.
 ![Example confidence threshold curve](confidence_thresholding.png)
 
 This thresholding is accomplished through the `--filter-percentile` and/or
-the `--filter-threshold` options of `modkit call-mods`, which may be used standalone or
+the `--filter-threshold` options of `modkit modbam call-mods`, which may be used standalone or
 in addition to the `--mod-threshold` parameter.
 We will not be discussing this further; you can refer to the modkit documentation
 [here](https://nanoporetech.github.io/modkit/advanced_usage.html#call-mods) if you are interested.
@@ -183,7 +183,7 @@ discussing above.
 Another use is to see if our experiment worked and we are seeing an expected number
 of bases with modifications.
 
-We will use the `modkit sample-probs` command. 
+We will use the `modkit modbam sample-probs` command. 
 We operate the tool in the histogram mode `--hist` and want ten
 bins in the histogram (`--buckets 10`), and wish to sample
 1000 reads (`-n 1000`) to measure statistics (we are using 1000
@@ -192,7 +192,7 @@ for these calculations and we leave it to the experimenter to
 determine what that fraction is for their dataset).
 We will discuss the `-p` option in an optional subsection a little later.
 
-NOTE: The `modkit sample-probs` command produces tabular files
+NOTE: The `modkit modbam sample-probs` command produces tabular files
 with rows labeled with either an unmodified one-letter code or
 a modified one-letter code.
 In the case of 5mC methylation which is coded
@@ -201,9 +201,9 @@ In the case of a generic modification such as `T+T`,
 which we use to label our BrdU data,
 we run into problems because both the modified and
 the unmodified rows are labeled `T`.
-This is a problem with the `modkit sample-probs` tool.
+This is a problem with the `modkit modbam sample-probs` tool.
 To get around the problem, before using this tool, we change
-the `T+T` code to `T+B` using `modkit adjust-mods`.
+the `T+T` code to `T+B` using `modkit modbam adjust-mods`.
 This is not a good idea in general as `B` means not `A` in the
 standard one-letter nucleotide code list.
 But, as the modification field is still developing, we occasionally
@@ -214,13 +214,13 @@ input_mod_bam= # fill this suitably
 input_mod_bam_adjust_tag= # fill this suitably
 
 # convert mod BAM from using T+T to T+B
-modkit adjust-mods --convert T B $input_mod_bam \
+modkit modbam adjust-mods --convert T B $input_mod_bam \
   $input_mod_bam_adjust_tag
 samtools index $input_mod_bam_adjust_tag
 
 # sample probabilities and make a histogram
 cd ~/nanomod_course_outputs/yeast
-modkit sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
+modkit modbam sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
   $input_mod_bam_adjust_tag -o ./histogram --hist --buckets 10 -n 1000
 ```
 
@@ -252,7 +252,7 @@ We are not going to discuss this further; please experiment with this tool and r
 ### Form modification histogram from data only at given genomic regions
 
 To form a histogram from data restricted to given genomic regions, pass a BED file
-containing these regions to `modkit sample-probs` with the `--include-bed`
+containing these regions to `modkit modbam sample-probs` with the `--include-bed`
 option. In the command block below, we look for modification probabilities in
 the regions `chrI:100000-200000` and `chrVII:500000-600000`. In other words,
 the program calculates statistics from bases on reads that fall in either
@@ -264,7 +264,7 @@ input_mod_bam_adjust_tag= # fill this suitably
 regions_bed_file= # we are going to make this file
 
 # convert mod BAM from using T+T to T+B
-modkit adjust-mods --convert T B $input_mod_bam \
+modkit modbam adjust-mods --convert T B $input_mod_bam \
   $input_mod_bam_adjust_tag
 
 # one can use any regions and any number of regions in the commands
@@ -275,14 +275,14 @@ echo -e "chrVII\t500000\t600000\tB\t1000\t." >> $regions_bed_file;
 
 # sample probabilities and make a histogram
 cd ~/nanomod_course_outputs/yeast
-modkit sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
+modkit modbam sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
   $input_mod_bam_adjust_tag -o ./histogram_subset --hist --buckets 10 -n 1000 \
   --include-bed $regions_bed_file
 ```
 
-## Use `modkit motif-bed` to form bed files for motifs
+## Use `modkit motif` to form bed files for motifs
 
-To form a BED file for particular motifs such as CG, you can use the `modkit motif-bed`
+To form a BED file for particular motifs such as CG, you can use the `modkit motif`
 command.
 Please refer to the modkit [documentation](https://nanoporetech.github.io/modkit/advanced_usage.html)
 for more details.
@@ -546,7 +546,7 @@ one_read_bam= # fill suitably with a mod BAM file with
 
 # Extract modification information from the bam file
 # NOTE: the --force overwrites any pre-existing output files.
-modkit extract --force "$one_read_bam" "$one_read_bam".tsv
+modkit extract full --force "$one_read_bam" "$one_read_bam".tsv
 
 # Use python scripts to extract raw data and window it
 mod_code=                  # use m for 5mC or T for BrdU etc.

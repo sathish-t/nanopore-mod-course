@@ -58,7 +58,7 @@ samtools index "$op_dir"/"plot"_"$2".bam
 
 # Extract modification information from the bam file
 # NOTE: the --force overwrites any pre-existing output files.
-modkit extract --force "$one_read_bam" "$one_read_bam".tsv
+modkit extract full --force "$one_read_bam" "$one_read_bam".tsv
 
 # Use python scripts to extract raw data and window it
 mod_code="$3"

@@ -169,8 +169,8 @@ position modification_probability
 3 0.90
 ```
 
-One can use `modkit extract` to perform the conversion.
-The command syntax is `modkit extract [OPTIONS] <IN_BAM> <OUT_PATH>`.
+One can use `modkit extract full` to perform the conversion.
+The command syntax is `modkit extract full [OPTIONS] <IN_BAM> <OUT_PATH>`.
 We have already encountered this command in the
 [session]({{ site.baseurl }}/materials/base-mod-detection) on modification detection.
 
@@ -188,7 +188,7 @@ f48c6a85-db3c-445f-865b-4bb876bd4a18 100 1000
 Such a tool does not exist to the best of our knowledge, but one can orchestrate
 pre-existing tools using a scripting language to achieve this.
 The following ideas could work:
-1. you need to get a table with read_id, modification_probability columns using `modkit extract`
+1. you need to get a table with read_id, modification_probability columns using `modkit extract full`
 and process the table using, say, a python or an R script.
 2. you can read the mod BAM file directly with python using a library like `pysam`
 3. you can convert the mod BAM file to plain text (.sam) with `samtools` and process

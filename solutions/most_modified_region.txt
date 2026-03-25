@@ -18,7 +18,7 @@ modified_reads_mod_bam= # fill suitably
 modified_reads_mod_bam_adjust_tag= # fill suitably
 
 # perform thresholding
-modkit call-mods --no-filtering $input_mod_bam $thresholded_mod_bam
+modkit modbam call-mods --no-filtering $input_mod_bam $thresholded_mod_bam
 
 cd ~/nanomod_course_scripts/nanopore-mod-course/code
 
@@ -45,7 +45,7 @@ Note down the statistics in the file `probabilities.txt` in the directory
 
 ```bash
 # adjust the tag of the modified-read mod bam file
-modkit adjust-mods --convert T B $modified_reads_mod_bam \
+modkit modbam adjust-mods --convert T B $modified_reads_mod_bam \
   $modified_reads_mod_bam_adjust_tag
 samtools index $modified_reads_mod_bam_adjust_tag
 
@@ -55,7 +55,7 @@ echo -e "chrVI\t150000\t160000\tA\t1000\t." > $region_file;
 # cd to a suitable directory which can hold
 # the histogram_exercise directory
 
-modkit sample-probs $modified_reads_mod_bam_adjust_tag -o ./histogram_exercise \
+modkit modbam sample-probs $modified_reads_mod_bam_adjust_tag -o ./histogram_exercise \
   --hist --buckets 2 --include-bed $region_file --force
 # --force above just overwrites files
 # in the ./histogram_exercise directory

@@ -67,7 +67,7 @@ modbamtools calcMeth --bed $region_file \
 
 A few columns are added to the output bed file: average percent modification,
 standard deviation of modification, and the coverage.
-This calculation offers us an alternate to `modkit sample-probs` as
+This calculation offers us an alternate to `modkit modbam sample-probs` as
 the style of the input options is slightly different.
 
 Although the command is called `modbamtools calcMeth`, it works
@@ -94,7 +94,7 @@ Per base on the reference genome, we can calculate
 input_mod_bam=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam
 output_dir=~/nanomod_course_outputs/human/modkit_pileup
 mkdir -p $output_dir
-modkit pileup --no-filtering --mod-thresholds m:0.5\
+modkit pileup --no-filtering --mod-threshold m:0.5\
   $input_mod_bam "$output_dir"/pileup.bed
 ```
 

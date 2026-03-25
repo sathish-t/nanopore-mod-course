@@ -25,7 +25,7 @@ cd ~/nanomod_course_scripts/nanopore-mod-course/code
 input_mod_bam=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam
 thresholded_mod_bam= # fill suitably
 mod_bam_with_counts= # set suitably
-modkit call-mods --no-filtering $input_mod_bam $thresholded_mod_bam
+modkit modbam call-mods --no-filtering $input_mod_bam $thresholded_mod_bam
 samtools view -h $thresholded_mod_bam | awk -f count_mods_per_read.awk |\
   samtools view -b -o $mod_bam_with_counts
 ```

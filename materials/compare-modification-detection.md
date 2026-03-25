@@ -187,7 +187,7 @@ learned in previous sessions.
 input_mod_bam=~/nanomod_course_outputs/human/PAM63974_pass_58881fec_60.ten_reads.mod.bam
 output_tsv=~/nanomod_course_outputs/human/PAM63974_pass_58881fec_60.ten_reads.mod.bam.tsv
 samtools index $input_mod_bam
-modkit extract $input_mod_bam $output_tsv
+modkit extract full $input_mod_bam $output_tsv
 ```
 
 You can view a few rows of the `$output_tsv` file above.
@@ -260,7 +260,7 @@ We can use `modkit` to convert the output aligned file to TSV and then inspect i
 cd ~/nanomod_course_outputs/human/
 input_mod_bam=PAM63974_pass_58881fec_60.ten_reads.aligned.mod.sorted.bam
 output_tsv=PAM63974_pass_58881fec_60.ten_reads.aligned.mod.sorted.bam.tsv
-modkit extract $input_mod_bam $output_tsv
+modkit extract full $input_mod_bam $output_tsv
 ```
 
 We can also inspect the file using the `samtools` and `bedtools` commands
