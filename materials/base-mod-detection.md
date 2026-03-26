@@ -8,9 +8,7 @@ In this session, we will perform reference-anchored modification calling
 on the dataset we have been using thus far — yeast DNA where some thymidines have been
 substituted by BrdU.
 We will use the software program `DNAscent` on the files already generated
-by us from previous sessions (fast5, bam, sequencing summary file).
-We will then convert the output of DNAscent into the standard mod bam format for storing
-modification information.
+by us from previous sessions (pod5, bam, sequencing summary file).
 Along the way, we will also learn the mod bam file format.
 We will be performing the steps highlighted with an asterisk in the pipeline figure below.
 
@@ -18,43 +16,16 @@ We will be performing the steps highlighted with an asterisk in the pipeline fig
 
 ## Running DNAscent to produce modification calls along each sequenced DNA strand
 
-<details markdown="1">
-
-<summary markdown="span"> 
-
-Optional: downloading a plugin required by DNAscent
-
-</summary>
-
-### Preparations to call modifications
-
-We first need to download a plugin to help DNAscent read the later versions of fast5 files.
-
-```bash
-mkdir -p ~/nanomod_course_references # any suitable folder will do here.
-cd ~/nanomod_course_references
-wget https://github.com/nanoporetech/vbz_compression/releases/download/v1.0.1/ont-vbz-hdf-plugin-1.0.1-Linux-x86_64.tar.gz
-tar -xvzf ont-vbz-hdf-plugin-1.0.1-Linux-x86_64.tar.gz
-export HDF5_PLUGIN_PATH=$(pwd)/ont-vbz-hdf-plugin-1.0.1-Linux/usr/local/hdf5/lib/plugin
-ls $HDF5_PLUGIN_PATH
-# libvbz_hdf_plugin.so
-rm ont-vbz-hdf-plugin-1.0.1-Linux-x86_64.tar.gz # if you see the output above, then cleanup by removing the tarball.
-```
-
-</details>
-
 ### Creating a DNAscent index
 
 We now need to create an index needed by DNAscent — a plain text with two columns: read id
 and the fast5 file with the corresponding time course of nanopore current.
 
 ```bash
-input_fast5_dir=~/nanomod_course_data/yeast
+input_pod5_dir=~/nanomod_course_data/yeast
 output_index=~/nanomod_course_outputs/yeast/index.dnascent
-input_seq_summ=~/nanomod_course_outputs/yeast/sequencing_summary.txt
 
-DNAscent index -f $input_fast5_dir -o $output_index \
-  -s $input_seq_summ
+DNAscent index -f $input_pod5_dir -o $output_index
 ```
 
 ### Call modifications
@@ -62,8 +33,8 @@ DNAscent index -f $input_fast5_dir -o $output_index \
 We run the reference-anchored modification caller `DNAscent detect` here.
 The program takes alignment information from the bam file, a reference genome,
 and the raw nanopore currents as inputs and outputs the probability of modification
-per thymidine per sequenced strand in a `.detect` format,
-which is very similar to the TSV (tab-separated values) format.
+per thymidine per sequenced strand in a `.mod.bam` format, which is just the BAM format
+with some tags that stored modification information.
 The program uses a machine-learning approach where model parameters learned previously
 represent differences in nanopore current characteristics between thymidine and BrdU.
 
@@ -77,24 +48,35 @@ as the virtual machines used in the course do not have GPUs to lower costs.
 input_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.onlyPrim.bam
 ref_genome=~/nanomod_course_references/sacCer3.fa
 index=~/nanomod_course_outputs/yeast/index.dnascent
-output_detect=~/nanomod_course_outputs/yeast/dnascent.detect
+output_mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.bam
 DNAscent detect -b $input_bam -r $ref_genome -i $index \
- -o $output_detect -t 8 -q 20 -l 1000
+ -o $output_mod_bam -t 8 -q 20 -l 1000
+
+# it's a good idea to always sort and index BAM files
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.bam
+output_sorted_mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
+samtools sort -o $output_sorted_mod_bam $input_mod_bam
+samtools index $output_sorted_mod_bam
 ```
 
-After the program has finished running, inspect the first few lines of the output
-file using the `head` command
+After the program has finished running, inspect the file using `nanalogue peek`.
 
 ```bash
-output_detect=~/nanomod_course_outputs/yeast/dnascent.detect
-head -n 30 $output_detect
+mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
+nanalogue peek $mod_bam
 ```
 
-You should see:
-- a few header lines starting with `#`
-- data from each read starts with `>` and has information about its alignment
-- the following lines give genomic alignment coordinate, BrdU probability,
-and k-mer (on the reference strand)
+You should see the details of the contigs in the BAM file along with two detected
+modification types: 'b' and 'e'. These correspond to BrdU and EdU respectively.
+As our data here contains only BrdU, we expect to see very few EdU calls.
+DNAscent in its current version calls both types of mods simultaneously, and this
+cannot be disabled. If you inspect modification counts per read using the following
+command, you should expect to see many more BrdU calls than EdU calls per molecule.
+
+```bash
+mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
+nanalogue read-info $mod_bam | more
+```
 
 ## Call replication dynamics with DNAscent forkSense using single-molecule modification densities
 
@@ -104,52 +86,47 @@ One can also ask specific questions that are experiment-dependent.
 
 In the experiments of the yeast dataset we have been using,
 the specific questions are about DNA replication dynamics.
-A specialized program called `forkSense` that ships with DNAscent detects gradients in BrdU density
-across a read, and associates these with the movement of replication forks.
-After fork calls are made, locations on the genome from which forks emerged are marked as
-origins of replication, and locations where forks terminate are marked as termination sites.
-Please see the figure below, reproduced from Müller et al., Nat. Methods (2019) at
-[this](https://www.nature.com/articles/s41592-019-0394-y) link.
+Gradients in BrdU density across a read are associated with the movement of replication forks.
+After fork calls are made, locations on the genome from which forks emerged are identified as
+origins of replication, and locations where forks terminate are identified as termination sites.
+Please see the figure below.
 
-![Muller et al figure showing origins and BrdU, Thymidine addition](muller_origins.png)
+![Figure showing origins and BrdU dilution](animation_BrdU.gif)
 
-In the course, we will just learn how to execute the `forkSense` command.
-Please discuss the biological interpretations with the instructors if you are interested.
+Here we will learn how to identify highly-modified reads, and associate features with them.
+In the next session, we will learn how to visualize these reads as well.
 
-```bash
-# Please change to the output directory using the cd command.
-# There are lots of output files which go to the output directory.
-input_detect=~/nanomod_course_outputs/yeast/dnascent.detect
-output_forksense=~/nanomod_course_outputs/yeast/dnascent.forkSense
-cd ~/nanomod_course_outputs/yeast/
-DNAscent forkSense -d $input_detect -o $output_forksense \
- -t 8 --markOrigins --markTerminations --markForks
-```
-
-The above command will produce a few plain-text output files.
-Inspect them using `shuf` and `head`; their names should be self-explanatory.
-
-## Conversion of DNAscent detect into the modBAM format
-
-We convert modification data from the specific `.detect` format used by DNAscent to
-the more widely used and standardized `.mod.bam` or mod BAM format using the package
-DNAscentTools developed by the Nieduszynski group.
-Mod BAM files are just BAM files with two additional tags per line that store
-modification information. We will discuss their structure later on in this session.
+The following nanalogue command sections each molecule in non-overlapping windows of size 300
+thymidines each. It then asks "which molecules have atleast one window where the modification
+level is above 40%?". 
 
 ```bash
-input_detect=~/nanomod_course_outputs/yeast/dnascent.detect
-output_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.bam
-cd ~/nanomod_course_scripts/DNAscentTools
-< $input_detect python convert_detect_to_modBAM.py \
-  --op $output_mod_bam --tag T
+mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
+highly_mod_reads=~/nanomod_course_outputs/yeast/highly_mod_reads
+nanalogue find-modified-reads any-dens-above --high 0.4 --win 300 \
+  --step 300 --tag b $mod_bam > $highly_mod_reads
 
-# sort and index the BAM files
-input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.bam
-output_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam
-samtools sort -o $output_mod_bam $input_mod_bam
-samtools index $output_mod_bam
+# print contents of the file
+cat $highly_mod_reads
 ```
+
+You should see that out of the 60 or so reads that we mod-called, only nine contain
+a BrdU window of significant modification.
+
+Examine the modification patterns across these reads in non-overlapping windows of
+size 300 thymidines each using the following command.
+
+```bash
+mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
+highly_mod_reads=~/nanomod_course_outputs/yeast/highly_mod_reads
+windowed_data=~/nanomod_course_outputs/yeast/windowed_data
+nanalogue window-dens --read-id-list $highly_mod_reads --win 300 \
+  --step 300 --tag b $mod_bam > $windowed_data
+more $windowed_data
+```
+
+Do you see patterns in the modification data? Can you pick out origins, forks etc.?
+
 
 ## Inspect modification data by conversion from modBAM to TSV format using modkit
 
@@ -169,8 +146,8 @@ the length of the read `read_length` etc.
 We can look up the full list in the official documentation [here](https://nanoporetech.github.io/modkit/intro_extract.html).
 
 ```bash
-input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam
-output_tsv=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam.tsv
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
+output_tsv=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam.tsv
 modkit extract full $input_mod_bam $output_tsv
 ```
 
