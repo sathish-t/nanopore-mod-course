@@ -14,7 +14,7 @@ reference genome (alignment/genome mapping), and assess their quality (quality c
 Basecalling and quality control are the first steps in any nanopore experiment,
 and are followed by more specialized steps like genome assembly or modification calling.
 
-We will use a dataset of nanopore currents from [this](https://doi.org/10.1038/s41592-019-0394-y) study
+We will use a dataset of nanopore currents similar to one from [this](https://doi.org/10.1101/2025.08.14.670160) study
 of DNA replication dynamics in budding yeast as input. Genetically-modified cells consumed
 5-bromodeoxyuridine (BrdU) added to the medium and this allowed substitution of thymidines
 in newly synthesized DNA by BrdU. We are going to sequence the DNA and call modifications
@@ -29,9 +29,8 @@ Nanopore devices ship with basecalling software that converts nanopore currents 
 sequences. Basecallers use pre-recorded model parameters that contain information about the
 characteristic currents produced by different DNA k-mers as they translocate through the nanopore.
 These programs segment the current corresponding to one DNA strand, assign a k-mer per segment,
-and stitch k-mers together into one sequence. We will use two basecallers: `guppy` in this session
-and the more-recent `dorado` in a [later]({{ site.baseurl }}/materials/compare-modification-detection)
-session. The workflow is similar in either case and whether you are using R9 or R10 flowcells for sequencing.
+and stitch k-mers together into one sequence. We will use the dorado basecaller.
+Similar workflows used older basecallers in the past (e.g. guppy).
 
 Basecallers can be run on the nanopore device during sequencing and/or can be run later on a computer.
 For most purposes, on-device basecalling is sufficient. If a higher accuracy is desired or
@@ -39,7 +38,7 @@ better model parameters become available, then data can be re-basecalled on a co
 Accuracy is specified through input parameters and higher accuracy leads to longer runtimes.
 
 Basecallers generally output DNA sequences with the four canonical DNA bases;
-modification calling is a separate step and is bolted on to the output of basecallers.
+modification calling is bolted on to the output of basecallers.
 We will deal with modification calling in a [later]({{ site.baseurl }}/materials/base-mod-detection)
 session.
 
@@ -69,7 +68,6 @@ e.g. `acde070d-8c4c-4f0d-9d8a-142843c10333` and a current time course as
 well as some metadata such as the label of the pore that sequenced this strand.
 Fast5 files can contain one read per file or multiple reads.
 Recently, fast5 files were replaced by the more efficient `.pod5` files.
-We will use fast5 files in this session and pod5 files in a later session.
 These are not plain text files and cannot be inspected directly on the command line.
 
 #### Fasta/fastq/bam files contain DNA sequences
@@ -78,7 +76,7 @@ One can use several file formats to store DNA sequence data.
 Fasta files can only contain read ids and sequences, whereas fastq files
 can include additional information like the quality of basecalling per base.
 BAM files are the most flexible, as they may contain one or all of the basecalling/alignment/modification
-information per read. We use the `.fastq` format in our pipeline below to store basecalling outputs,
+information per read. We use the `.bam` format in our pipeline below to store basecalling outputs,
 and the `.fasta` format to store the reference genome for alignment purposes.
 We will not discuss BAM files here but later on in this session when we discuss alignment.
 
@@ -143,35 +141,64 @@ and `mean_qscore_template` (average read quality).
 
 </details>
 
-### Running the basecalling commands
+### Running the basecalling and alignment commands
 
-We do the basecalling using guppy as shown below. The options specify input file paths,
-output file paths, a model file as dictated by the experimental flowcell (r9.4.1) and accuracy desired (hac),
+We do the basecalling and alignment using dorado. Alignment is run using the minimap2 software within dorado.
+We take pod5 files as input in this step and generate bam files as output.
+First, we explore the available dorado basecalling models using
+
+```bash
+dorado download --list
+```
+
+We are going to use the model `dna_r10.4.1_e8.2_400bps_hac@v5.2.0`. You will already see the model files
+at `~/nanomod_course_references/dorado_models/`, but if you don't, you can download the model files
+using the following command.
+
+```bash
+dorado download --model dna_r10.4.1_e8.2_400bps_hac@v5.2.0 --models-directory ~/nanomod_course_references/dorado_models/
+```
+
+We will also obtain the sacCer3 (_S. cerevisiae_) reference genome and make a corresponding fasta index file.
+You may already have the reference genome in your `nanomod_course_references` folder. If not, please download it
+using the command here.
+
+```bash
+mkdir -p ~/nanomod_course_references # any folder will do here.
+cd ~/nanomod_course_references
+wget https://hgdownload.soe.ucsc.edu/goldenPath/sacCer3/bigZips/sacCer3.fa.gz
+gunzip sacCer3.fa.gz
+samtools faidx sacCer3.fa
+```
+
+The basecalling and alignment is run as shown below.
+The options specify input file paths,
+output file paths, a model file as dictated by the experimental flowcell (r10.4.1) and accuracy desired (hac),
 and details on how many reads per fastq file and how many threads of execution.
 Basecallers are faster on
 machines with GPUs but we operate in a CPU-only mode here to minimize costs.
-To use GPUs, one needs to specify the input parameter `--device cuda:n` where `n` is the device id
-(this is usually a number like zero), and one might need to do away with `--cpu_threads_per_caller`.
-Normally, reads are split into pass
-and fail bins depending on their quality, but we allow all reads through (`--disable_qscore_filtering`) as our
+To use GPUs, one may need to specify an input parameter like `--device cuda:n` where `n` is the device id
+(this is usually a number like zero).
+Reads may be split into pass and fail bins depending on their quality if `--min-qscore` is set,
+but we allow all reads through as our
 reads contain modified bases which are expected to interfere with basecalling accuracy.
 
 ```bash
 input_dir=~/nanomod_course_data/yeast
 output_dir=~/nanomod_course_outputs/yeast
-model_file=dna_r9.4.1_450bps_fast.cfg
+output_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam
+ref_fasta=~/nanomod_course_references/sacCer3.fa
+model_files=~/nanomod_course_references/dorado_models/dna_r10.4.1_e8.2_400bps_hac@v5.2.0
   # NOTE: A higher accuracy model file (_hac instead of _fast) above
   # leads to longer run times.
-  # NOTE: The model file is internal to the guppy install, so
-  # please do not be confused if we do not have a file called
-  # 'dna_r9.4.1_450bps_fast.cfg' in our directory.
 mkdir -p $output_dir
 
-guppy_basecaller --input_path $input_dir \
-    --save_path $output_dir \
-    --config $model_file --disable_pings \
-    --num_callers 8 --cpu_threads_per_caller 2 --disable_qscore_filtering \
-    --progress_stats_frequency 10
+# Whenever BAM/SAM files are made, it is a good idea to sort and index them.
+dorado basecaller $model_files $input_dir --reference $ref_fasta \
+  --verbose -x cpu -b 10 -c 1000 |\
+      samtools sort -o $output_bam
+
+samtools index $output_bam
 ```
 
 The above command produces a few files in the output directory.
@@ -193,7 +220,7 @@ We will give an overview of alignment and the file formats used before running t
 In a modification-calling genomics pipeline,
 alignment can be performed before or after modification calling. 
 In our workflow today, we will use a program that implements reference-anchored modification
-calling, so we need to do alignment before calling modifications.
+calling, so we perform modification calling after alignment.
 The program, DNAscent, calls modifications on the reference sequence corresponding
 to each read instead of the basecalled sequence.
 Tomorrow, we will use a program that performs reference-independent modification calling
@@ -340,54 +367,6 @@ chr2 30000 34000 DEF1 1000 .
 
 </details>
 
-<details markdown="1">
-
-<summary markdown="span"> 
-
-Optional: Downloading the reference genome
-
-</summary>
-
-### Downloading the reference genome
-
-We will first obtain the sacCer3 (_S. cerevisiae_) reference genome
-and make a corresponding fasta index file.
-
-```bash
-mkdir -p ~/nanomod_course_references # any folder will do here.
-cd ~/nanomod_course_references
-wget https://hgdownload.soe.ucsc.edu/goldenPath/sacCer3/bigZips/sacCer3.fa.gz
-gunzip sacCer3.fa.gz
-samtools faidx sacCer3.fa
-```
-
-</details>
-
-### Running the alignment commands
-
-We perform alignment using `minimap2` with 8 threads, using the basecalled fastq
-files and the reference genome we downloaded above. The `-x map-ont` parameter instructs
-minimap2 to use alignment parameters optimized for nanopore data.
-
-```bash
-reference=~/nanomod_course_references/sacCer3.fa
-input_fastq=~/nanomod_course_outputs/yeast/*.fastq
-output_sam=~/nanomod_course_outputs/yeast/aligned_reads.sam
-minimap2 -L -a -x map-ont -t 8 \
-  $reference $input_fastq > $output_sam
-```
-
-Whenever BAM/SAM files are made, it is a good idea to sort and index them as many
-tools require that BAM/SAM files are sorted and indexed.
-We can use samtools to do this.
-
-```bash
-input_sam=~/nanomod_course_outputs/yeast/aligned_reads.sam
-output_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam
-samtools sort -@ 8 -T /tmp -o $output_bam $input_sam
-samtools index $output_bam
-```
-
 ## Preliminary inspection of alignments
 
 ### Visualizing alignments using genome browsers
@@ -407,7 +386,7 @@ the instructions in the figures below.
 ![Instructions on how to load genome](igv_load_genome_screenshot.png)
 ![Instructions on how to load BAM file](igv_load_file_screenshot.png)
 
-You should see two tracks immediately below the reference genome on top.
+You should see some tracks immediately below the reference genome on top.
 Now, you can zoom in to the genome.
 Select any region of size around 10 to 50 kb and have a look at the result.
 
@@ -473,12 +452,20 @@ aligned data. The program runs commands similar in spirit to the `samtools` and
 `bedtools` commands above to produce metrics like number of pass/fail reads,
 number of alignments etc. and plots like histograms of alignment lengths etc.
 
+First, we have to make a sequencing summary file using dorado like so
+
 ```bash
-input_seq_sum=~/nanomod_course_outputs/yeast/sequencing_summary.txt
+input_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam
+output_seq_summ=~/nanomod_course_outputs/yeast/sequencing_summary.txt
+dorado summary $input_bam > $output_seq_summ
+```
+
+```bash
+input_seq_summ=~/nanomod_course_outputs/yeast/sequencing_summary.txt
 input_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam
 output_html=~/nanomod_course_outputs/yeast/pycoQC/analysis.html
 output_json=~/nanomod_course_outputs/yeast/pycoQC/analysis.json
-pycoQC -f $input_seq_sum -a $input_bam -o $output_html \
+pycoQC -f $input_seq_summ -a $input_bam -o $output_html \
   -j $output_json --quiet
 ```
 
@@ -497,11 +484,11 @@ You should see many more reads from the output above.
 Let's run pycoQC with this BAM file.
 
 ```bash
-input_seq_sum=~/nanomod_course_data/yeast/sequencing_summary.subset_1.txt
+input_seq_summ=~/nanomod_course_data/yeast/sequencing_summary.subset_1.txt
 input_bam=~/nanomod_course_data/yeast/subset_1.bam
 output_html=~/nanomod_course_outputs/yeast/pycoQC/analysis.subset_1.html
 output_json=~/nanomod_course_outputs/yeast/pycoQC/analysis.subset_1.json
-pycoQC -f $input_seq_sum -a $input_bam -o $output_html \
+pycoQC -f $input_seq_summ -a $input_bam -o $output_html \
   -j $output_json --quiet
 ```
 
