@@ -134,26 +134,31 @@ We will visualize another mod BAM file in IGV in
 
 ## Visualizing modifications across single reads with custom script
 
-We will now visualize a read of interest with our custom script.
+We will now visualize a read of interest with our GUI program.
+First, we will get coordinates of all reads in our BAM file.
 
 ```bash
-# change to the github repo of the course and go to the code folder
-cd ~/nanomod_course_scripts/nanopore-mod-course/code
-# define the variables for the script
-mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam 
-read_id=40222373-a3e9-4918-aff1-3031f7cb6ec2
-mod_code=T # T is for any T modification
-ref_flag=use_ref # reference genome coordinates
-threshold=0.5 # threhold for modification calling
-window_size=300 # 300T is roughly 1 kb
-output_dir=~/nanomod_course_outputs/yeast/plot_reads
-# run the script
-bash plot_read.sh $mod_bam $read_id $mod_code $ref_flag $threshold $window_size $output_dir
+cd ~/nanomod_course_outputs/yeast
+mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam 
+output_reads_bed=~/nanomod_course_outputs/yeast/reads_from_dnascent.bed
+bedtools bamtobed -i $mod_bam > $output_reads_bed
+# If you want to, you can inspect the first few lines of the output BED file
+head -n 10 $output_reads_bed
 ```
 
-You should see the following figure.
+Now, run the command `nanalogue-gui`. Click on the Swipe button, then
+load up the BAM file with the newly made BED file. You can choose
+an appropriate name and location for the output bed file.
+Uncheck 'Show annotation highlight' if checked and set 'Flanking
+Region' to 0. Then press 'Start Swiping'.
 
-![Rain plot visualization](sample_rain_plot.png)
+![Nanalogue landing page](nanalogue_landing_page.png)
+![Nanalogue Swipe landing page](nanalogue_swipe_landing_page.png)
+
+You should see two types of reads
+
+![Rain plot visualization of low mod read](nanalogue_swipe_low_mod_read.png)
+![Rain plot visualization of high mod read](nanalogue_swipe_high_mod_read.png)
 
 Compare the plot you see with the track of the same read in IGV.
 Can you pick out the same features?

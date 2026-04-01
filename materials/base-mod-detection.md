@@ -19,7 +19,7 @@ We will be performing the steps highlighted with an asterisk in the pipeline fig
 ### Creating a DNAscent index
 
 We now need to create an index needed by DNAscent — a plain text with two columns: read id
-and the fast5 file with the corresponding time course of nanopore current.
+and the pod5 file with the corresponding time course of nanopore current.
 
 ```bash
 input_pod5_dir=~/nanomod_course_data/yeast
