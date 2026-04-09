@@ -2,31 +2,50 @@ Ans: chrVI:190000-200000
 
 Step 1: Isolate reads with modifications.
 
-Use our script to form a mod BAM file with the XC tag
-containg read modifcation counts.
-Then, we isolate the modified strands.
-We use the criterion that on average at least 5 thymidines
-per every 100 thymidines must be modified.
-So the modification rate must be at least 5% when we count only
-thymidines, or 1.25% when we count all four canonical DNA bases.
-Any other reasonable criterion is ok.
+Some of the reads in our dataset are unmodified and some are modified
+due to the nature of our experimental technique and our dataset i.e.
+some of the DNA molecules were synthesized before the current cell cycle
+and do not contain thymidines.
+We use the criterion that on average at least 100 thymidines
+must be modified to select these modified DNA strands.
+Any reasonable criterion is ok.
 
 ```bash
-input_mod_bam=~/nanomod_course_data/yeast/subset_2.sorted.bam
-thresholded_mod_bam= # fill suitably
-modified_reads_mod_bam= # fill suitably
-modified_reads_mod_bam_adjust_tag= # fill suitably
+input_mod_bam=~/nanomod_course_data/yeast/subset_2.mod.sorted.bam
+highly_mod_reads=~/nanomod_course_outputs/yeast/subset_2.highly_mod_reads
+output_mod_bam=~/nanomod_course_outputs/yeast/subset_2.highly_mod.sorted.bam
 
-# perform thresholding
-modkit modbam call-mods --no-filtering $input_mod_bam $thresholded_mod_bam
-
-cd ~/nanomod_course_scripts/nanopore-mod-course/code
+# peek at the file to see what tags are in it
+nanalogue peek $input_mod_bam
 
 # count number of modifications per read and select
-# those where average modification rate > 1.25% as explained
-# above
-samtools view -h $thresholded_mod_bam | awk -f count_mods_per_read.awk |\
- samtools view -b -e '[XC]/rlen>0.0125' -o $modified_reads_mod_bam
+# those where average modification count > 100 as explained above.
+# We use the tag "T" as revealed to us by peek.
+nanalogue read-info --tag T $input_mod_bam |\
+  jq -r '.[] | {read_id: .read_id,
+                mod_count: (.mod_count | split(":")[1] | split(";")[0] | tonumber )}
+             | select(.mod_count > 100) | .read_id' > $highly_mod_reads
+
+# subset BAM file to only include these reads
+samtools view -b -N $highly_mod_reads $input_mod_bam | samtools sort -o $output_mod_bam
+samtools index $output_mod_bam
+```
+
+A more sophisticated approach is to select reads with a minimum amount of modification density
+i.e. modification count normalized by sequence length. This can be performed by more tweaks
+to the `jq` command above as shown here. This is not covered directly in the course, so we
+do not expect you to get this on your own. If you do get this, then great! The command
+below selects for reads that have a modification density of at least 5% i.e. out of all
+the thymidines on the read, at least 5% are modified. We assume that one-fourth of the bases
+on the read are thymidines (the `/4` in the command). You can customize the command
+to set more realistic base compositions, or modification densities etc.
+
+```bash
+nanalogue read-info --tag T $input_mod_bam |\
+  jq -r '.[] | {read_id: .read_id,
+                mod_count: (.mod_count | split(":")[1] | split(";")[0] | tonumber ),
+                sequence_length: .sequence_length}
+             | select(.mod_count/(.sequence_length/4) > 0.05)'
 ```
 
 Step 2:
@@ -40,23 +59,21 @@ We are not doing this as a part of this solution.
 Step 3:
 
 The command below produces statistics of the region chrVI:150000-160000.
-Note down the statistics in the file `probabilities.txt` in the directory
-./histogram_exercise and repeat this command for the other regions.
+Note down the statistics in the directory ./histogram_exercise, either by
+examining the text files or by looking at the histogram plots produced by modkit.
+Then, repeat this command for the other regions of the exercise.
+In this manner, you can find the most modified region.
 
 ```bash
-# adjust the tag of the modified-read mod bam file
-modkit modbam adjust-mods --convert T B $modified_reads_mod_bam \
-  $modified_reads_mod_bam_adjust_tag
-samtools index $modified_reads_mod_bam_adjust_tag
-
-region_file= # fill suitably
+input_mod_bam=~/nanomod_course_outputs/yeast/subset_2.highly_mod.sorted.bam
+region_file=~/nanomod_course_outputs/yeast/temp_region
 echo -e "chrVI\t150000\t160000\tA\t1000\t." > $region_file;   
 
 # cd to a suitable directory which can hold
 # the histogram_exercise directory
 
-modkit modbam sample-probs $modified_reads_mod_bam_adjust_tag -o ./histogram_exercise \
-  --hist --buckets 2 --include-bed $region_file --force
+modkit modbam sample-probs $input_mod_bam -o ./histogram_exercise \
+  --hist --include-bed $region_file --force
 # --force above just overwrites files
 # in the ./histogram_exercise directory
 ```

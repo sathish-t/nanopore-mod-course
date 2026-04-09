@@ -4,7 +4,7 @@ topic: Modification analysis
 title: Most modified region
 ---
 
-The file `~/nanomod_course_data/yeast/subset_2.sorted.bam`
+The file `~/nanomod_course_data/yeast/subset_2.mod.sorted.bam`
 contains reads from the yeast dataset longer than 30 kb
 that pass through the region chrVI:150000-250000.
 Our goal is to identify which of the following three regions
@@ -18,6 +18,7 @@ a qualitative or a quantitative solution.
 For the official solution, we want you to implement
 the steps below:
 
+- First, inspect the file to see what modification tags are present in it.
 - Our molecules fall into two categories: newly-synthesized
 DNA with BrdU in it and DNA that was synthesized before the
 current cell cycle and does not have BrdU.
