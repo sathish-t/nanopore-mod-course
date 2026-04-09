@@ -73,7 +73,7 @@ examine it, and make a decision - we will cover this later in this session.
 We can execute the thresholding step with a threshold of 0.5 using `modkit`.
 
 ```bash
-input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
 output_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.bam
 modkit modbam call-mods --no-filtering $input_mod_bam $output_mod_bam
 ```
@@ -184,56 +184,25 @@ Another use is to see if our experiment worked and we are seeing an expected num
 of bases with modifications.
 
 We will use the `modkit modbam sample-probs` command. 
-We operate the tool in the histogram mode `--hist` and want ten
-bins in the histogram (`--buckets 10`), and wish to sample
+We operate the tool in the histogram mode `--hist`
+and wish to sample
 1000 reads (`-n 1000`) to measure statistics (we are using 1000
 to save runtime; usually a fraction of the BAM file is sufficient
 for these calculations and we leave it to the experimenter to
 determine what that fraction is for their dataset).
 We will discuss the `-p` option in an optional subsection a little later.
 
-NOTE: The `modkit modbam sample-probs` command produces tabular files
-with rows labeled with either an unmodified one-letter code or
-a modified one-letter code.
-In the case of 5mC methylation which is coded
-as `C+m`, the rows are labelled either `C` or `m`.
-In the case of a generic modification such as `T+T`,
-which we use to label our BrdU data,
-we run into problems because both the modified and
-the unmodified rows are labeled `T`.
-This is a problem with the `modkit modbam sample-probs` tool.
-To get around the problem, before using this tool, we change
-the `T+T` code to `T+B` using `modkit modbam adjust-mods`.
-This is not a good idea in general as `B` means not `A` in the
-standard one-letter nucleotide code list.
-But, as the modification field is still developing, we occasionally
-run into these problems and have to use such workarounds.
-
 ```bash
 input_mod_bam= # fill this suitably
-input_mod_bam_adjust_tag= # fill this suitably
-
-# convert mod BAM from using T+T to T+B
-modkit modbam adjust-mods --convert T B $input_mod_bam \
-  $input_mod_bam_adjust_tag
-samtools index $input_mod_bam_adjust_tag
 
 # sample probabilities and make a histogram
 cd ~/nanomod_course_outputs/yeast
 modkit modbam sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
-  $input_mod_bam_adjust_tag -o ./histogram --hist --buckets 10 -n 1000
+  $input_mod_bam -o ./histogram --hist -n 1000
 ```
 
 The output files are deposited in the `./histogram` folder.
-You should see three output files: `probabilities.txt`, `probabilities.tsv`
-and `thresholds.tsv`.
-The `probabilities` files report number of modified bases in ten buckets of
-modification probability `p_mod` from 0.5 - 1.0,
-and the same for the number of unmodified bases using the probability that
-the base is not modified `p_unmod = 1 - p_mod`.
-`probabilities.txt` also contains a histogram made with ASCII art
-(i.e. using the symbol ∎ to build horizontal bars of this histogram).
-
+You should see some text output files and some HTML files with plots.
 Have a look at these files, and answer this question for yourself: what 
 would be a good modification probability value for thresholding?
 
@@ -260,23 +229,18 @@ region.
 
 ```bash
 input_mod_bam= # fill this suitably
-input_mod_bam_adjust_tag= # fill this suitably
 regions_bed_file= # we are going to make this file
-
-# convert mod BAM from using T+T to T+B
-modkit modbam adjust-mods --convert T B $input_mod_bam \
-  $input_mod_bam_adjust_tag
 
 # one can use any regions and any number of regions in the commands
 # below. The '.' in the sixth column means we include both +
 # and - strands in our calculation.
-echo -e "chrI\t100000\t200000\tA\t1000\t." > $regions_bed_file;   
-echo -e "chrVII\t500000\t600000\tB\t1000\t." >> $regions_bed_file;
+echo -e "chrI\t0\t230000\tA\t1000\t." > $regions_bed_file;   
+echo -e "chrVII\t0\t800000\tB\t1000\t." >> $regions_bed_file;
 
 # sample probabilities and make a histogram
 cd ~/nanomod_course_outputs/yeast
 modkit modbam sample-probs -p 0.1,0.2,0.3,0.4,0.5 \
-  $input_mod_bam_adjust_tag -o ./histogram_subset --hist --buckets 10 -n 1000 \
+  $input_mod_bam -o ./histogram_subset --hist -n 1000 \
   --include-bed $regions_bed_file
 ```
 
@@ -398,103 +362,68 @@ samtools view -c $output_mod_bam # count reads
 ### Subset by modification amount
 
 An experimenter may wish to isolate the reads with a minimum number of modified bases
-in them for further analysis.
-Unfortunately, there is no off-the-shelf `samtools` command or otherwise to achieve this.
-We solve this problem using a custom script to generate mod BAM files with custom tags
-at the end of each line with modification counts.
-Then, samtools can be used to query this new mod BAM file to output the desired
-high-modification-count subset.
-
-We have implemented a custom script `count_mods_per_read.awk`
-written for the tool `awk` that takes a thresholded mod BAM file as input
-and makes an output file by appending a numeric tag `XC` at the end of each line.
-The tag contains the number of modifications in that mod BAM line.
-For example, the mod BAM line with the modification data `MM:Z:T+T?,0,0,0; ML:B:C,0,255,255`
-gets the tag `XC:i:2` as there are two modifications.
-
-The script is purely for demonstrative purposes and is not production-ready
-as it will not work with all types of mod BAM files e.g. non-thresholded ones,
-ones with multiple modifications, and a few others.
-We wanted a simple demonstration of how to leverage pre-existing tools and our knowledge
-of the mod BAM format to write tools ourselves when they are not available.
-So we have not added all the additional features to make the script a
-good production script for the sake of simplicity.
-
-```bash
-cd ~/nanomod_course_scripts/nanopore-mod-course/code
-input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.bam
-samtools view -c $input_mod_bam
-bam_with_counts=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.w_counts.bam
-samtools view -h $input_mod_bam | awk -f count_mods_per_read.awk |\
-  samtools view -b -o $bam_with_counts
-# above line converts BAM -> SAM, runs script on it,
-# and converts back to BAM.
-# the output bam file contains the XC tag.
-```
-
-Let us display a table of some reads, their alignment coordinates,
-and their modification
-counts using the following `bedtools bamtobed` command.
-The output data is in the BED format, with the fifth column
-containing the modification count from the XC tag (`-tag XC`).
-
-```bash
-bedtools bamtobed -i $bam_with_counts -tag XC | shuf | head -n 20
-# you can drop the shuf and the head if the bam file is short enough
-```
-
-The advantage of storing modification counts using a tag in
-the modBAM file is that one can use `samtools` to achieve
-the desired high-modification-count subset now.
-The following command extracts reads with at least 100 modified bases
+in them for further analysis. The following command outputs counts of modification
 per read.
 
 ```bash
-output_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.highmod.bam
-samtools view -e '[XC]>100' -b -o $output_bam $bam_with_counts
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
+nanalogue read-info $input_mod_bam
 ```
 
-One can combine other variables like alignment length with our modification
-count in samtools queries.
-We give an example below where we form a subset of reads with at least
-one modified base per 100 aligned bases on average.
+You can choose read ids with a high number of modifications by querying the output of
+these commands. You can use tools like `jq` to do this. A sample command is shown below.
+You do not need to learn the language of `jq` -- tools like ChatGPT can help you write
+these types of commands given the output structure of tools like `nanalogue` as an example.
 
 ```bash
-output_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.thresholded.high_mod_dens.bam
-samtools view -e '[XC]/rlen>0.01' -b -o $output_bam $bam_with_counts
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
+nanalogue read-info --tag b $input_mod_bam |\
+  jq -r '.[] | {read_id: .read_id, 
+                mod_count: (.mod_count | split(":")[1] | split(";")[0] | tonumber )}' 
 ```
 
-<details markdown="1">
+A further modification of the command above can report reads with a high enough mod count.
+Here, we select only those reads with at least ten modification calls.
+Again, tools like ChatGPT can help you write these commands; they just need to know the output
+format of `nanalogue` and to be prompted to use the tool `jq`.
 
-<summary markdown="span"> 
+```bash
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
+nanalogue read-info --tag b $input_mod_bam |\
+  jq -r '.[] | {read_id: .read_id, 
+                mod_count: (.mod_count | split(":")[1] | split(";")[0] | tonumber )}
+             | select(.mod_count > 10)'
+```
 
-Optional: more details about the modification counting script
+You can then use samtools to subset the mod bam file to just retain the reads of interest.
+We first have to form a one-column text file containing just the read ids of interest.
+Then, we use samtools to perform the subset.
 
-</summary>
+```bash
+input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
+output_mod_bam=~/nanomod_course_outputs/yeast/dnascent.highly_mod.sorted.bam
+read_id_list=~/nanomod_course_outputs/yeast/highly_mod_reads
+nanalogue read-info --tag b $input_mod_bam |\
+  jq -r '.[] | {read_id: .read_id, 
+                mod_count: (.mod_count | split(":")[1] | split(";")[0] | tonumber )}
+             | select(.mod_count > 10) | .read_id' > $read_id_list
+samtools view -b -N $read_id_list $input_mod_bam | samtools sort -o $output_mod_bam
+samtools index $output_mod_bam
+```
 
-#### More details about the modification counting script
+### Combining several filters to form subsets
 
-We have written the script in the AWK programming language.
-The logic in the script is to read each line, isolate the column starting with ML,
-split by comma, count the number of 255s in it, put this information
-in an XC tag, and append it to the line.
-This logic could easily be implemented in python or R as well.
-We have chosen a tag starting with 'X' so as to not to interfere with other
-BAM tags.
-
-</details>
-
-### Combining several filters to form subsets with `samtools`
-
-A powerful feature of `samtools` is that commands 
-can be combined to form complex queries that would have otherwise required
+A powerful feature of the BAM ecosystem (`samtools`, `modkit`, `nanalogue` etc.)
+is that commands can be combined to form complex queries that would have otherwise required
 a substantial amount of computer code to achieve.
-For example: to get reads longer than 10 kb with more than 100 modifications, do
-`samtools view -e '[XC]>100&&rlen>10000'`.
 Please read the documentation on `samtools view`
-[here](https://www.htslib.org/doc/samtools-view.html) and the documentation
-on filter expressions [here](https://www.htslib.org/doc/1.19/samtools.html#FILTER_EXPRESSIONS)
-to learn about the possibilities.
+[here](https://www.htslib.org/doc/samtools-view.html), the documentation
+on filter expressions [here](https://www.htslib.org/doc/1.19/samtools.html#FILTER_EXPRESSIONS),
+and the documentation of the respective tools ([modkit](https://nanoporetech.github.io/modkit/) and
+[nanalogue](https://nanalogue.com/all_cli_commands.html))
+to learn about the possibilities. One feature that is useful is using `samtools` to perform
+subsets and then passing this output to tools like `nanalogue` e.g.
+`samtools view -b -h $input_mod_bam | nanalogue ...`
 
 ## Combining mod BAM tools leads to easy workflows
 
@@ -526,42 +455,27 @@ highly-modified region in our subset mod BAM file
 
 <summary markdown="span"> 
 
-Optional: windowing mod BAM files using custom scripts
+Optional: windowing mod BAM files
 
 </summary>
 
-## Windowing mod BAM files using custom scripts
+## Windowing mod BAM files
 
-We will now learn how to make the data behind the windowed track that we saw in
+We will explore how to make the data behind the windowed track that we saw in
 our earlier visualization [session]({{ site.baseurl }}/materials/genome-browser-visualization)
 when we made one-read modification plots.
 We will measure mean modification density per shoulder-to-shoulder windows of a given
 size in base pairs along a read and output it to a tab-separated file.
-We will use two custom python scripts that we have written as there are no
-ready-made tools for this purpose.
 
 ```bash
-one_read_bam= # fill suitably with a mod BAM file with
-              # just one read in it
+mod_bam=~/nanomod_course_outputs/yeast/dnascent.mod.sorted.bam
+windowed_data=~/nanomod_course_outputs/yeast/windowed_data_2
+nanalogue window-dens --win 300 \
+  --step 300 --tag b $mod_bam > $windowed_data
 
-# Extract modification information from the bam file
-# NOTE: the --force overwrites any pre-existing output files.
-modkit extract full --force "$one_read_bam" "$one_read_bam".tsv
-
-# Use python scripts to extract raw data and window it
-mod_code=                  # use m for 5mC or T for BrdU etc.
-ref_flag=use_ref        # window using reference coordinates
-threshold=                 # threshold to call bases as modified
-window_size= # size of window in number of bases of interest
-             # e.g. 300
-
-python extract_raw_mod_data.py $mod_code $ref_flag\
-  "$one_read_bam".tsv "$one_read_bam"_rawVal.tsv
-python window_mod_data.py $threshold $window_size \
-  "$one_read_bam"_rawVal.tsv "$one_read_bam"_winVal.tsv
+# inspect the produced file with this command
+more $windowed_data
 ```
-
-Please see the windowed data in the `"$one_read_bam"_winVal.tsv` file.
 
 </details>
 
