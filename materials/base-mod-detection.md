@@ -122,6 +122,8 @@ highly_mod_reads=~/nanomod_course_outputs/yeast/highly_mod_reads
 windowed_data=~/nanomod_course_outputs/yeast/windowed_data
 nanalogue window-dens --read-id-list $highly_mod_reads --win 300 \
   --step 300 --tag b $mod_bam > $windowed_data
+
+# inspect the produced file with this command
 more $windowed_data
 ```
 
