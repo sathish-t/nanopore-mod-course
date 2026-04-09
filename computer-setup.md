@@ -141,6 +141,8 @@ samtools --version | head -n 2
 # Using htslib 1.23.1
 aws --version
 # aws-cli/2.34.15
+jq --version
+# jq-1.6
 # The following are system tools. Any reasonable version will suffice.
 # They run from the host OS, not the container.
 git --version
@@ -232,6 +234,11 @@ Alignment software that finds the best-fit location of a given sequence on a lin
 
 ONT-written package for reading and writing files in the pod5 format.
 - [Installation and documentation](https://github.com/nanoporetech/pod5-file-format)
+
+## jq
+
+jq is a software used on the command line to process JSON data.
+- [Homepage](https://jqlang.org)
 
 ## Other software
 

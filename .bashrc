@@ -38,6 +38,9 @@ export -f aws;
 pod5() { singularity exec "$sgl_base_path/software.img" pod5 "$@"; }
 export -f pod5;
 
+jq() { singularity exec "$sgl_base_path/software.img" jq "$@"; }
+export -f jq;
+
 nanalogue-gui() { cd ~/nanomod_course_software/nanalogue-gui && npm start; }
 export -f nanalogue-gui;
 
