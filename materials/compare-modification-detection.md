@@ -15,15 +15,13 @@ in this session.
 
 As you can see from the figure, there are a few differences compared to the pipeline
 we followed for the yeast dataset:
-- The input format for nanopore currents is `pod5` instead of `fast5`.
-- We are using the basecaller `dorado` instead of `guppy`.
-- `dorado` performs the job of `guppy` (basecalling) and `DNAscent` (modification calling)
+- `dorado` performs the job of `DNAscent` (modification calling)
 in the `dorado basecaller` command and calls `minimap2` (alignment) in the
-`dorado aligner` command.
+`dorado aligner` command. Dorado can call methylation modification without
+relying on external software, whereas for custom modifications like BrdU,
+we have to use external software like DNAscent.
 - Modification calling and basecalling are performed with a single `dorado basecaller` command.
 - Modification calling is still bolted onto the output of basecalling.
-- We get a mod BAM file directly from the modification caller,
-so we do not need to perform any file format conversions to mod BAM.
 - The workflow is reference-unanchored, so alignment is optional and follows modification calling.
 Alignment is done through the `dorado aligner` command although it is just a different name for `minimap2`
 which is doing the job under the hood.
