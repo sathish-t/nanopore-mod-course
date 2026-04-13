@@ -4,12 +4,12 @@ topic: Modification analysis
 title: Compare modification levels
 ---
 
-In the commands we executed on the first day, we used
-`DNAscent forkSense` to call features such as initiation
-and termination sites on single molecules.
-In the case study today, we learned that in the experimental
-protocol used in the yeast dataset, sites that are replicated
-early are more modified than sites that are replicated late.
+Over the first day, we learned that features associated with DNA replication
+such as initiation and termination sites can be identified
+on single molecules using BrdU labelling.
+In the experimental protocol used in the following yeast dataset,
+sites that are replicated early are more modified than
+sites that are replicated late.
 In this exercise, please demonstrate that sequences
 on single molecules corresponding to initiation sites
 are more modified than sequences on single molecules
@@ -34,7 +34,7 @@ please abandon it and try to think up a simpler solution.
 
 For some answers, you may want to use the bed files above as an
 input to programs such as `modkit`.
-Please be advised that although `DNAscent forkSense`
+Please be advised that although programs such as `DNAscent forkSense`
 outputs files ending in `.bed`, these are not in the correct bed format.
 So, if you intend to use these files as inputs, please convert
 them to the correct bed format before doing so.

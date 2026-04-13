@@ -1,30 +1,12 @@
 As stated in the question, there are several ways to solve the problem.
-We are going to use the following algorithm:
+We are going to use the following simple algorithm:
 
 1. We create two bed files, one for initiation sites
 and one for termination sites by cleaning up the output of forkSense.
 
-2. Then, we create a mod BAM subset with just the newly synthesized DNA
-by excluding reads where average modification density is
-close to the false-positive rate of modification calling.
-We performed a similar step in the most modified region exercise
-earlier. We have not quantified the false-positive rate in the
-course; we will use a reasonable guess.
-
-3. Then, we are going to run `modkit modbam sample-probs` using these
+2. Then, we are going to run `modkit modbam sample-probs` using these
 regions as input, and examine the histogram of modification
-probabilities.
-
-This is an approximate solution as we have called
-origins and terminations on single molecules using forkSense,
-but we are calculating modification densities over all the
-reads passing through these sites using `modkit modbam sample-probs`.
-Performing the exact calculation will involve some manual
-work as you will have to create subsets of reads, or you will
-need to know some programming.
-This illustrates the limitations we are up against when we
-want to do sophisticated single-molecule data processing
-in the DNA modification field.
+probabilities within these regions
 
 ```bash
 # clean forkSense files
@@ -38,41 +20,32 @@ cleaned_termination_bed= # fill suitably
 awk -v OFS="\t" '{print $1, $2, $3, $4, 100, $8=="fwd"?"+":"-"}' \
   $input_termination_bed > $cleaned_termination_bed
 
-# set input and output files for the rest of the script
-input_mod_bam=~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam
-thresholded_mod_bam= # fill suitably
-modified_reads_mod_bam= # fill suitably
-modified_reads_mod_bam_adjust_tag= # fill suitably
-
-# perform thresholding
-modkit modbam call-mods --no-filtering $input_mod_bam $thresholded_mod_bam
-
-# go to the code folder where our modification-counting script is located
-cd ~/nanomod_course_scripts/nanopore-mod-course/code
-
-# count number of modifications per read and select
-# those where average modification rate > 1.25%
-# (we have assumed the false positive rate is 1.25%).
-samtools view -h $thresholded_mod_bam | awk -f count_mods_per_read.awk |\
- samtools view -b -e '[XC]/rlen>0.0125' -o $modified_reads_mod_bam
-
-# adjust the tag of the modified-read mod bam file
-modkit modbam adjust-mods --convert T B $modified_reads_mod_bam $modified_reads_mod_bam_adjust_tag
-samtools index $modified_reads_mod_bam_adjust_tag
-
 # sample modification rates at origins and terminations.
 # first, cd to a suitable directory where the histogram directories
 # will be deposited.
-modkit modbam sample-probs $modified_reads_mod_bam_adjust_tag -o ./histogram_exercise_origin \
-  --hist --buckets 2 --include-bed $cleaned_origin_bed --force
+mod_bam=~/nanomod_course_capstone/compare_mod_levels/dnascent.detect.mod.sorted.bam
+modkit modbam sample-probs $mod_bam -o ./histogram_exercise_origin \
+  --hist --include-bed $cleaned_origin_bed --force
 
-modkit modbam sample-probs $modified_reads_mod_bam_adjust_tag -o ./histogram_exercise_terminations \
-  --hist --buckets 2 --include-bed $cleaned_termination_bed --force
+modkit modbam sample-probs $mod_bam -o ./histogram_exercise_terminations \
+  --hist --include-bed $cleaned_termination_bed --force
 ```
 
-You should see in the two `probabilities.tsv` files in the respective
+You should see in the HTML files in the respective
 histogram folders that the ratio of modified to unmodified bases is larger
 at the initiation sites than at the termination sites.
+
+Improvements to the solution above
+==================================
+
+If you wanted, you could have first rejected reads where the modification densities
+are close to the false-positive rate. The biological interpretation of these molecules
+is that they were replicated before the current round of replication and are thus
+expected to have no BrdU incorporation. This would have enriched for the reads with
+actual BrdU substitution in them. You can do this by filtering on mod counts from
+`nanalogue read-info` or `nanalogue window-dens` using the `jq` tool, and then
+use `samtools view -N` to create a new mod BAM file with just these reads.
+Then, you can apply the procedure above on this smaller BAM file.
 
 Alternative solution 1
 ======================
