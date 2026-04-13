@@ -85,6 +85,9 @@ dorado_model_dir=~/nanomod_course_references/dorado_models
 model_config=dna_r10.4.1_e8.2_400bps_hac@v3.5.2
 mkdir -p $dorado_model_dir
 dorado download --model $model_config --directory $dorado_model_dir
+
+model_config=dna_r10.4.1_e8.2_400bps_hac@v3.5.2_5mCG@v2
+dorado download --model $model_config --directory $dorado_model_dir
 ```
 
 </details>
@@ -97,7 +100,7 @@ mkdir -p $output_dir
 ```
 
 We can basecall and modification call ten of our reads (`-n 10`) with
-5mC methylation at CpG sites (`--modified-bases 5mCG`).
+5mC methylation at CpG sites (with a suitable `--modified-bases-models`).
 NOTE: the `-b 10 -c 1000` are internal `dorado` parameters which we've chosen to fit
 our virtual machines, and we are running in the slower CPU-only mode.
 This step will take approximately ten minutes.
@@ -105,9 +108,10 @@ This step will take approximately ten minutes.
 ```bash
 input_dir=~/nanomod_course_data/human
 model_files=~/nanomod_course_references/dorado_models/dna_r10.4.1_e8.2_400bps_hac@v3.5.2
+mod_model_files=~/nanomod_course_references/dorado_models/dna_r10.4.1_e8.2_400bps_hac@v3.5.2_5mCG@v2
 output_mod_bam=~/nanomod_course_outputs/human/PAM63974_pass_58881fec_60.ten_reads.mod.bam
 dorado basecaller $model_files $input_dir \
-  --verbose -n 10 -x cpu -b 10 -c 1000 --modified-bases 5mCG | \
+  --verbose -n 10 -x cpu -b 10 -c 1000 --modified-bases-models $mod_model_files | \
     samtools view --threads 8 -O BAM -o $output_mod_bam
 ```
 
@@ -178,29 +182,16 @@ We are not going to call both 5hmC and 5mC methylation here, but you can use the
 
 ## Inspect results of modification calling
 
-We can view the output modification data in tabular form with `modkit` as we have
-learned in previous sessions.
+We can view the output modification data using `nanalogue`.
 
 ```bash
 input_mod_bam=~/nanomod_course_outputs/human/PAM63974_pass_58881fec_60.ten_reads.mod.bam
-output_tsv=~/nanomod_course_outputs/human/PAM63974_pass_58881fec_60.ten_reads.mod.bam.tsv
-samtools index $input_mod_bam
-modkit extract full $input_mod_bam $output_tsv
+nanalogue read-info $input_mod_bam
 ```
 
-You can view a few rows of the `$output_tsv` file above.
-As we've discussed in the [session]({{ site.baseurl }}/materials/base-mod-detection)
-on modification detection in yeast, the most important columns are `read_id`,
-`forward_read_position`, and `mod_qual`.
-The reference-related columns have null values or equivalent as we have not
-aligned the file to a reference genome thus far.
-You can look up the full list of columns in the official documentation
-[here](https://nanoporetech.github.io/modkit/intro_extract.html).
-
-Do you see anything interesting in the `query_kmer` column?
-The middle of the k-mer is the base of interest on
-which modification has been called.
-What base follows the cytosine of interest?
+You can view a few reads and their mod counts above.
+You should see that all the reads are unmapped, but there are mod counts associated with each read.
+That is because we have just performed reference-independent modification calling.
 
 ## Perform alignment post-modification calling
 
@@ -260,6 +251,18 @@ input_mod_bam=PAM63974_pass_58881fec_60.ten_reads.aligned.mod.sorted.bam
 output_tsv=PAM63974_pass_58881fec_60.ten_reads.aligned.mod.sorted.bam.tsv
 modkit extract full $input_mod_bam $output_tsv
 ```
+
+You can view a few rows of the `$output_tsv` file above.
+As we've discussed in the [session]({{ site.baseurl }}/materials/base-mod-detection)
+on modification detection in yeast, the most important columns are `read_id`,
+`forward_read_position`, `ref_position`, and `mod_qual`.
+You can look up the full list of columns in the official documentation
+[here](https://nanoporetech.github.io/modkit/intro_extract.html).
+
+Do you see anything interesting in the `query_kmer` column?
+The middle of the k-mer is the base of interest on
+which modification has been called.
+What base follows the cytosine of interest?
 
 We can also inspect the file using the `samtools` and `bedtools` commands
 we have encountered throughout the course.

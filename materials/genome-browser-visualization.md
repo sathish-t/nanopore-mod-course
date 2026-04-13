@@ -77,7 +77,9 @@ You should see two tracks immediately below the reference genome on top.
 ### Colouring tracks by modification and exploring the visualization
 
 Now, we have to choose the option of 'Color by modification'.
-Please follow the instructions in the figure below.
+Please follow the instructions in the figure below and please
+note that the colour you see in your IGV view may be different
+from the green shown here.
 You may have some issues if you are using a Mac trackpad; please
 see the helpful images [here]({{ site.baseurl }}/materials/mac_trackpad_1.png)
 and [here]({{ site.baseurl }}/materials/mac_trackpad_2.png).
@@ -85,7 +87,8 @@ and [here]({{ site.baseurl }}/materials/mac_trackpad_2.png).
 ![Instructions on how to colour by modification](igv_colour_by_mod.png)
 
 Now, you can zoom in to the genome. Select any region of size around 10 to 50 kb.
-You should see something similar to the figure below.
+You should see something similar to the figure below. Please note that the actual
+colours you see may be different.
 
 ![IGV view with pileup annotation](igv_overall_view_with_pileup_annotated.png)
 

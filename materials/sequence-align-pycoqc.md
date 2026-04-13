@@ -151,12 +151,12 @@ First, we explore the available dorado basecalling models using
 dorado download --list
 ```
 
-We are going to use the model `dna_r10.4.1_e8.2_400bps_hac@v5.2.0`. You will already see the model files
+We are going to use the model `dna_r10.4.1_e8.2_400bps_hac@v5.0.0`. You will already see the model files
 at `~/nanomod_course_references/dorado_models/`, but if you don't, you can download the model files
 using the following command.
 
 ```bash
-dorado download --model dna_r10.4.1_e8.2_400bps_hac@v5.2.0 --models-directory ~/nanomod_course_references/dorado_models/
+dorado download --model dna_r10.4.1_e8.2_400bps_hac@v5.0.0 --models-directory ~/nanomod_course_references/dorado_models/
 ```
 
 We will also obtain the sacCer3 (_S. cerevisiae_) reference genome and make a corresponding fasta index file.
@@ -188,7 +188,7 @@ input_dir=~/nanomod_course_data/yeast
 output_dir=~/nanomod_course_outputs/yeast
 output_bam=~/nanomod_course_outputs/yeast/aligned_reads.sorted.bam
 ref_fasta=~/nanomod_course_references/sacCer3.fa
-model_files=~/nanomod_course_references/dorado_models/dna_r10.4.1_e8.2_400bps_hac@v5.2.0
+model_files=~/nanomod_course_references/dorado_models/dna_r10.4.1_e8.2_400bps_hac@v5.0.0
   # NOTE: A higher accuracy model file (_hac instead of _fast) above
   # leads to longer run times.
 mkdir -p $output_dir

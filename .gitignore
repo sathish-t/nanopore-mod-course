@@ -10,3 +10,6 @@ node_modules/
 *.sif
 ignore*
 course_dataset*
+tmux-exec.sh
+.pi*
+AGENTS.md

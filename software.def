@@ -24,7 +24,7 @@ Include: yum
 #
 # List of packages / tools:
 # bedtools 2.31.1
-# dorado 1.4.0
+# dorado 0.9.6
 # minimap2 2.30
 # modbamtools 0.4.8
 # modkit 0.6.1
@@ -142,14 +142,14 @@ Include: yum
     cd $pwd
 
     # --------------------------------------------------------------------------
-    # Dorado 1.4.0 (pre-built binary, CPU+CUDA bundled)
+    # Dorado 0.9.6 (pre-built binary, CPU+CUDA bundled)
     # --------------------------------------------------------------------------
     pwd=$(pwd)
     cd /opt/software
-    wget https://cdn.oxfordnanoportal.com/software/analysis/dorado-1.4.0-linux-x64.tar.gz
-    tar xzf dorado-1.4.0-linux-x64.tar.gz
-    rm -f dorado-1.4.0-linux-x64.tar.gz
-    mv dorado-1.4.0-linux-x64 dorado
+    wget https://cdn.oxfordnanoportal.com/software/analysis/dorado-0.9.6-linux-x64.tar.gz
+    tar xzf dorado-0.9.6-linux-x64.tar.gz
+    rm -f dorado-0.9.6-linux-x64.tar.gz
+    mv dorado-0.9.6-linux-x64 dorado
     cd $pwd
 
     # --------------------------------------------------------------------------

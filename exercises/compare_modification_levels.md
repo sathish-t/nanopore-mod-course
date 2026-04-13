@@ -16,9 +16,9 @@ are more modified than sequences on single molecules
 that correspond to termination sites.
 
 Your calculation should use the following files as input:
-- `~/nanomod_course_outputs/yeast/dnascent.detect.mod.sorted.bam`
-- `~/nanomod_course_outputs/yeast/origins_DNAscent_forkSense.bed`
-- `~/nanomod_course_outputs/yeast/terminations_DNAscent_forkSense.bed`
+- `~/nanomod_course_capstone/compare_mod_levels/dnascent.detect.mod.sorted.bam`
+- `~/nanomod_course_capstone/compare_mod_levels/origins_DNAscent_forkSense.bed`
+- `~/nanomod_course_capstone/compare_mod_levels/terminations_DNAscent_forkSense.bed`
 
 Although the commands you need to answer this question have been
 covered in the course, we expect this exercise to be challenging

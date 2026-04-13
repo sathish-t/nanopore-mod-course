@@ -1,61 +1,21 @@
-We've detailed a couple of solutions below.
+Ans: d1d81f8c-2958-4ab4-ae8d-00bdc3b1acd7
+
+We've detailed a solution below.
 There may be other ways of solving the problem.
 We interpret 'most modified' to mean highest total number of modifications
 in the read and present a solution below.
 However, you can interpret it as the read with the
 highest mean modification density or any other reasonable interpretation.
 
-Threshold the mod BAM file and use our custom program to add the XC tag
-with modification counts to the end of each BAM line.
-Then, use `bedtools bamtobed -i $mod_bam -tag XC` to output reads in a
-tabular format with the modification count in the fifth column.
-Then, you can use one of two ways to find the most modified reads:
-(1) You can sort by the fifth column in descending order to find the most
-modified reads.
-(2) You can use samtools filters and iteratively restrict them.
-For example: `samtools view -c -e '[XC]>100'` counts reads with more than
-100 modifications.
-Keep increasing 100 till you get only a few reads or even only one read.
-Then inspect this subset mod BAM file with `bedtools bamtobed` or `awk`
-to get the read id(s).
+The commands to find reads with more than 100 modifications is shown below;
+we've discussed this command earlier in the course.
+Just keep increasing 100 till you hit a number where there is only one read left
+(this number is around 8000).
 
-The code for this is
 ```bash
-cd ~/nanomod_course_scripts/nanopore-mod-course/code
 input_mod_bam=~/nanomod_course_data/human/bonito_calls.subset.sorted.bam
-thresholded_mod_bam= # fill suitably
-mod_bam_with_counts= # set suitably
-modkit modbam call-mods --no-filtering $input_mod_bam $thresholded_mod_bam
-samtools view -h $thresholded_mod_bam | awk -f count_mods_per_read.awk |\
-  samtools view -b -o $mod_bam_with_counts
+nanalogue read-info --tag m $input_mod_bam |  jq -r '.[] | {read_id: .read_id,
+                mod_count: (.mod_count | split(":")[1] | split(";")[0] | tonumber )}
+             | select(.mod_count > 100) | .read_id'
 ```
 
-For option (1), do
-```bash
-bedtools bamtobed -i $mod_bam_with_counts -tag XC |\
-  sort -k 5,5nr | head
-```
-
-The first few lines of the output from the above command looks like
-
-```text
-chr20   57534781        58216350        d1d81f8c-2958-4ab4-ae8d-00bdc3b1acd7    8980    +
-chr20   57583951        58181535        723a1fc6-caff-4450-85d8-935500455295    7550    -
-chr20   58753383        59037011        a253aed5-4af3-40a0-9619-b4c50d53c46a    3766    -
-chr20   58729723        58954369        e2e14405-1a6e-4da2-ac72-40b024023f96    3171    +
-chr20   59665770        59991546        907815f5-7662-4253-964c-c99fa614b98d    3163    +
-chr20   58222726        58521702        2dd1e234-159c-40a8-a872-3059c7f47ddc    3136    +
-chr20   58069561        58340998        c3ba6670-8efb-4fe4-8bdc-145f41b04fa8    3102    -
-chr20   58669122        58842617        06cc7b58-a01e-4c80-8501-6a7c5fd4a1bc    2930    +
-chr20   59308684        59556716        f9ea277a-e505-4ac1-89b1-5826218c3c7c    2927    +
-chr20   58637442        58830504        ad23871e-ad34-4e8d-8075-ca812ec86aff    2842    -
-```
-
-For option (2), keep trying the following command with ever-increasing
-number of modifications (i.e. keep increasing the number 100 in the command below)
-
-```bash
-output_bam_file= # fill suitably
-samtools view -b -e '[XC]>100' $mod_bam_with_counts > $output_bam_file
-bedtools bamtobed -i $output_bam_file -tag XC | head
-```

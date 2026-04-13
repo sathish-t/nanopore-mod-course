@@ -123,7 +123,7 @@ bedtools -version
 DNAscent --version | head -n 1
 # Version: 4.1.1
 dorado --version
-# 1.4.0+ba44a013
+# 0.9.6+0949eb8d
 minimap2 --version
 # 2.30-r1287
 modbamtools --version

@@ -27,6 +27,7 @@ modbamtools plot -r chr20:58815000-58895000 \
 
 Open `cliveome.html` in the output directory.
 You should see the screen below.
+Please note that you may see different colours than the green and the grey shown here.
 
 ![Output modBAMtools](modbamtools_screenshot.png)
 
@@ -107,7 +108,7 @@ head -n 20 "$output_dir"/pileup.bed
 cat "$output_dir"/pileup.bed | shuf | head -n 20
 ```
 
-You can find more details on what the columns mean in the modkit [documentation](https://github.com/nanoporetech/modkit).
+You can find more details on what the columns mean in the modkit [documentation](https://nanoporetech.github.io/modkit/intro_pileup.html).
 
 <details markdown="1">
 
