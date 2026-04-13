@@ -155,15 +155,6 @@ We need IGV v2.16.2 or later, which can be downloaded [here](https://igv.org/dow
 
 We need nanalogue-gui v0.2.7 or later, which can be downloaded [here](https://github.com/sathish-t/nanalogue-gui/releases).
 
-We need the latest version of the course repository.
-
-```bash
-mkdir -p ~/nanomod_course_scripts
-cd ~/nanomod_course_scripts
-# we store scripts in the above folder.
-git clone --depth 1 {{ site.github.repo }}
-```
-
 #### Directory structure
 
 We use the following four directories to store input data, scripts,
